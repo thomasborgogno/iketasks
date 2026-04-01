@@ -25,7 +25,7 @@ extension EisenhowerQuadrantX on EisenhowerQuadrant {
   String get cardTitle {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
-        return 'Fai subito';
+        return 'Priorità';
       case EisenhowerQuadrant.importantNotUrgent:
         return 'Pianifica';
       case EisenhowerQuadrant.notImportantUrgent:

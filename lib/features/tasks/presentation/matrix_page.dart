@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -54,6 +55,10 @@ class _MatrixPageState extends State<MatrixPage> {
     setState(_selectedTaskIds.clear);
   }
 
+  User? _getUser() {
+    return context.read<AuthCubit>().state.user;
+  }
+
   Future<void> _deleteSelectedTasks(BuildContext context) async {
     final selectedIds = _selectedTaskIds.toList(growable: false);
     if (selectedIds.isEmpty) return;
@@ -89,14 +94,58 @@ class _MatrixPageState extends State<MatrixPage> {
     setState(_selectedTaskIds.clear);
   }
 
+  Future<void> _openSettingsOverlay(BuildContext context) async {
+    final user = _getUser();
+    if (user == null) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Impostazioni',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 20),
+                _ProfileHeader(user: user),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      await context.read<AuthCubit>().signOut();
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Logout'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = _getUser();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           _isSelectionMode
               ? '${_selectedTaskIds.length} selezionat${_selectedTaskIds.length == 1 ? 'a' : 'e'}'
-              : 'Matrice di Eisenhower',
+              : user?.displayName?.trim().split(' ').firstOrNull == null
+              ? 'La tua matrice di Eisenhower'
+              : 'Ciao, ${user?.displayName?.trim().split(' ').first}!',
         ),
         actions: [
           if (_isSelectionMode)
@@ -117,23 +166,30 @@ class _MatrixPageState extends State<MatrixPage> {
               icon: const Icon(Icons.close),
               tooltip: 'Esci dalla selezione',
             ),
-          IconButton(
-            onPressed: () => context.read<AuthCubit>().signOut(),
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
+          BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              final user = state.user;
+              return IconButton(
+                onPressed: user == null
+                    ? null
+                    : () => _openSettingsOverlay(context),
+                tooltip: 'Profilo e impostazioni',
+                icon: _ProfileAvatar(photoUrl: user?.photoURL, radius: 20),
+              );
+            },
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _openTaskForm(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Nuova task'),
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
           BlocBuilder<CategoryCubit, CategoryState>(
             builder: (context, state) {
               final categories = state.categories;
+              if (categories.isEmpty) return const SizedBox.shrink();
               return SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
                 scrollDirection: Axis.horizontal,
@@ -257,6 +313,61 @@ class _MatrixPageState extends State<MatrixPage> {
     await showDialog<void>(
       context: context,
       builder: (_) => const _CategoryManagerDialog(),
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = user.displayName?.trim();
+    final email = user.email?.trim();
+    return Row(
+      children: [
+        _ProfileAvatar(photoUrl: user.photoURL, radius: 28),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                (name == null || name.isEmpty) ? 'Utente Google' : name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (email != null && email.isNotEmpty)
+                Text(email, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({required this.photoUrl, this.radius = 18});
+
+  final String? photoUrl;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final validPhotoUrl = photoUrl != null && photoUrl!.isNotEmpty;
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      foregroundImage: validPhotoUrl ? NetworkImage(photoUrl!) : null,
+      child: validPhotoUrl
+          ? null
+          : Icon(
+              Icons.person,
+              size: radius,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
     );
   }
 }
