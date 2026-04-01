@@ -19,16 +19,18 @@ class CategoryCubit extends Cubit<CategoryState> {
     _uid = uid;
     emit(const CategoryState.loading());
     await _subscription?.cancel();
-    _subscription = _repository.watchCategories(uid).listen(
-      (categories) => emit(CategoryState.loaded(categories)),
-      onError: (error) => emit(CategoryState.error(error.toString())),
-    );
+    _subscription = _repository
+        .watchCategories(uid)
+        .listen(
+          (categories) => emit(CategoryState.loaded(categories)),
+          onError: (error) => emit(CategoryState.error(error.toString())),
+        );
   }
 
-  Future<void> createCategory(String name) async {
+  Future<void> createCategory(String name, {String? emoji}) async {
     final uid = _uid;
     if (uid == null) return;
-    await _repository.createCategory(uid, name);
+    await _repository.createCategory(uid, name, emoji: emoji);
   }
 
   Future<void> deleteCategory(String categoryId) async {

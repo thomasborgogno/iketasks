@@ -124,19 +124,19 @@ class _MatrixPageState extends State<MatrixPage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    FilterChip(
-                      selected: _selectedCategoryId == null,
-                      onSelected: (_) => _setSelectedCategory(null),
-                      label: const Text('Tutte'),
-                    ),
-                    const SizedBox(width: 8),
                     for (final category in categories)
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
                           selected: _selectedCategoryId == category.id,
-                          onSelected: (_) => _setSelectedCategory(category.id),
-                          label: Text(category.name),
+                          onSelected: (isSelected) => _setSelectedCategory(
+                            isSelected ? category.id : null,
+                          ),
+                          label: Text(
+                            category.emoji != null && category.emoji!.isNotEmpty
+                                ? '${category.emoji} ${category.name}'
+                                : category.name,
+                          ),
                         ),
                       ),
                   ],
@@ -145,34 +145,48 @@ class _MatrixPageState extends State<MatrixPage> {
             },
           ),
           Expanded(
-            child: BlocBuilder<TaskCubit, TaskState>(
-              builder: (context, state) {
-                if (state.status == TaskStatus.loading ||
-                    state.status == TaskStatus.initial) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            child: BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, categoryState) {
+                final categoryEmojiMap = _selectedCategoryId == null
+                    ? {
+                        for (final c in categoryState.categories)
+                          c.id: c.emoji ?? '',
+                      }
+                    : null;
+                return BlocBuilder<TaskCubit, TaskState>(
+                  builder: (context, state) {
+                    if (state.status == TaskStatus.loading ||
+                        state.status == TaskStatus.initial) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                if (state.status == TaskStatus.error) {
-                  return Center(child: Text(state.errorMessage ?? 'Errore'));
-                }
+                    if (state.status == TaskStatus.error) {
+                      return Center(
+                        child: Text(state.errorMessage ?? 'Errore'),
+                      );
+                    }
 
-                final filtered = _selectedCategoryId == null
-                    ? state.tasks
-                    : state.tasks
-                          .where((t) => t.categoryId == _selectedCategoryId)
-                          .toList();
+                    final filtered = _selectedCategoryId == null
+                        ? state.tasks
+                        : state.tasks
+                              .where((t) => t.categoryId == _selectedCategoryId)
+                              .toList();
 
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  child: _MatrixGrid(
-                    tasks: filtered,
-                    onToggleTask: (task) =>
-                        context.read<TaskCubit>().toggleTask(task),
-                    onTaskTap: (task) => _openTaskForm(context, existing: task),
-                    onTaskMove: (task, targetQuadrant) => context
-                        .read<TaskCubit>()
-                        .moveTask(task, targetQuadrant),
-                  ),
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                      child: _MatrixGrid(
+                        tasks: filtered,
+                        categoryEmojiMap: categoryEmojiMap,
+                        onToggleTask: (task) =>
+                            context.read<TaskCubit>().toggleTask(task),
+                        onTaskTap: (task) =>
+                            _openTaskForm(context, existing: task),
+                        onTaskMove: (task, targetQuadrant) => context
+                            .read<TaskCubit>()
+                            .moveTask(task, targetQuadrant),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -290,26 +304,64 @@ class _CategoryManagerDialog extends StatefulWidget {
 
 class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
   late final TextEditingController _controller;
+  late final TextEditingController _emojiController;
+  late final FocusNode _emojiFocusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _emojiController = TextEditingController();
+    _emojiFocusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_emojiFocusNode);
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _emojiController.dispose();
+    _emojiFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _addCategory() async {
     final name = _controller.text.trim();
     if (name.isEmpty) return;
-
-    await context.read<CategoryCubit>().createCategory(name);
+    final emoji = _emojiController.text.trim();
+    await context.read<CategoryCubit>().createCategory(
+      name,
+      emoji: emoji.isEmpty ? null : emoji,
+    );
     if (!mounted) return;
     _controller.clear();
+    _emojiController.clear();
+  }
+
+  Future<void> _confirmDelete(TaskCategory category) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: const Text('Elimina categoria'),
+        content: Text(
+          'Eliminare "${category.name}"?\n'
+          'Le attività associate perderanno la categoria.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(d).pop(false),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(d).pop(true),
+            child: const Text('Elimina'),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete != true || !mounted) return;
+    await context.read<CategoryCubit>().deleteCategory(category.id);
   }
 
   void _closeDialog() {
@@ -326,10 +378,32 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(labelText: 'Nuova categoria'),
-              onSubmitted: (_) => _addCategory(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 64,
+                  child: TextField(
+                    controller: _emojiController,
+                    focusNode: _emojiFocusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Emoji',
+                      hintText: '🚀',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome categoria',
+                    ),
+                    onSubmitted: (_) => _addCategory(),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             FilledButton(
@@ -347,12 +421,17 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
                       final category = state.categories[index];
                       return ListTile(
                         dense: true,
+                        leading:
+                            category.emoji != null && category.emoji!.isNotEmpty
+                            ? Text(
+                                category.emoji!,
+                                style: const TextStyle(fontSize: 20),
+                              )
+                            : null,
                         title: Text(category.name),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline),
-                          onPressed: () => context
-                              .read<CategoryCubit>()
-                              .deleteCategory(category.id),
+                          onPressed: () => _confirmDelete(category),
                         ),
                       );
                     },

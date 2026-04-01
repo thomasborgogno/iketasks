@@ -5,7 +5,7 @@ import '../domain/task_category.dart';
 
 class CategoryRepository {
   CategoryRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
   static const _uuid = Uuid();
@@ -18,15 +18,18 @@ class CategoryRepository {
     return _categoriesRef(uid)
         .orderBy('name')
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => TaskCategory.fromDoc(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => TaskCategory.fromDoc(doc)).toList(),
+        );
   }
 
-  Future<void> createCategory(String uid, String name) async {
+  Future<void> createCategory(String uid, String name, {String? emoji}) async {
     final now = DateTime.now();
     final category = TaskCategory(
       id: _uuid.v4(),
       name: name,
+      emoji: emoji,
       createdAt: now,
       updatedAt: now,
     );
@@ -35,6 +38,23 @@ class CategoryRepository {
   }
 
   Future<void> deleteCategory(String uid, String categoryId) async {
-    await _categoriesRef(uid).doc(categoryId).delete();
+    final tasksRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('tasks');
+
+    final tasksInCategory = await tasksRef
+        .where('categoryId', isEqualTo: categoryId)
+        .get();
+
+    final batch = _firestore.batch();
+
+    for (final doc in tasksInCategory.docs) {
+      batch.update(doc.reference, {'categoryId': FieldValue.delete()});
+    }
+
+    batch.delete(_categoriesRef(uid).doc(categoryId));
+
+    await batch.commit();
   }
 }
