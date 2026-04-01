@@ -27,7 +27,7 @@
             android:id="@+id/q1_tasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nessuna task"
+            android:text="Nessuna attività"
             android:textColor="#333333"
             android:textSize="12sp" />
 
@@ -43,7 +43,7 @@
             android:id="@+id/q2_tasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nessuna task"
+            android:text="Nessuna attività"
             android:textColor="#333333"
             android:textSize="12sp" />
 
@@ -59,7 +59,7 @@
             android:id="@+id/q3_tasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nessuna task"
+            android:text="Nessuna attività"
             android:textColor="#333333"
             android:textSize="12sp" />
 
@@ -75,7 +75,7 @@
             android:id="@+id/q4_tasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nessuna task"
+            android:text="Nessuna attività"
             android:textColor="#333333"
             android:textSize="12sp" />
 
