@@ -255,7 +255,11 @@ class _TaskFormState extends State<_TaskForm> {
                 ...widget.categories.map(
                   (c) => DropdownMenuItem<String?>(
                     value: c.id,
-                    child: Text(c.name),
+                    child: Text(
+                      c.emoji != null && c.emoji!.isNotEmpty
+                          ? '${c.emoji} ${c.name}'
+                          : c.name,
+                    ),
                   ),
                 ),
               ],

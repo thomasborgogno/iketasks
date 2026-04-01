@@ -4,6 +4,7 @@ class _QuadrantCard extends StatelessWidget {
   const _QuadrantCard({
     required this.quadrant,
     required this.tasks,
+    required this.categoryEmojiMap,
     required this.onToggle,
     required this.onTaskTap,
     required this.onTaskMove,
@@ -11,6 +12,7 @@ class _QuadrantCard extends StatelessWidget {
 
   final EisenhowerQuadrant quadrant;
   final List<TaskItem> tasks;
+  final Map<String, String>? categoryEmojiMap;
   final ValueChanged<TaskItem> onToggle;
   final ValueChanged<TaskItem> onTaskTap;
   final void Function(TaskItem task, EisenhowerQuadrant targetQuadrant)
@@ -94,6 +96,11 @@ class _QuadrantCard extends StatelessWidget {
                                 final task = tasks[index];
                                 return _TaskTile(
                                   task: task,
+                                  categoryEmoji:
+                                      task.categoryId != null &&
+                                          categoryEmojiMap != null
+                                      ? categoryEmojiMap![task.categoryId]
+                                      : null,
                                   onToggle: () => onToggle(task),
                                   onTap: () => onTaskTap(task),
                                 );
@@ -114,12 +121,14 @@ class _QuadrantCard extends StatelessWidget {
 class _MatrixGrid extends StatelessWidget {
   const _MatrixGrid({
     required this.tasks,
+    required this.categoryEmojiMap,
     required this.onToggleTask,
     required this.onTaskTap,
     required this.onTaskMove,
   });
 
   final List<TaskItem> tasks;
+  final Map<String, String>? categoryEmojiMap;
   final ValueChanged<TaskItem> onToggleTask;
   final ValueChanged<TaskItem> onTaskTap;
   final void Function(TaskItem task, EisenhowerQuadrant targetQuadrant)
@@ -154,6 +163,7 @@ class _MatrixGrid extends StatelessWidget {
                       tasks: _tasksFor(
                         _matrixQuadrantRows[rowIndex][columnIndex],
                       ),
+                      categoryEmojiMap: categoryEmojiMap,
                       onToggle: onToggleTask,
                       onTaskTap: onTaskTap,
                       onTaskMove: onTaskMove,
@@ -176,9 +186,11 @@ class _TaskTile extends StatelessWidget {
     required this.task,
     required this.onToggle,
     required this.onTap,
+    this.categoryEmoji,
   });
 
   final TaskItem task;
+  final String? categoryEmoji;
   final VoidCallback onToggle;
   final VoidCallback onTap;
 
@@ -208,7 +220,9 @@ class _TaskTile extends StatelessWidget {
               onTap: onToggle,
             ),
             title: Text(
-              task.title,
+              categoryEmoji != null && categoryEmoji!.isNotEmpty
+                  ? '$categoryEmoji ${task.title}'
+                  : task.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
