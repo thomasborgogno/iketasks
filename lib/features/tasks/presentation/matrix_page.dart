@@ -305,24 +305,18 @@ class _CategoryManagerDialog extends StatefulWidget {
 class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
   late final TextEditingController _controller;
   late final TextEditingController _emojiController;
-  late final FocusNode _emojiFocusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
     _emojiController = TextEditingController();
-    _emojiFocusNode = FocusNode();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_emojiFocusNode);
-    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _emojiController.dispose();
-    _emojiFocusNode.dispose();
     super.dispose();
   }
 
@@ -385,11 +379,7 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
                   width: 64,
                   child: TextField(
                     controller: _emojiController,
-                    focusNode: _emojiFocusNode,
-                    decoration: const InputDecoration(
-                      labelText: 'Emoji',
-                      hintText: '🚀',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Emoji'),
                     textAlign: TextAlign.center,
                   ),
                 ),
