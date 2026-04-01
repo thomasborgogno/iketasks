@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "118668837979",
+    "project_id": "heisenhower-todo",
+    "storage_bucket": "heisenhower-todo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:118668837979:android:364baadd0fcfd912356b7e",
+        "android_client_info": {
+          "package_name": "com.eisenhower.matrix.todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "118668837979-2p4ihrg2gkl9f4tbmo5t79rmjjqo9nd5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eisenhower.matrix.todo",
+            "certificate_hash": "c6c3ac1842053f98bab7d70f9e33dd7114539cdd"
+          }
+        },
+        {
+          "client_id": "118668837979-v6t0udkcak6uhd81m18ol5r2cqi1bns6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm9NK_Yguq9gGbTDJqTMPcJzhgOqwg1hs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "118668837979-v6t0udkcak6uhd81m18ol5r2cqi1bns6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
