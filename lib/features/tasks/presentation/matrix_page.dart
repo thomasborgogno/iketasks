@@ -53,7 +53,8 @@ class _MatrixPageState extends State<MatrixPage> {
                   children: [
                     FilterChip(
                       selected: _selectedCategoryId == null,
-                      onSelected: (_) => setState(() => _selectedCategoryId = null),
+                      onSelected: (_) =>
+                          setState(() => _selectedCategoryId = null),
                       label: const Text('Tutte'),
                     ),
                     const SizedBox(width: 8),
@@ -87,8 +88,8 @@ class _MatrixPageState extends State<MatrixPage> {
                 final filtered = _selectedCategoryId == null
                     ? state.tasks
                     : state.tasks
-                        .where((t) => t.categoryId == _selectedCategoryId)
-                        .toList();
+                          .where((t) => t.categoryId == _selectedCategoryId)
+                          .toList();
 
                 if (filtered.isEmpty) {
                   return Center(
@@ -101,7 +102,9 @@ class _MatrixPageState extends State<MatrixPage> {
                 }
 
                 return GridView.count(
-                  crossAxisCount: MediaQuery.sizeOf(context).width > 900 ? 2 : 1,
+                  crossAxisCount: MediaQuery.sizeOf(context).width > 900
+                      ? 2
+                      : 1,
                   childAspectRatio: 1.15,
                   padding: const EdgeInsets.all(12),
                   crossAxisSpacing: 12,
@@ -110,12 +113,17 @@ class _MatrixPageState extends State<MatrixPage> {
                       .map(
                         (q) => _QuadrantCard(
                           quadrant: q,
-                          tasks: filtered.where((t) => t.quadrant == q).toList(),
-                          onDrop: (task) => context.read<TaskCubit>().moveTask(task, q),
-                          onToggle: (task) => context.read<TaskCubit>().toggleTask(task),
+                          tasks: filtered
+                              .where((t) => t.quadrant == q)
+                              .toList(),
+                          onDrop: (task) =>
+                              context.read<TaskCubit>().moveTask(task, q),
+                          onToggle: (task) =>
+                              context.read<TaskCubit>().toggleTask(task),
                           onDelete: (task) =>
                               context.read<TaskCubit>().deleteTask(task.id),
-                          onEdit: (task) => _openTaskForm(context, existing: task),
+                          onEdit: (task) =>
+                              _openTaskForm(context, existing: task),
                         ),
                       )
                       .toList(),
@@ -134,10 +142,7 @@ class _MatrixPageState extends State<MatrixPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _TaskForm(
-        categories: categories,
-        existing: existing,
-      ),
+      builder: (_) => _TaskForm(categories: categories, existing: existing),
     );
     if (!context.mounted) return;
 
@@ -145,93 +150,122 @@ class _MatrixPageState extends State<MatrixPage> {
 
     if (existing == null) {
       await context.read<TaskCubit>().createTask(
-            title: result.title,
-            quadrant: result.quadrant,
-            description: result.description,
-            dueDate: result.dueDate,
-            categoryId: result.categoryId,
-          );
+        title: result.title,
+        quadrant: result.quadrant,
+        description: result.description,
+        dueDate: result.dueDate,
+        categoryId: result.categoryId,
+      );
       return;
     }
 
     await context.read<TaskCubit>().updateTask(
-          existing.copyWith(
-            title: result.title,
-            description: result.description,
-            dueDate: result.dueDate,
-            categoryId: result.categoryId,
-            quadrant: result.quadrant,
-            clearDueDate: result.clearDueDate,
-            clearCategory: result.clearCategory,
-          ),
-        );
+      existing.copyWith(
+        title: result.title,
+        description: result.description,
+        dueDate: result.dueDate,
+        categoryId: result.categoryId,
+        quadrant: result.quadrant,
+        clearDueDate: result.clearDueDate,
+        clearCategory: result.clearCategory,
+      ),
+    );
   }
 
   Future<void> _openCategoryManager(BuildContext context) async {
-    final controller = TextEditingController();
     await showDialog<void>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Gestione categorie'),
-          content: SizedBox(
-            width: 420,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(
-                    labelText: 'Nuova categoria',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () async {
-                    final name = controller.text.trim();
-                    if (name.isEmpty) return;
-                    await context.read<CategoryCubit>().createCategory(name);
-                    controller.clear();
-                  },
-                  child: const Text('Aggiungi'),
-                ),
-                const SizedBox(height: 16),
-                Flexible(
-                  child: BlocBuilder<CategoryCubit, CategoryState>(
-                    builder: (context, state) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.categories.length,
-                        itemBuilder: (context, index) {
-                          final category = state.categories[index];
-                          return ListTile(
-                            dense: true,
-                            title: Text(category.name),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () => context
-                                  .read<CategoryCubit>()
-                                  .deleteCategory(category.id),
-                            ),
-                          );
-                        },
+      builder: (_) => const _CategoryManagerDialog(),
+    );
+  }
+}
+
+class _CategoryManagerDialog extends StatefulWidget {
+  const _CategoryManagerDialog();
+
+  @override
+  State<_CategoryManagerDialog> createState() => _CategoryManagerDialogState();
+}
+
+class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _addCategory() async {
+    final name = _controller.text.trim();
+    if (name.isEmpty) return;
+
+    await context.read<CategoryCubit>().createCategory(name);
+    if (!mounted) return;
+    _controller.clear();
+  }
+
+  void _closeDialog() {
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Gestione categorie'),
+      content: SizedBox(
+        width: 420,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(labelText: 'Nuova categoria'),
+              onSubmitted: (_) => _addCategory(),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _addCategory,
+              child: const Text('Aggiungi'),
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: BlocBuilder<CategoryCubit, CategoryState>(
+                builder: (context, state) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: state.categories.length,
+                    itemBuilder: (context, index) {
+                      final category = state.categories[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(category.name),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => context
+                              .read<CategoryCubit>()
+                              .deleteCategory(category.id),
+                        ),
                       );
                     },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Chiudi'),
+                  );
+                },
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: _closeDialog, child: const Text('Chiudi')),
+      ],
     );
-    controller.dispose();
   }
 }
 
@@ -273,11 +307,16 @@ class _QuadrantCard extends StatelessWidget {
       onAcceptWithDetails: (details) => onDrop(details.data),
       builder: (context, candidateData, rejectedData) {
         return Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: color.withValues(alpha: 0.4), width: 1.2),
+              border: Border.all(
+                color: color.withValues(alpha: 0.4),
+                width: 1.2,
+              ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -294,10 +333,9 @@ class _QuadrantCard extends StatelessWidget {
                 children: [
                   Text(
                     quadrant.label,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Expanded(
@@ -306,7 +344,7 @@ class _QuadrantCard extends StatelessWidget {
                         : ListView.separated(
                             itemCount: tasks.length,
                             separatorBuilder: (context, index) =>
-                              const SizedBox(height: 6),
+                                const SizedBox(height: 6),
                             itemBuilder: (context, index) {
                               final task = tasks[index];
                               return LongPressDraggable<TaskItem>(
@@ -315,8 +353,9 @@ class _QuadrantCard extends StatelessWidget {
                                   elevation: 4,
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 280),
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 280,
+                                    ),
                                     padding: const EdgeInsets.all(8),
                                     child: Text(task.title),
                                   ),
@@ -365,15 +404,14 @@ class _TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final due = task.dueDate == null ? null : DateFormat('dd/MM/yyyy').format(task.dueDate!);
+    final due = task.dueDate == null
+        ? null
+        : DateFormat('dd/MM/yyyy').format(task.dueDate!);
 
     return Card(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        leading: Checkbox(
-          value: task.completed,
-          onChanged: (_) => onToggle(),
-        ),
+        leading: Checkbox(value: task.completed, onChanged: (_) => onToggle()),
         title: Text(
           task.title,
           maxLines: 1,
@@ -440,8 +478,9 @@ class _TaskFormState extends State<_TaskForm> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.existing?.title);
-    _descriptionController =
-        TextEditingController(text: widget.existing?.description);
+    _descriptionController = TextEditingController(
+      text: widget.existing?.description,
+    );
     _quadrant = widget.existing?.quadrant ?? EisenhowerQuadrant.importantUrgent;
     _dueDate = widget.existing?.dueDate;
     _categoryId = widget.existing?.categoryId;
@@ -476,30 +515,21 @@ class _TaskFormState extends State<_TaskForm> {
             const SizedBox(height: 12),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Titolo *',
-              ),
+              decoration: const InputDecoration(labelText: 'Titolo *'),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
               minLines: 2,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Descrizione',
-              ),
+              decoration: const InputDecoration(labelText: 'Descrizione'),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<EisenhowerQuadrant>(
               initialValue: _quadrant,
               decoration: const InputDecoration(labelText: 'Quadrante *'),
               items: EisenhowerQuadrant.values
-                  .map(
-                    (q) => DropdownMenuItem(
-                      value: q,
-                      child: Text(q.label),
-                    ),
-                  )
+                  .map((q) => DropdownMenuItem(value: q, child: Text(q.label)))
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
