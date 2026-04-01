@@ -122,6 +122,37 @@ class _TaskFormState extends State<_TaskForm> {
     super.dispose();
   }
 
+  Future<void> _deleteExistingTask() async {
+    final task = widget.existing;
+    if (task == null) return;
+
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Elimina task'),
+          content: const Text('Vuoi eliminare questa task?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Annulla'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Elimina'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !mounted) return;
+
+    await context.read<TaskCubit>().deleteTask(task.id);
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.existing != null;
@@ -262,28 +293,46 @@ class _TaskFormState extends State<_TaskForm> {
               ],
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                final title = _titleController.text.trim();
-                if (title.isEmpty) return;
-
-                Navigator.pop(
-                  context,
-                  _TaskFormResult(
-                    title: title,
-                    quadrant: _quadrant,
-                    description: _descriptionController.text.trim().isEmpty
-                        ? null
-                        : _descriptionController.text.trim(),
-                    dueDate: _dueDate,
-                    categoryId: _categoryId,
-                    clearDueDate: _dueDate == null,
-                    clearCategory: _categoryId == null,
+            Row(
+              children: [
+                if (isEdit)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _deleteExistingTask,
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Elimina'),
+                    ),
                   ),
-                );
-              },
-              child: Text(isEdit ? 'Salva modifiche' : 'Crea task'),
+                if (isEdit) const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      final title = _titleController.text.trim();
+                      if (title.isEmpty) return;
+
+                      Navigator.pop(
+                        context,
+                        _TaskFormResult(
+                          title: title,
+                          quadrant: _quadrant,
+                          description:
+                              _descriptionController.text.trim().isEmpty
+                              ? null
+                              : _descriptionController.text.trim(),
+                          dueDate: _dueDate,
+                          categoryId: _categoryId,
+                          clearDueDate: _dueDate == null,
+                          clearCategory: _categoryId == null,
+                        ),
+                      );
+                    },
+                    label: Text(isEdit ? 'Salva' : 'Crea attività'),
+                    icon: const Icon(Icons.save_outlined),
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

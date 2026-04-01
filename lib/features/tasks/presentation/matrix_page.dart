@@ -29,69 +29,13 @@ class MatrixPage extends StatefulWidget {
 
 class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
-  final Set<String> _selectedTaskIds = <String>{};
-
-  bool get _isSelectionMode => _selectedTaskIds.isNotEmpty;
 
   void _setSelectedCategory(String? categoryId) {
-    setState(() {
-      _selectedCategoryId = categoryId;
-      _selectedTaskIds.clear();
-    });
-  }
-
-  void _toggleTaskSelection(String taskId) {
-    setState(() {
-      if (_selectedTaskIds.contains(taskId)) {
-        _selectedTaskIds.remove(taskId);
-      } else {
-        _selectedTaskIds.add(taskId);
-      }
-    });
-  }
-
-  void _clearSelection() {
-    if (_selectedTaskIds.isEmpty) return;
-    setState(_selectedTaskIds.clear);
+    setState(() => _selectedCategoryId = categoryId);
   }
 
   User? _getUser() {
     return context.read<AuthCubit>().state.user;
-  }
-
-  Future<void> _deleteSelectedTasks(BuildContext context) async {
-    final selectedIds = _selectedTaskIds.toList(growable: false);
-    if (selectedIds.isEmpty) return;
-
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Elimina task'),
-          content: Text(
-            selectedIds.length == 1
-                ? 'Vuoi eliminare la task selezionata?'
-                : 'Vuoi eliminare ${selectedIds.length} task selezionate?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Annulla'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Elimina'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldDelete != true || !context.mounted) return;
-
-    await context.read<TaskCubit>().deleteTasks(selectedIds);
-    if (!context.mounted) return;
-    setState(_selectedTaskIds.clear);
   }
 
   Future<void> _openSettingsOverlay(BuildContext context) async {
@@ -141,31 +85,16 @@ class _MatrixPageState extends State<MatrixPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isSelectionMode
-              ? '${_selectedTaskIds.length} selezionat${_selectedTaskIds.length == 1 ? 'a' : 'e'}'
-              : user?.displayName?.trim().split(' ').firstOrNull == null
+          user?.displayName?.trim().split(' ').firstOrNull == null
               ? 'La tua matrice di Eisenhower'
               : 'Ciao, ${user?.displayName?.trim().split(' ').first}!',
         ),
         actions: [
-          if (_isSelectionMode)
-            IconButton(
-              onPressed: () => _deleteSelectedTasks(context),
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Elimina selezionate',
-            )
-          else
-            IconButton(
-              onPressed: () => _openCategoryManager(context),
-              icon: const Icon(Icons.category_outlined),
-              tooltip: 'Categorie',
-            ),
-          if (_isSelectionMode)
-            IconButton(
-              onPressed: _clearSelection,
-              icon: const Icon(Icons.close),
-              tooltip: 'Esci dalla selezione',
-            ),
+          IconButton(
+            onPressed: () => _openCategoryManager(context),
+            icon: const Icon(Icons.category_outlined),
+            tooltip: 'Categorie',
+          ),
           BlocBuilder<AuthCubit, AuthState>(
             builder: (context, state) {
               final user = state.user;
@@ -237,18 +166,12 @@ class _MatrixPageState extends State<MatrixPage> {
                   padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                   child: _MatrixGrid(
                     tasks: filtered,
-                    selectedTaskIds: _selectedTaskIds,
-                    isSelectionMode: _isSelectionMode,
                     onToggleTask: (task) =>
                         context.read<TaskCubit>().toggleTask(task),
-                    onTaskTap: (task) {
-                      if (_isSelectionMode) {
-                        _toggleTaskSelection(task.id);
-                        return;
-                      }
-                      _openTaskForm(context, existing: task);
-                    },
-                    onTaskLongPress: (task) => _toggleTaskSelection(task.id),
+                    onTaskTap: (task) => _openTaskForm(context, existing: task),
+                    onTaskMove: (task, targetQuadrant) => context
+                        .read<TaskCubit>()
+                        .moveTask(task, targetQuadrant),
                   ),
                 );
               },
@@ -256,20 +179,6 @@ class _MatrixPageState extends State<MatrixPage> {
           ),
         ],
       ),
-      bottomNavigationBar: _isSelectionMode
-          ? SafeArea(
-              minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: FilledButton.icon(
-                onPressed: () => _deleteSelectedTasks(context),
-                icon: const Icon(Icons.delete_outline),
-                label: Text(
-                  _selectedTaskIds.length == 1
-                      ? 'Elimina task selezionata'
-                      : 'Elimina ${_selectedTaskIds.length} task selezionate',
-                ),
-              ),
-            )
-          : null,
     );
   }
 
