@@ -17,18 +17,95 @@ class MatrixPage extends StatefulWidget {
 
 class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
+  final Set<String> _selectedTaskIds = <String>{};
+
+  bool get _isSelectionMode => _selectedTaskIds.isNotEmpty;
+
+  void _setSelectedCategory(String? categoryId) {
+    setState(() {
+      _selectedCategoryId = categoryId;
+      _selectedTaskIds.clear();
+    });
+  }
+
+  void _toggleTaskSelection(String taskId) {
+    setState(() {
+      if (_selectedTaskIds.contains(taskId)) {
+        _selectedTaskIds.remove(taskId);
+      } else {
+        _selectedTaskIds.add(taskId);
+      }
+    });
+  }
+
+  void _clearSelection() {
+    if (_selectedTaskIds.isEmpty) return;
+    setState(_selectedTaskIds.clear);
+  }
+
+  Future<void> _deleteSelectedTasks(BuildContext context) async {
+    final selectedIds = _selectedTaskIds.toList(growable: false);
+    if (selectedIds.isEmpty) return;
+
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Elimina task'),
+          content: Text(
+            selectedIds.length == 1
+                ? 'Vuoi eliminare la task selezionata?'
+                : 'Vuoi eliminare ${selectedIds.length} task selezionate?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Annulla'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Elimina'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !context.mounted) return;
+
+    await context.read<TaskCubit>().deleteTasks(selectedIds);
+    if (!context.mounted) return;
+    setState(_selectedTaskIds.clear);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Matrice di Eisenhower'),
+        title: Text(
+          _isSelectionMode
+              ? '${_selectedTaskIds.length} selezionat${_selectedTaskIds.length == 1 ? 'a' : 'e'}'
+              : 'Matrice di Eisenhower',
+        ),
         actions: [
-          IconButton(
-            onPressed: () => _openCategoryManager(context),
-            icon: const Icon(Icons.category_outlined),
-            tooltip: 'Categorie',
-          ),
+          if (_isSelectionMode)
+            IconButton(
+              onPressed: () => _deleteSelectedTasks(context),
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Elimina selezionate',
+            )
+          else
+            IconButton(
+              onPressed: () => _openCategoryManager(context),
+              icon: const Icon(Icons.category_outlined),
+              tooltip: 'Categorie',
+            ),
+          if (_isSelectionMode)
+            IconButton(
+              onPressed: _clearSelection,
+              icon: const Icon(Icons.close),
+              tooltip: 'Esci dalla selezione',
+            ),
           IconButton(
             onPressed: () => context.read<AuthCubit>().signOut(),
             icon: const Icon(Icons.logout),
@@ -53,8 +130,7 @@ class _MatrixPageState extends State<MatrixPage> {
                   children: [
                     FilterChip(
                       selected: _selectedCategoryId == null,
-                      onSelected: (_) =>
-                          setState(() => _selectedCategoryId = null),
+                      onSelected: (_) => _setSelectedCategory(null),
                       label: const Text('Tutte'),
                     ),
                     const SizedBox(width: 8),
@@ -63,8 +139,7 @@ class _MatrixPageState extends State<MatrixPage> {
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
                           selected: _selectedCategoryId == category.id,
-                          onSelected: (_) =>
-                              setState(() => _selectedCategoryId = category.id),
+                          onSelected: (_) => _setSelectedCategory(category.id),
                           label: Text(category.name),
                         ),
                       ),
@@ -91,48 +166,43 @@ class _MatrixPageState extends State<MatrixPage> {
                           .where((t) => t.categoryId == _selectedCategoryId)
                           .toList();
 
-                if (filtered.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'Nessuna attivita ancora.\nPremi Nuova task per iniziare.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-
-                return GridView.count(
-                  crossAxisCount: MediaQuery.sizeOf(context).width > 900
-                      ? 2
-                      : 1,
-                  childAspectRatio: 1.15,
-                  padding: const EdgeInsets.all(12),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  children: EisenhowerQuadrant.values
-                      .map(
-                        (q) => _QuadrantCard(
-                          quadrant: q,
-                          tasks: filtered
-                              .where((t) => t.quadrant == q)
-                              .toList(),
-                          onDrop: (task) =>
-                              context.read<TaskCubit>().moveTask(task, q),
-                          onToggle: (task) =>
-                              context.read<TaskCubit>().toggleTask(task),
-                          onDelete: (task) =>
-                              context.read<TaskCubit>().deleteTask(task.id),
-                          onEdit: (task) =>
-                              _openTaskForm(context, existing: task),
-                        ),
-                      )
-                      .toList(),
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: _MatrixGrid(
+                    tasks: filtered,
+                    selectedTaskIds: _selectedTaskIds,
+                    isSelectionMode: _isSelectionMode,
+                    onToggleTask: (task) =>
+                        context.read<TaskCubit>().toggleTask(task),
+                    onTaskTap: (task) {
+                      if (_isSelectionMode) {
+                        _toggleTaskSelection(task.id);
+                        return;
+                      }
+                      _openTaskForm(context, existing: task);
+                    },
+                    onTaskLongPress: (task) => _toggleTaskSelection(task.id),
+                  ),
                 );
               },
             ),
           ),
         ],
       ),
+      bottomNavigationBar: _isSelectionMode
+          ? SafeArea(
+              minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: FilledButton.icon(
+                onPressed: () => _deleteSelectedTasks(context),
+                icon: const Icon(Icons.delete_outline),
+                label: Text(
+                  _selectedTaskIds.length == 1
+                      ? 'Elimina task selezionata'
+                      : 'Elimina ${_selectedTaskIds.length} task selezionate',
+                ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -273,18 +343,20 @@ class _QuadrantCard extends StatelessWidget {
   const _QuadrantCard({
     required this.quadrant,
     required this.tasks,
-    required this.onDrop,
+    required this.selectedTaskIds,
+    required this.isSelectionMode,
     required this.onToggle,
-    required this.onDelete,
-    required this.onEdit,
+    required this.onTaskTap,
+    required this.onTaskLongPress,
   });
 
   final EisenhowerQuadrant quadrant;
   final List<TaskItem> tasks;
-  final ValueChanged<TaskItem> onDrop;
+  final Set<String> selectedTaskIds;
+  final bool isSelectionMode;
   final ValueChanged<TaskItem> onToggle;
-  final ValueChanged<TaskItem> onDelete;
-  final ValueChanged<TaskItem> onEdit;
+  final ValueChanged<TaskItem> onTaskTap;
+  final ValueChanged<TaskItem> onTaskLongPress;
 
   Color _quadrantColor() {
     switch (quadrant) {
@@ -302,89 +374,161 @@ class _QuadrantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _quadrantColor();
-    return DragTarget<TaskItem>(
-      onWillAcceptWithDetails: (details) => details.data.quadrant != quadrant,
-      onAcceptWithDetails: (details) => onDrop(details.data),
-      builder: (context, candidateData, rejectedData) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.4), width: 1.2),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.12),
+              color.withValues(alpha: 0.03),
+            ],
           ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: color.withValues(alpha: 0.4),
-                width: 1.2,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                quadrant.cardTitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  color.withValues(alpha: 0.12),
-                  color.withValues(alpha: 0.03),
-                ],
+              const SizedBox(height: 4),
+              Text(
+                quadrant.label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    quadrant.label,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: tasks.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Vuoto',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: tasks.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 6),
+                        itemBuilder: (context, index) {
+                          final task = tasks[index];
+                          return _TaskTile(
+                            task: task,
+                            isSelected: selectedTaskIds.contains(task.id),
+                            isSelectionMode: isSelectionMode,
+                            onToggle: () => onToggle(task),
+                            onTap: () => onTaskTap(task),
+                            onLongPress: () => onTaskLongPress(task),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MatrixGrid extends StatelessWidget {
+  const _MatrixGrid({
+    required this.tasks,
+    required this.selectedTaskIds,
+    required this.isSelectionMode,
+    required this.onToggleTask,
+    required this.onTaskTap,
+    required this.onTaskLongPress,
+  });
+
+  final List<TaskItem> tasks;
+  final Set<String> selectedTaskIds;
+  final bool isSelectionMode;
+  final ValueChanged<TaskItem> onToggleTask;
+  final ValueChanged<TaskItem> onTaskTap;
+  final ValueChanged<TaskItem> onTaskLongPress;
+
+  List<TaskItem> _tasksFor(EisenhowerQuadrant quadrant) {
+    return tasks.where((task) => task.quadrant == quadrant).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const cardSpacing = 8.0;
+    return Expanded(
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _QuadrantCard(
+                    quadrant: EisenhowerQuadrant.importantUrgent,
+                    tasks: _tasksFor(EisenhowerQuadrant.importantUrgent),
+                    selectedTaskIds: selectedTaskIds,
+                    isSelectionMode: isSelectionMode,
+                    onToggle: onToggleTask,
+                    onTaskTap: onTaskTap,
+                    onTaskLongPress: onTaskLongPress,
                   ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: tasks.isEmpty
-                        ? const Center(child: Text('Vuoto'))
-                        : ListView.separated(
-                            itemCount: tasks.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 6),
-                            itemBuilder: (context, index) {
-                              final task = tasks[index];
-                              return LongPressDraggable<TaskItem>(
-                                data: task,
-                                feedback: Material(
-                                  elevation: 4,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      maxWidth: 280,
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(task.title),
-                                  ),
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: 0.3,
-                                  child: _TaskTile(
-                                    task: task,
-                                    onToggle: () => onToggle(task),
-                                    onEdit: () => onEdit(task),
-                                    onDelete: () => onDelete(task),
-                                  ),
-                                ),
-                                child: _TaskTile(
-                                  task: task,
-                                  onToggle: () => onToggle(task),
-                                  onEdit: () => onEdit(task),
-                                  onDelete: () => onDelete(task),
-                                ),
-                              );
-                            },
-                          ),
+                ),
+                const SizedBox(width: cardSpacing),
+                Expanded(
+                  child: _QuadrantCard(
+                    quadrant: EisenhowerQuadrant.importantNotUrgent,
+                    tasks: _tasksFor(EisenhowerQuadrant.importantNotUrgent),
+                    selectedTaskIds: selectedTaskIds,
+                    isSelectionMode: isSelectionMode,
+                    onToggle: onToggleTask,
+                    onTaskTap: onTaskTap,
+                    onTaskLongPress: onTaskLongPress,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+          const SizedBox(height: cardSpacing),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _QuadrantCard(
+                    quadrant: EisenhowerQuadrant.notImportantUrgent,
+                    tasks: _tasksFor(EisenhowerQuadrant.notImportantUrgent),
+                    selectedTaskIds: selectedTaskIds,
+                    isSelectionMode: isSelectionMode,
+                    onToggle: onToggleTask,
+                    onTaskTap: onTaskTap,
+                    onTaskLongPress: onTaskLongPress,
+                  ),
+                ),
+                const SizedBox(width: cardSpacing),
+                Expanded(
+                  child: _QuadrantCard(
+                    quadrant: EisenhowerQuadrant.notImportantNotUrgent,
+                    tasks: _tasksFor(EisenhowerQuadrant.notImportantNotUrgent),
+                    selectedTaskIds: selectedTaskIds,
+                    isSelectionMode: isSelectionMode,
+                    onToggle: onToggleTask,
+                    onTaskTap: onTaskTap,
+                    onTaskLongPress: onTaskLongPress,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -392,45 +536,76 @@ class _QuadrantCard extends StatelessWidget {
 class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.task,
+    required this.isSelected,
+    required this.isSelectionMode,
     required this.onToggle,
-    required this.onEdit,
-    required this.onDelete,
+    required this.onTap,
+    required this.onLongPress,
   });
 
   final TaskItem task;
+  final bool isSelected;
+  final bool isSelectionMode;
   final VoidCallback onToggle;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
     final due = task.dueDate == null
         ? null
         : DateFormat('dd/MM/yyyy').format(task.dueDate!);
+    final selectedColor = Theme.of(
+      context,
+    ).colorScheme.primaryContainer.withValues(alpha: 0.9);
 
-    return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        leading: Checkbox(value: task.completed, onChanged: (_) => onToggle()),
-        title: Text(
-          task.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            decoration: task.completed ? TextDecoration.lineThrough : null,
-            fontWeight: FontWeight.w600,
-          ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: isSelected ? selectedColor : null,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
-        subtitle: due == null ? null : Text('Scadenza: $due'),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'edit') onEdit();
-            if (value == 'delete') onDelete();
-          },
-          itemBuilder: (context) => const [
-            PopupMenuItem(value: 'edit', child: Text('Modifica')),
-            PopupMenuItem(value: 'delete', child: Text('Elimina')),
-          ],
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 2,
+            ),
+            leading: Checkbox(
+              value: task.completed,
+              onChanged: (_) => onToggle(),
+            ),
+            title: Text(
+              task.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                decoration: task.completed ? TextDecoration.lineThrough : null,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: due == null ? null : Text('Scadenza: $due'),
+            trailing: isSelectionMode || isSelected
+                ? Icon(
+                    isSelected
+                        ? Icons.check_circle
+                        : Icons.radio_button_unchecked,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline,
+                  )
+                : null,
+          ),
         ),
       ),
     );
@@ -529,7 +704,9 @@ class _TaskFormState extends State<_TaskForm> {
               initialValue: _quadrant,
               decoration: const InputDecoration(labelText: 'Quadrante *'),
               items: EisenhowerQuadrant.values
-                  .map((q) => DropdownMenuItem(value: q, child: Text(q.label)))
+                  .map(
+                    (q) => DropdownMenuItem(value: q, child: Text(q.cardTitle)),
+                  )
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
