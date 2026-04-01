@@ -120,7 +120,7 @@ class _MatrixPageState extends State<MatrixPage> {
               final categories = state.categories;
               if (categories.isEmpty) return const SizedBox.shrink();
               return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [

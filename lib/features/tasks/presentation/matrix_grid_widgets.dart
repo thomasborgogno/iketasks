@@ -21,6 +21,7 @@ class _QuadrantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _quadrantColor(quadrant);
+    final radius = BorderRadius.circular(26);
     return DragTarget<TaskItem>(
       onWillAcceptWithDetails: (details) => details.data.quadrant != quadrant,
       onAcceptWithDetails: (details) => onTaskMove(details.data, quadrant),
@@ -30,7 +31,7 @@ class _QuadrantCard extends StatelessWidget {
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOut,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: radius,
             boxShadow: isActive
                 ? [
                     BoxShadow(
@@ -42,73 +43,59 @@ class _QuadrantCard extends StatelessWidget {
                 : null,
           ),
           child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: color.withValues(alpha: isActive ? 0.75 : 0.4),
-                  width: isActive ? 2 : 1.2,
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    color.withValues(alpha: isActive ? 0.2 : 0.12),
-                    color.withValues(alpha: 0.03),
-                  ],
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+            shape: RoundedRectangleBorder(borderRadius: radius),
+            color: isActive ? color.withValues(alpha: 0.001) : null,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Text(
                       quadrant.cardTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
+                        color: color,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      quadrant.label,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    quadrant.label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 2),
-                    Expanded(
-                      child: tasks.isEmpty
-                          ? Center(
-                              child: Text(
-                                'Vuoto',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            )
-                          : ListView.separated(
-                              itemCount: tasks.length,
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 0),
-                              itemBuilder: (context, index) {
-                                final task = tasks[index];
-                                return _TaskTile(
-                                  task: task,
-                                  categoryEmoji:
-                                      task.categoryId != null &&
-                                          categoryEmojiMap != null
-                                      ? categoryEmojiMap![task.categoryId]
-                                      : null,
-                                  onToggle: () => onToggle(task),
-                                  onTap: () => onTaskTap(task),
-                                );
-                              },
+                  ),
+                  const SizedBox(height: 2),
+                  Expanded(
+                    child: tasks.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Vuoto',
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
-                    ),
-                  ],
-                ),
+                          )
+                        : ListView.separated(
+                            itemCount: tasks.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 0),
+                            itemBuilder: (context, index) {
+                              final task = tasks[index];
+                              return _TaskTile(
+                                task: task,
+                                categoryEmoji:
+                                    task.categoryId != null &&
+                                        categoryEmojiMap != null
+                                    ? categoryEmojiMap![task.categoryId]
+                                    : null,
+                                onToggle: () => onToggle(task),
+                                onTap: () => onTaskTap(task),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
           ),
