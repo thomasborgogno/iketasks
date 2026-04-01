@@ -407,7 +407,7 @@ class _QuadrantCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               Expanded(
                 child: tasks.isEmpty
                     ? Center(
@@ -419,7 +419,7 @@ class _QuadrantCard extends StatelessWidget {
                     : ListView.separated(
                         itemCount: tasks.length,
                         separatorBuilder: (context, index) =>
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 0),
                         itemBuilder: (context, index) {
                           final task = tasks[index];
                           return _TaskTile(
@@ -465,70 +465,68 @@ class _MatrixGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const cardSpacing = 8.0;
-    return Expanded(
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _QuadrantCard(
-                    quadrant: EisenhowerQuadrant.importantUrgent,
-                    tasks: _tasksFor(EisenhowerQuadrant.importantUrgent),
-                    selectedTaskIds: selectedTaskIds,
-                    isSelectionMode: isSelectionMode,
-                    onToggle: onToggleTask,
-                    onTaskTap: onTaskTap,
-                    onTaskLongPress: onTaskLongPress,
-                  ),
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: _QuadrantCard(
+                  quadrant: EisenhowerQuadrant.importantUrgent,
+                  tasks: _tasksFor(EisenhowerQuadrant.importantUrgent),
+                  selectedTaskIds: selectedTaskIds,
+                  isSelectionMode: isSelectionMode,
+                  onToggle: onToggleTask,
+                  onTaskTap: onTaskTap,
+                  onTaskLongPress: onTaskLongPress,
                 ),
-                const SizedBox(width: cardSpacing),
-                Expanded(
-                  child: _QuadrantCard(
-                    quadrant: EisenhowerQuadrant.importantNotUrgent,
-                    tasks: _tasksFor(EisenhowerQuadrant.importantNotUrgent),
-                    selectedTaskIds: selectedTaskIds,
-                    isSelectionMode: isSelectionMode,
-                    onToggle: onToggleTask,
-                    onTaskTap: onTaskTap,
-                    onTaskLongPress: onTaskLongPress,
-                  ),
+              ),
+              const SizedBox(width: cardSpacing),
+              Expanded(
+                child: _QuadrantCard(
+                  quadrant: EisenhowerQuadrant.importantNotUrgent,
+                  tasks: _tasksFor(EisenhowerQuadrant.importantNotUrgent),
+                  selectedTaskIds: selectedTaskIds,
+                  isSelectionMode: isSelectionMode,
+                  onToggle: onToggleTask,
+                  onTaskTap: onTaskTap,
+                  onTaskLongPress: onTaskLongPress,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: cardSpacing),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _QuadrantCard(
-                    quadrant: EisenhowerQuadrant.notImportantUrgent,
-                    tasks: _tasksFor(EisenhowerQuadrant.notImportantUrgent),
-                    selectedTaskIds: selectedTaskIds,
-                    isSelectionMode: isSelectionMode,
-                    onToggle: onToggleTask,
-                    onTaskTap: onTaskTap,
-                    onTaskLongPress: onTaskLongPress,
-                  ),
+        ),
+        const SizedBox(height: cardSpacing),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: _QuadrantCard(
+                  quadrant: EisenhowerQuadrant.notImportantUrgent,
+                  tasks: _tasksFor(EisenhowerQuadrant.notImportantUrgent),
+                  selectedTaskIds: selectedTaskIds,
+                  isSelectionMode: isSelectionMode,
+                  onToggle: onToggleTask,
+                  onTaskTap: onTaskTap,
+                  onTaskLongPress: onTaskLongPress,
                 ),
-                const SizedBox(width: cardSpacing),
-                Expanded(
-                  child: _QuadrantCard(
-                    quadrant: EisenhowerQuadrant.notImportantNotUrgent,
-                    tasks: _tasksFor(EisenhowerQuadrant.notImportantNotUrgent),
-                    selectedTaskIds: selectedTaskIds,
-                    isSelectionMode: isSelectionMode,
-                    onToggle: onToggleTask,
-                    onTaskTap: onTaskTap,
-                    onTaskLongPress: onTaskLongPress,
-                  ),
+              ),
+              const SizedBox(width: cardSpacing),
+              Expanded(
+                child: _QuadrantCard(
+                  quadrant: EisenhowerQuadrant.notImportantNotUrgent,
+                  tasks: _tasksFor(EisenhowerQuadrant.notImportantNotUrgent),
+                  selectedTaskIds: selectedTaskIds,
+                  isSelectionMode: isSelectionMode,
+                  onToggle: onToggleTask,
+                  onTaskTap: onTaskTap,
+                  onTaskLongPress: onTaskLongPress,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -564,11 +562,6 @@ class _TaskTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: isSelected ? selectedColor : null,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).dividerColor.withValues(alpha: 0.2),
-        ),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -577,13 +570,16 @@ class _TaskTile extends StatelessWidget {
           onTap: onTap,
           onLongPress: onLongPress,
           child: ListTile(
+            dense: true,
+            visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 2,
+              horizontal: 0,
+              vertical: 0,
             ),
-            leading: Checkbox(
-              value: task.completed,
-              onChanged: (_) => onToggle(),
+            horizontalTitleGap: 10,
+            leading: _TaskCompletionCircle(
+              completed: task.completed,
+              onTap: onToggle,
             ),
             title: Text(
               task.title,
@@ -595,16 +591,54 @@ class _TaskTile extends StatelessWidget {
               ),
             ),
             subtitle: due == null ? null : Text('Scadenza: $due'),
-            trailing: isSelectionMode || isSelected
-                ? Icon(
-                    isSelected
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline,
-                  )
-                : null,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TaskCompletionCircle extends StatelessWidget {
+  const _TaskCompletionCircle({required this.completed, required this.onTap});
+
+  final bool completed;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.outline;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 26,
+        height: 30,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: completed ? color : Colors.transparent,
+              border: Border.all(color: color, width: 1.8),
+            ),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: completed
+                  ? const Icon(
+                      Icons.check,
+                      key: ValueKey('checked'),
+                      size: 14,
+                      color: Colors.white,
+                    )
+                  : const SizedBox(key: ValueKey('unchecked')),
+            ),
           ),
         ),
       ),
