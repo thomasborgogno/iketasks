@@ -12,13 +12,26 @@ extension EisenhowerQuadrantX on EisenhowerQuadrant {
   String get label {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
-        return 'Importante e Urgente';
+        return 'Importante, urgente';
       case EisenhowerQuadrant.importantNotUrgent:
-        return 'Importante ma Non Urgente';
+        return 'Importante, non urgente';
       case EisenhowerQuadrant.notImportantUrgent:
-        return 'Non Importante ma Urgente';
+        return 'Non importante, urgente';
       case EisenhowerQuadrant.notImportantNotUrgent:
-        return 'Non Importante e Non Urgente';
+        return 'Non importante, non urgente';
+    }
+  }
+
+  String get cardTitle {
+    switch (this) {
+      case EisenhowerQuadrant.importantUrgent:
+        return 'Fai subito';
+      case EisenhowerQuadrant.importantNotUrgent:
+        return 'Pianifica';
+      case EisenhowerQuadrant.notImportantUrgent:
+        return 'Delega';
+      case EisenhowerQuadrant.notImportantNotUrgent:
+        return 'Elimina';
     }
   }
 
@@ -117,23 +130,27 @@ class TaskItem extends Equatable {
       description: data['description'] as String?,
       dueDate: (data['dueDate'] as Timestamp?)?.toDate(),
       categoryId: data['categoryId'] as String?,
-      quadrant: EisenhowerQuadrantX.fromValue((data['quadrant'] as String?) ?? 'q1'),
+      quadrant: EisenhowerQuadrantX.fromValue(
+        (data['quadrant'] as String?) ?? 'q1',
+      ),
       completed: (data['completed'] as bool?) ?? false,
-      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
-      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
+      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
     );
   }
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        dueDate,
-        categoryId,
-        quadrant,
-        completed,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    title,
+    description,
+    dueDate,
+    categoryId,
+    quadrant,
+    completed,
+    createdAt,
+    updatedAt,
+  ];
 }

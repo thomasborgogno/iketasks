@@ -89,6 +89,12 @@ class TaskCubit extends Cubit<TaskState> {
     await _repository.deleteTask(uid, taskId);
   }
 
+  Future<void> deleteTasks(Iterable<String> taskIds) async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _repository.deleteTasks(uid, taskIds);
+  }
+
   @override
   Future<void> close() async {
     await _taskSubscription?.cancel();

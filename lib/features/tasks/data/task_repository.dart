@@ -5,7 +5,7 @@ import '../domain/task_item.dart';
 
 class TaskRepository {
   TaskRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
   static const _uuid = Uuid();
@@ -18,12 +18,16 @@ class TaskRepository {
     return _tasksRef(uid)
         .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => TaskItem.fromDoc(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => TaskItem.fromDoc(doc)).toList(),
+        );
   }
 
   Future<void> upsertTask(String uid, TaskItem task) async {
-    await _tasksRef(uid).doc(task.id).set(task.toMap(), SetOptions(merge: true));
+    await _tasksRef(
+      uid,
+    ).doc(task.id).set(task.toMap(), SetOptions(merge: true));
   }
 
   Future<void> createTask(
@@ -52,5 +56,16 @@ class TaskRepository {
 
   Future<void> deleteTask(String uid, String taskId) async {
     await _tasksRef(uid).doc(taskId).delete();
+  }
+
+  Future<void> deleteTasks(String uid, Iterable<String> taskIds) async {
+    final ids = taskIds.toSet();
+    if (ids.isEmpty) return;
+
+    final batch = _firestore.batch();
+    for (final taskId in ids) {
+      batch.delete(_tasksRef(uid).doc(taskId));
+    }
+    await batch.commit();
   }
 }
