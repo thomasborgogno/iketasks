@@ -1,3 +1,4 @@
+import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -498,18 +499,5 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
         TextButton(onPressed: _closeDialog, child: const Text('Chiudi')),
       ],
     );
-  }
-}
-
-Color _quadrantColor(EisenhowerQuadrant quadrant) {
-  switch (quadrant) {
-    case EisenhowerQuadrant.importantUrgent:
-      return const Color(0xFFD7263D);
-    case EisenhowerQuadrant.importantNotUrgent:
-      return const Color(0xFF1B998B);
-    case EisenhowerQuadrant.notImportantUrgent:
-      return const Color(0xFFF4A261);
-    case EisenhowerQuadrant.notImportantNotUrgent:
-      return const Color(0xFF457B9D);
   }
 }

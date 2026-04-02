@@ -86,7 +86,7 @@ class _TaskFormState extends State<_TaskForm> {
   }
 
   Widget _quadrantChoiceChip(EisenhowerQuadrant quadrant) {
-    final chipColor = _quadrantColor(quadrant);
+    final chipColor = quadrantColor(quadrant);
     final selected = _quadrant == quadrant;
 
     return ChoiceChip(

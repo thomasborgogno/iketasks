@@ -22,7 +22,7 @@ class _QuadrantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _quadrantColor(quadrant);
+    final color = quadrantColor(quadrant);
     final radius = BorderRadius.circular(26);
     return DragTarget<TaskItem>(
       onWillAcceptWithDetails: (details) => details.data.quadrant != quadrant,
