@@ -8,6 +8,7 @@ class _QuadrantCard extends StatelessWidget {
     required this.onToggle,
     required this.onTaskTap,
     required this.onTaskMove,
+    this.scrollable = true,
   });
 
   final EisenhowerQuadrant quadrant;
@@ -17,6 +18,7 @@ class _QuadrantCard extends StatelessWidget {
   final ValueChanged<TaskItem> onTaskTap;
   final void Function(TaskItem task, EisenhowerQuadrant targetQuadrant)
   onTaskMove;
+  final bool scrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -68,33 +70,59 @@ class _QuadrantCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Expanded(
-                    child: tasks.isEmpty
-                        ? Center(
-                            child: Text(
-                              'Vuoto',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                  if (scrollable)
+                    Expanded(
+                      child: tasks.isEmpty
+                          ? Center(
+                              child: Text(
+                                'Vuoto',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            )
+                          : ListView.separated(
+                              itemCount: tasks.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 0),
+                              itemBuilder: (context, index) {
+                                final task = tasks[index];
+                                return _TaskTile(
+                                  task: task,
+                                  categoryEmoji:
+                                      task.categoryId != null &&
+                                          categoryEmojiMap != null
+                                      ? categoryEmojiMap![task.categoryId]
+                                      : null,
+                                  onToggle: () => onToggle(task),
+                                  onTap: () => onTaskTap(task),
+                                );
+                              },
                             ),
-                          )
-                        : ListView.separated(
-                            itemCount: tasks.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 0),
-                            itemBuilder: (context, index) {
-                              final task = tasks[index];
-                              return _TaskTile(
-                                task: task,
-                                categoryEmoji:
-                                    task.categoryId != null &&
-                                        categoryEmojiMap != null
-                                    ? categoryEmojiMap![task.categoryId]
-                                    : null,
-                                onToggle: () => onToggle(task),
-                                onTap: () => onTaskTap(task),
-                              );
-                            },
-                          ),
-                  ),
+                    )
+                  else if (tasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Center(
+                        child: Text(
+                          'Vuoto',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    )
+                  else
+                    Column(
+                      children: tasks.map((task) {
+                        return _TaskTile(
+                          task: task,
+                          categoryEmoji:
+                              task.categoryId != null &&
+                                  categoryEmojiMap != null
+                              ? categoryEmojiMap![task.categoryId]
+                              : null,
+                          onToggle: () => onToggle(task),
+                          onTap: () => onTaskTap(task),
+                        );
+                      }).toList(),
+                    ),
                 ],
               ),
             ),
@@ -168,6 +196,55 @@ class _MatrixGrid extends StatelessWidget {
   }
 }
 
+class _StackedMatrix extends StatelessWidget {
+  const _StackedMatrix({
+    required this.tasks,
+    required this.categoryEmojiMap,
+    required this.onToggleTask,
+    required this.onTaskTap,
+    required this.onTaskMove,
+  });
+
+  final List<TaskItem> tasks;
+  final Map<String, String>? categoryEmojiMap;
+  final ValueChanged<TaskItem> onToggleTask;
+  final ValueChanged<TaskItem> onTaskTap;
+  final void Function(TaskItem task, EisenhowerQuadrant targetQuadrant)
+  onTaskMove;
+
+  List<TaskItem> _tasksFor(EisenhowerQuadrant quadrant) {
+    return tasks.where((task) => task.quadrant == quadrant).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const cardSpacing = 8.0;
+    final quadrants = [
+      EisenhowerQuadrant.importantUrgent,
+      EisenhowerQuadrant.importantNotUrgent,
+      EisenhowerQuadrant.notImportantUrgent,
+      EisenhowerQuadrant.notImportantNotUrgent,
+    ];
+    return ListView.separated(
+      padding: EdgeInsets.zero,
+      itemCount: quadrants.length,
+      separatorBuilder: (_, _) => const SizedBox(height: cardSpacing),
+      itemBuilder: (context, index) {
+        final quadrant = quadrants[index];
+        return _QuadrantCard(
+          quadrant: quadrant,
+          tasks: _tasksFor(quadrant),
+          categoryEmojiMap: categoryEmojiMap,
+          onToggle: onToggleTask,
+          onTaskTap: onTaskTap,
+          onTaskMove: onTaskMove,
+          scrollable: false,
+        );
+      },
+    );
+  }
+}
+
 class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.task,
@@ -201,20 +278,20 @@ class _TaskTile extends StatelessWidget {
               horizontal: 0,
               vertical: 0,
             ),
-            horizontalTitleGap: 10,
-            leading: _TaskCompletionCircle(
+            horizontalTitleGap: 8,
+            leading: TaskCompletionCircle(
               completed: task.completed,
+              categoryEmoji: categoryEmoji,
               onTap: onToggle,
             ),
             title: Text(
-              categoryEmoji != null && categoryEmoji!.isNotEmpty
-                  ? '$categoryEmoji ${task.title}'
-                  : task.title,
-              maxLines: 1,
+              task.title,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                height: 1.2,
                 decoration: task.completed ? TextDecoration.lineThrough : null,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
             subtitle: due == null ? null : Text('Scadenza: $due'),
@@ -260,54 +337,6 @@ class _DraggedTaskPreview extends StatelessWidget {
         style: Theme.of(
           context,
         ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-}
-
-class _TaskCompletionCircle extends StatelessWidget {
-  const _TaskCompletionCircle({required this.completed, required this.onTap});
-
-  final bool completed;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.outline;
-
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 26,
-        height: 30,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut,
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: completed ? color : Colors.transparent,
-              border: Border.all(color: color, width: 1.8),
-            ),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
-              transitionBuilder: (child, animation) =>
-                  ScaleTransition(scale: animation, child: child),
-              child: completed
-                  ? const Icon(
-                      Icons.check,
-                      key: ValueKey('checked'),
-                      size: 14,
-                      color: Colors.white,
-                    )
-                  : const SizedBox(key: ValueKey('unchecked')),
-            ),
-          ),
-        ),
       ),
     );
   }

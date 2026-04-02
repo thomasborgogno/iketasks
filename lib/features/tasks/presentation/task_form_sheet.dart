@@ -244,26 +244,40 @@ class _TaskFormState extends State<_TaskForm> {
               ],
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String?>(
-              initialValue: _categoryId,
-              decoration: const InputDecoration(labelText: 'Categoria'),
-              items: [
-                const DropdownMenuItem<String?>(
-                  value: null,
-                  child: Text('Nessuna categoria'),
-                ),
-                ...widget.categories.map(
-                  (c) => DropdownMenuItem<String?>(
-                    value: c.id,
-                    child: Text(
-                      c.emoji != null && c.emoji!.isNotEmpty
-                          ? '${c.emoji} ${c.name}'
-                          : c.name,
+            Text('Categoria', style: Theme.of(context).textTheme.labelMedium),
+            const SizedBox(height: 8),
+            BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, categoryState) {
+                final categories = categoryState.categories;
+                if (categories.isEmpty) {
+                  return TextButton.icon(
+                    onPressed: () => showDialog<void>(
+                      context: context,
+                      builder: (_) => const _CategoryManagerDialog(),
                     ),
-                  ),
-                ),
-              ],
-              onChanged: (value) => setState(() => _categoryId = value),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Crea una categoria'),
+                  );
+                }
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ...categories.map((c) {
+                      final label = c.emoji != null && c.emoji!.isNotEmpty
+                          ? '${c.emoji} ${c.name}'
+                          : c.name;
+                      return ChoiceChip(
+                        label: Text(label),
+                        selected: _categoryId == c.id,
+                        onSelected: (_) => setState(
+                          () => _categoryId = _categoryId == c.id ? null : c.id,
+                        ),
+                      );
+                    }),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             Row(

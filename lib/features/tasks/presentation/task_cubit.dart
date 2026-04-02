@@ -21,6 +21,7 @@ class TaskCubit extends Cubit<TaskState> {
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   String? _uid;
+  final Set<String> _justCompletedIds = {};
 
   Future<void> bindUser(String uid) async {
     _uid = uid;
@@ -28,15 +29,23 @@ class TaskCubit extends Cubit<TaskState> {
 
     await _taskSubscription?.cancel();
     _taskSubscription = _repository.watchTasks(uid).listen((tasks) async {
-      final sorted = [...tasks]
-        ..sort((a, b) {
-          if (a.dueDate == null && b.dueDate == null) return 0;
-          if (a.dueDate == null) return 1;
-          if (b.dueDate == null) return -1;
-          return a.dueDate!.compareTo(b.dueDate!);
-        });
-      emit(TaskState.loaded(sorted));
-      await _widgetSyncService.pushTasks(sorted);
+      final justCompleted = Set<String>.from(_justCompletedIds);
+      _justCompletedIds.clear();
+
+      final visible =
+          tasks
+              .where((t) => !t.completed || justCompleted.contains(t.id))
+              .toList()
+            ..sort((a, b) {
+              if (a.dueDate == null && b.dueDate == null) return 0;
+              if (a.dueDate == null) return 1;
+              if (b.dueDate == null) return -1;
+              return a.dueDate!.compareTo(b.dueDate!);
+            });
+
+      final allIncompleteForWidget = tasks.where((t) => !t.completed).toList();
+      emit(TaskState.loaded(visible));
+      await _widgetSyncService.pushTasks(allIncompleteForWidget);
     }, onError: (error) => emit(TaskState.error(error.toString())));
 
     await _connectivitySubscription?.cancel();
@@ -76,6 +85,9 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   Future<void> toggleTask(TaskItem task) async {
+    if (!task.completed) {
+      _justCompletedIds.add(task.id);
+    }
     await updateTask(task.copyWith(completed: !task.completed));
   }
 

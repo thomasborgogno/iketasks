@@ -16,6 +16,17 @@ class TaskRepository {
 
   Stream<List<TaskItem>> watchTasks(String uid) {
     return _tasksRef(uid)
+        .orderBy('title')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => TaskItem.fromDoc(doc)).toList(),
+        );
+  }
+
+  Stream<List<TaskItem>> watchCompletedTasks(String uid) {
+    return _tasksRef(uid)
+        .where('completed', isEqualTo: true)
         .orderBy('updatedAt', descending: true)
         .snapshots()
         .map(
