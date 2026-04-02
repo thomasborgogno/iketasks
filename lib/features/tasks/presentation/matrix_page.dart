@@ -1,6 +1,7 @@
 import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -11,6 +12,9 @@ import '../domain/task_item.dart';
 import 'completed_page.dart';
 import 'task_cubit.dart';
 import 'task_completion_circle.dart';
+
+import '../../google_tasks/data/google_tasks_repository.dart';
+import '../../google_tasks/presentation/google_tasks_select_page.dart';
 
 part 'matrix_grid_widgets.dart';
 part 'task_form_sheet.dart';
@@ -98,6 +102,23 @@ class _MatrixPageState extends State<MatrixPage> {
                     );
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.cloud_download_outlined),
+                  title: const Text('Importa da Google Tasks'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (pageContext) => RepositoryProvider.value(
+                          value: pageContext.read<GoogleTasksRepository>(),
+                          child: const GoogleTasksImportPage(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
@@ -238,9 +259,9 @@ class _MatrixPageState extends State<MatrixPage> {
                             tasks: filtered,
                             categoryEmojiMap: categoryEmojiMap,
                             onToggleTask: (task) =>
-                            context.read<TaskCubit>().toggleTask(task),
-                        onTaskTap: (task) =>
-                            _openTaskForm(context, existing: task),
+                                context.read<TaskCubit>().toggleTask(task),
+                            onTaskTap: (task) =>
+                                _openTaskForm(context, existing: task),
                             onTaskMove: (task, targetQuadrant) => context
                                 .read<TaskCubit>()
                                 .moveTask(task, targetQuadrant),
