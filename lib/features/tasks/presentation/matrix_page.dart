@@ -7,10 +7,14 @@ import '../../auth/presentation/auth_cubit.dart';
 import '../../categories/domain/task_category.dart';
 import '../../categories/presentation/category_cubit.dart';
 import '../domain/task_item.dart';
+import 'completed_page.dart';
 import 'task_cubit.dart';
+import 'task_completion_circle.dart';
 
 part 'matrix_grid_widgets.dart';
 part 'task_form_sheet.dart';
+
+enum _LayoutMode { grid, stacked }
 
 const List<List<EisenhowerQuadrant>> _matrixQuadrantRows = [
   [EisenhowerQuadrant.importantUrgent, EisenhowerQuadrant.importantNotUrgent],
@@ -29,9 +33,30 @@ class MatrixPage extends StatefulWidget {
 
 class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
+  _LayoutMode _layoutMode = _LayoutMode.grid;
+
+  static const _widgetChannel = MethodChannel('com.eisenhower.matrix/widget');
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetChannel.setMethodCallHandler((call) async {
+      if (call.method == 'openAddTask' && mounted) {
+        await _openTaskForm(context);
+      }
+    });
+  }
 
   void _setSelectedCategory(String? categoryId) {
     setState(() => _selectedCategoryId = categoryId);
+  }
+
+  void _toggleLayoutMode() {
+    setState(() {
+      _layoutMode = _layoutMode == _LayoutMode.grid
+          ? _LayoutMode.stacked
+          : _LayoutMode.grid;
+    });
   }
 
   User? _getUser() {
@@ -59,6 +84,19 @@ class _MatrixPageState extends State<MatrixPage> {
                 const SizedBox(height: 20),
                 _ProfileHeader(user: user),
                 const SizedBox(height: 20),
+                ListTile(
+                  leading: const Icon(Icons.check_circle_outline),
+                  title: const Text('Attività completate'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => CompletedPage(uid: user.uid),
+                      ),
+                    );
+                  },
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
@@ -90,6 +128,17 @@ class _MatrixPageState extends State<MatrixPage> {
               : 'Ciao, ${user?.displayName?.trim().split(' ').first}!',
         ),
         actions: [
+          IconButton(
+            onPressed: _toggleLayoutMode,
+            icon: Icon(
+              _layoutMode == _LayoutMode.grid
+                  ? Icons.view_agenda_outlined
+                  : Icons.grid_view_outlined,
+            ),
+            tooltip: _layoutMode == _LayoutMode.grid
+                ? 'Vista a colonne'
+                : 'Vista a griglia',
+          ),
           IconButton(
             onPressed: () => _openCategoryManager(context),
             icon: const Icon(Icons.category_outlined),
@@ -172,19 +221,32 @@ class _MatrixPageState extends State<MatrixPage> {
                               .where((t) => t.categoryId == _selectedCategoryId)
                               .toList();
 
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                      child: _MatrixGrid(
-                        tasks: filtered,
-                        categoryEmojiMap: categoryEmojiMap,
-                        onToggleTask: (task) =>
+                    final grid = _layoutMode == _LayoutMode.grid
+                        ? _MatrixGrid(
+                            tasks: filtered,
+                            categoryEmojiMap: categoryEmojiMap,
+                            onToggleTask: (task) =>
+                                context.read<TaskCubit>().toggleTask(task),
+                            onTaskTap: (task) =>
+                                _openTaskForm(context, existing: task),
+                            onTaskMove: (task, targetQuadrant) => context
+                                .read<TaskCubit>()
+                                .moveTask(task, targetQuadrant),
+                          )
+                        : _StackedMatrix(
+                            tasks: filtered,
+                            categoryEmojiMap: categoryEmojiMap,
+                            onToggleTask: (task) =>
                             context.read<TaskCubit>().toggleTask(task),
                         onTaskTap: (task) =>
                             _openTaskForm(context, existing: task),
-                        onTaskMove: (task, targetQuadrant) => context
-                            .read<TaskCubit>()
-                            .moveTask(task, targetQuadrant),
-                      ),
+                            onTaskMove: (task, targetQuadrant) => context
+                                .read<TaskCubit>()
+                                .moveTask(task, targetQuadrant),
+                          );
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                      child: grid,
                     );
                   },
                 );
