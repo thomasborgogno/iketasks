@@ -47,6 +47,19 @@ extension EisenhowerQuadrantX on EisenhowerQuadrant {
     }
   }
 
+  String get importLabel {
+    switch (this) {
+      case EisenhowerQuadrant.importantUrgent:
+        return '$cardTitle\n$label';
+      case EisenhowerQuadrant.importantNotUrgent:
+        return '$cardTitle\n$label';
+      case EisenhowerQuadrant.notImportantUrgent:
+        return '$cardTitle\n$label';
+      case EisenhowerQuadrant.notImportantNotUrgent:
+        return '$cardTitle\n$label';
+    }
+  }
+
   String get value {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
