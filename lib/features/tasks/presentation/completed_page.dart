@@ -119,19 +119,6 @@ class _CompletedTaskTile extends StatelessWidget {
 
   final TaskItem task;
 
-  Color _quadrantColor(EisenhowerQuadrant q) {
-    switch (q) {
-      case EisenhowerQuadrant.importantUrgent:
-        return const Color(0xFFD7263D);
-      case EisenhowerQuadrant.importantNotUrgent:
-        return const Color(0xFF1B998B);
-      case EisenhowerQuadrant.notImportantUrgent:
-        return const Color(0xFFF4A261);
-      case EisenhowerQuadrant.notImportantNotUrgent:
-        return const Color(0xFF457B9D);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final updatedStr = DateFormat('dd/MM/yyyy', 'it_IT').format(task.updatedAt);
