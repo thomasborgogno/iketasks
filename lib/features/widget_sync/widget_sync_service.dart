@@ -6,7 +6,7 @@ import 'package:home_widget/home_widget.dart';
 import '../tasks/domain/task_item.dart';
 
 class WidgetSyncService {
-  static const _androidProvider = 'EisenhowerAppWidgetProvider';
+  static const _androidProvider = 'EisenhowerGlanceReceiver';
 
   Future<void> initialize() async {
     await HomeWidget.setAppGroupId('group.com.eisenhower.matrix');

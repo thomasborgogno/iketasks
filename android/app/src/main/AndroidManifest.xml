@@ -34,22 +34,16 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <service
-            android:name=".EisenhowerWidgetRemoteViewsService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <receiver
-            android:name=".EisenhowerAppWidgetProvider"
+            android:name=".EisenhowerGlanceReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.eisenhower.matrix.TOGGLE_TASK" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/eisenhower_widget_info" />
+                android:resource="@xml/eisenhower_glance_widget_info" />
         </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
