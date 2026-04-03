@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../tasks/domain/task_item.dart';
@@ -21,16 +22,17 @@ class WidgetSyncService {
 
     for (final task in tasks) {
       final list = byQuadrant[task.quadrant.value]!;
-      if (list.length < 3) {
-        list.add({
-          'id': task.id,
-          'title': task.title,
-          'completed': task.completed,
-        });
-      }
+      list.add({
+        'id': task.id,
+        'title': task.title,
+        'completed': task.completed,
+      });
     }
 
-    await HomeWidget.saveWidgetData<String>('matrix_payload', jsonEncode(byQuadrant));
+    await HomeWidget.saveWidgetData<String>(
+      'matrix_payload',
+      jsonEncode(byQuadrant),
+    );
     await HomeWidget.updateWidget(androidName: _androidProvider);
   }
 }

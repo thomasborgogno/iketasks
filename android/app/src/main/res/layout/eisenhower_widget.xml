@@ -1,82 +1,224 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="8dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Matrice di Eisenhower"
+            android:layout_weight="1"
+            android:text="Eisenhower"
             android:textColor="#0D1B2A"
-            android:textSize="18sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
-        <TextView
+        <ImageButton
+            android:id="@+id/btn_add_widget"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Aggiungi attività"
+            android:src="@android:drawable/ic_input_add" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="4dp"
+        android:background="#22000000" />
+
+    <!-- Grid: 2 rows x 2 columns -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Row 1: Q1 | Q2 -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Importante e Urgente"
-            android:textColor="#D7263D"
-            android:textStyle="bold" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <!-- Q1 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Priorità"
+                    android:textColor="#D7263D"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/q1_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:dividerHeight="0dp" />
+
+                <TextView
+                    android:id="@+id/q1_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vuoto"
+                    android:textColor="#88333333"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#22000000" />
+
+            <!-- Q2 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pianifica"
+                    android:textColor="#1B998B"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/q2_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:dividerHeight="0dp" />
+
+                <TextView
+                    android:id="@+id/q2_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vuoto"
+                    android:textColor="#88333333"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/q1_tasks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nessuna attività"
-            android:textColor="#333333"
-            android:textSize="12sp" />
+            android:layout_height="1dp"
+            android:background="#22000000" />
 
-        <TextView
+        <!-- Row 2: Q3 | Q4 -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Importante ma Non Urgente"
-            android:textColor="#1B998B"
-            android:textStyle="bold" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/q2_tasks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nessuna attività"
-            android:textColor="#333333"
-            android:textSize="12sp" />
+            <!-- Q3 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="4dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Non Importante ma Urgente"
-            android:textColor="#F4A261"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delega"
+                    android:textColor="#F4A261"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/q3_tasks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nessuna attività"
-            android:textColor="#333333"
-            android:textSize="12sp" />
+                <ListView
+                    android:id="@+id/q3_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:dividerHeight="0dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Non Importante e Non Urgente"
-            android:textColor="#457B9D"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/q3_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vuoto"
+                    android:textColor="#88333333"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/q4_tasks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nessuna attività"
-            android:textColor="#333333"
-            android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#22000000" />
+
+            <!-- Q4 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Elimina"
+                    android:textColor="#457B9D"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/q4_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:divider="@null"
+                    android:dividerHeight="0dp" />
+
+                <TextView
+                    android:id="@+id/q4_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vuoto"
+                    android:textColor="#88333333"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
