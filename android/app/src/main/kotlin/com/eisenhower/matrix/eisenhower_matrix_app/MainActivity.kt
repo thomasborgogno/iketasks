@@ -27,7 +27,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        if (intent?.getBooleanExtra(EisenhowerAppWidgetProvider.EXTRA_OPEN_ADD_TASK, false) == true) {
+        if (intent?.getBooleanExtra(EXTRA_OPEN_ADD_TASK, false) == true) {
             methodChannel?.invokeMethod("openAddTask", null)
         }
     }

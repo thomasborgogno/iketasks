@@ -47,7 +47,6 @@ android/app/src/main/
 	AndroidManifest.xml
 	kotlin/com/eisenhower/matrix/eisenhower_matrix_app/
 		MainActivity.kt
-		EisenhowerAppWidgetProvider.kt
 	res/layout/eisenhower_widget.xml
 	res/xml/eisenhower_widget_info.xml
 	res/values/strings.xml
