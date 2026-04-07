@@ -310,6 +310,7 @@ class _MatrixPageState extends State<MatrixPage> {
         dueDate: result.dueDate,
         categoryId: result.categoryId,
         quadrant: result.quadrant,
+        clearDescription: result.clearDescription,
         clearDueDate: result.clearDueDate,
         clearCategory: result.clearCategory,
       ),
@@ -474,6 +475,7 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
                     decoration: const InputDecoration(
                       labelText: 'Nome categoria',
                     ),
+                    textCapitalization: TextCapitalization.sentences,
                     onSubmitted: (_) => _addCategory(),
                   ),
                 ),
