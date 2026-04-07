@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'completed_page.dart';
 import 'task_cubit.dart';
 import 'task_completion_circle.dart';
 
+import '../../../core/notifications/notification_service.dart';
 import '../../google_tasks/data/google_tasks_repository.dart';
 import '../../google_tasks/presentation/google_tasks_select_page.dart';
 
@@ -39,6 +42,7 @@ class MatrixPage extends StatefulWidget {
 class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
   _LayoutMode _layoutMode = _LayoutMode.grid;
+  StreamSubscription<void>? _newTaskSubscription;
 
   static const _widgetChannel = MethodChannel('com.eisenhower.matrix/widget');
 
@@ -49,6 +53,14 @@ class _MatrixPageState extends State<MatrixPage> {
       if (call.method == 'openAddTask' && mounted) {
         await _openTaskForm(context);
       }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _newTaskSubscription = context
+          .read<NotificationService>()
+          .onNewTaskRequested
+          .listen((_) {
+            if (mounted) _openTaskForm(context);
+          });
     });
   }
 
@@ -72,67 +84,86 @@ class _MatrixPageState extends State<MatrixPage> {
     final user = _getUser();
     if (user == null) return;
 
+    final notificationService = context.read<NotificationService>();
+
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Impostazioni',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 20),
-                _ProfileHeader(user: user),
-                const SizedBox(height: 20),
-                ListTile(
-                  leading: const Icon(Icons.check_circle_outline),
-                  title: const Text('Attività completate'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => CompletedPage(uid: user.uid),
+        return StatefulBuilder(
+          builder: (builderContext, setState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Impostazioni',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 20),
+                    _ProfileHeader(user: user),
+                    const SizedBox(height: 20),
+                    ListTile(
+                      leading: const Icon(Icons.check_circle_outline),
+                      title: const Text('Attività completate'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => CompletedPage(uid: user.uid),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.cloud_download_outlined),
+                      title: const Text('Importa da Google Tasks'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (pageContext) => RepositoryProvider.value(
+                              value: pageContext.read<GoogleTasksRepository>(),
+                              child: const GoogleTasksImportPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SwitchListTile(
+                      secondary: const Icon(Icons.notifications_outlined),
+                      title: const Text('Notifica priorità'),
+                      subtitle: const Text(
+                        'Mostra le attività prioritarie nella barra delle notifiche',
                       ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.cloud_download_outlined),
-                  title: const Text('Importa da Google Tasks'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.of(sheetContext).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (pageContext) => RepositoryProvider.value(
-                          value: pageContext.read<GoogleTasksRepository>(),
-                          child: const GoogleTasksImportPage(),
-                        ),
+                      value: notificationService.isEnabled,
+                      onChanged: (value) async {
+                        final tasks = context.read<TaskCubit>().state.tasks;
+                        await notificationService.setEnabled(value, tasks);
+                        setState(() {});
+                      },
+                    ),
+                    const Divider(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () async {
+                          Navigator.of(sheetContext).pop();
+                          await context.read<AuthCubit>().signOut();
+                        },
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Logout'),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
-                const Divider(),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      Navigator.of(sheetContext).pop();
-                      await context.read<AuthCubit>().signOut();
-                    },
-                    icon: const Icon(Icons.logout),
-                    label: const Text('Logout'),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -322,6 +353,12 @@ class _MatrixPageState extends State<MatrixPage> {
       context: context,
       builder: (_) => const _CategoryManagerDialog(),
     );
+  }
+
+  @override
+  void dispose() {
+    _newTaskSubscription?.cancel();
+    super.dispose();
   }
 }
 

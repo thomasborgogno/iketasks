@@ -5,6 +5,7 @@ import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/notifications/notification_service.dart';
 import '../../tasks/data/task_repository.dart';
 import '../../tasks/domain/task_item.dart';
 import '../../widget_sync/widget_sync_service.dart';
@@ -12,11 +13,15 @@ import '../../widget_sync/widget_sync_service.dart';
 part 'task_state.dart';
 
 class TaskCubit extends Cubit<TaskState> {
-  TaskCubit(this._repository, this._widgetSyncService)
-    : super(const TaskState.initial());
+  TaskCubit(
+    this._repository,
+    this._widgetSyncService,
+    this._notificationService,
+  ) : super(const TaskState.initial());
 
   final TaskRepository _repository;
   final WidgetSyncService _widgetSyncService;
+  final NotificationService _notificationService;
 
   StreamSubscription<List<TaskItem>>? _taskSubscription;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
@@ -54,6 +59,9 @@ class TaskCubit extends Cubit<TaskState> {
       final allIncompleteForWidget = tasks.where((t) => !t.completed).toList();
       emit(TaskState.loaded(visible));
       await _widgetSyncService.pushTasks(allIncompleteForWidget);
+      await _notificationService.updatePriorityNotification(
+        allIncompleteForWidget,
+      );
     }, onError: (error) => emit(TaskState.error(error.toString())));
 
     await _connectivitySubscription?.cancel();
