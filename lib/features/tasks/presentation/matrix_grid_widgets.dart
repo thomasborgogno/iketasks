@@ -291,7 +291,10 @@ class _TaskTile extends StatelessWidget {
               style: TextStyle(
                 height: 1.2,
                 decoration: task.completed ? TextDecoration.lineThrough : null,
-                fontWeight: FontWeight.w500,
+                color: task.completed
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : null,
+                fontWeight: task.completed ? null : FontWeight.w500,
               ),
             ),
             subtitle: due == null ? null : Text('Scadenza: $due'),
