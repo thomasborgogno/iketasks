@@ -45,6 +45,8 @@ dependencies:
   googleapis: ^14.0.0
   http: ^1.0.0
   flutter_launcher_icons: ^0.14.4
+  flutter_local_notifications: ^18.0.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

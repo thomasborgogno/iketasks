@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
+import 'core/notifications/notification_service.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'features/categories/data/category_repository.dart';
@@ -24,6 +25,8 @@ Future<void> main() async {
   final googleTasksRepository = GoogleTasksRepository();
   final widgetSyncService = WidgetSyncService();
   await widgetSyncService.initialize();
+  final notificationService = NotificationService();
+  await notificationService.initialize();
 
   runApp(
     MultiRepositoryProvider(
@@ -33,6 +36,7 @@ Future<void> main() async {
         RepositoryProvider.value(value: categoryRepository),
         RepositoryProvider.value(value: googleTasksRepository),
         RepositoryProvider.value(value: widgetSyncService),
+        RepositoryProvider.value(value: notificationService),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -43,6 +47,7 @@ Future<void> main() async {
             create: (context) => TaskCubit(
               context.read<TaskRepository>(),
               context.read<WidgetSyncService>(),
+              context.read<NotificationService>(),
             ),
           ),
           BlocProvider(
