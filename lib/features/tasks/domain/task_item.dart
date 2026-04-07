@@ -33,13 +33,14 @@ class TaskItem extends Equatable {
     EisenhowerQuadrant? quadrant,
     bool? completed,
     DateTime? updatedAt,
+    bool clearDescription = false,
     bool clearDueDate = false,
     bool clearCategory = false,
   }) {
     return TaskItem(
       id: id,
       title: title ?? this.title,
-      description: description ?? this.description,
+      description: clearDescription ? null : (description ?? this.description),
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
       categoryId: clearCategory ? null : (categoryId ?? this.categoryId),
       quadrant: quadrant ?? this.quadrant,
@@ -93,4 +94,9 @@ class TaskItem extends Equatable {
     createdAt,
     updatedAt,
   ];
+
+  @override
+  String toString() {
+    return 'Task $title : {\nid: $id, title: $title, description: $description, \ndueDate: $dueDate, categoryId: $categoryId, quadrant: $quadrant, completed: $completed, createdAt: $createdAt, updatedAt: $updatedAt}';
+  }
 }

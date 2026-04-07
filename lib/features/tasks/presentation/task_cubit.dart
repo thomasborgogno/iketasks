@@ -23,9 +23,8 @@ class TaskCubit extends Cubit<TaskState> {
 
   String? _uid;
 
-  static bool _isToday(DateTime dt) {
-    final now = DateTime.now();
-    return dt.year == now.year && dt.month == now.month && dt.day == now.day;
+  static bool _completedWithinLastHour(DateTime dt) {
+    return DateTime.now().difference(dt) <= const Duration(hours: 1);
   }
 
   Future<void> bindUser(String uid) async {
@@ -34,16 +33,23 @@ class TaskCubit extends Cubit<TaskState> {
 
     await _taskSubscription?.cancel();
     _taskSubscription = _repository.watchTasks(uid).listen((tasks) async {
-      final visible =
+      int sortByDueDate(TaskItem a, TaskItem b) {
+        if (a.dueDate == null && b.dueDate == null) return 0;
+        if (a.dueDate == null) return 1;
+        if (b.dueDate == null) return -1;
+        return a.dueDate!.compareTo(b.dueDate!);
+      }
+
+      final incomplete = tasks.where((t) => !t.completed).toList()
+        ..sort(sortByDueDate);
+      final recentlyCompleted =
           tasks
-              .where((t) => !t.completed || _isToday(t.updatedAt))
+              .where(
+                (t) => t.completed && _completedWithinLastHour(t.updatedAt),
+              )
               .toList()
-            ..sort((a, b) {
-              if (a.dueDate == null && b.dueDate == null) return 0;
-              if (a.dueDate == null) return 1;
-              if (b.dueDate == null) return -1;
-              return a.dueDate!.compareTo(b.dueDate!);
-            });
+            ..sort(sortByDueDate);
+      final visible = [...incomplete, ...recentlyCompleted];
 
       final allIncompleteForWidget = tasks.where((t) => !t.completed).toList();
       emit(TaskState.loaded(visible));

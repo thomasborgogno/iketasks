@@ -7,6 +7,7 @@ class _TaskFormResult {
     required this.description,
     required this.dueDate,
     required this.categoryId,
+    required this.clearDescription,
     required this.clearDueDate,
     required this.clearCategory,
   });
@@ -16,6 +17,7 @@ class _TaskFormResult {
   final DateTime? dueDate;
   final String? categoryId;
   final EisenhowerQuadrant quadrant;
+  final bool clearDescription;
   final bool clearDueDate;
   final bool clearCategory;
 }
@@ -33,11 +35,13 @@ class _TaskForm extends StatefulWidget {
 class _TaskFormState extends State<_TaskForm> {
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
+  final FocusNode _descriptionFocusNode = FocusNode();
   late EisenhowerQuadrant _quadrant;
   late bool _isImportant;
   late bool _isUrgent;
   DateTime? _dueDate;
   String? _categoryId;
+  bool _showDescription = false;
 
   @override
   void initState() {
@@ -50,6 +54,9 @@ class _TaskFormState extends State<_TaskForm> {
     _syncFlagsFromQuadrant(_quadrant);
     _dueDate = widget.existing?.dueDate;
     _categoryId = widget.existing?.categoryId;
+    _showDescription =
+        widget.existing?.description != null &&
+        widget.existing!.description!.isNotEmpty;
   }
 
   void _syncFlagsFromQuadrant(EisenhowerQuadrant quadrant) {
@@ -119,6 +126,7 @@ class _TaskFormState extends State<_TaskForm> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _descriptionFocusNode.dispose();
     super.dispose();
   }
 
@@ -130,8 +138,8 @@ class _TaskFormState extends State<_TaskForm> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Elimina task'),
-          content: const Text('Vuoi eliminare questa task?'),
+          title: const Text('Elimina attività'),
+          content: const Text('Vuoi eliminare questa attività?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -168,19 +176,25 @@ class _TaskFormState extends State<_TaskForm> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isEdit ? 'Modifica task' : 'Nuova task',
+              isEdit ? 'Modifica attività' : 'Nuova attività',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Titolo *'),
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(labelText: 'Titolo'),
+              autofocus: !isEdit,
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Descrizione'),
-            ),
+            if (_showDescription) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: _descriptionController,
+                focusNode: _descriptionFocusNode,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(labelText: 'Descrizione'),
+              ),
+            ],
             const SizedBox(height: 16),
             Text('Priorità', style: Theme.of(context).textTheme.labelMedium),
             Align(
@@ -212,7 +226,7 @@ class _TaskFormState extends State<_TaskForm> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
             Text('Quadrante', style: Theme.of(context).textTheme.labelMedium),
             Column(
@@ -222,30 +236,26 @@ class _TaskFormState extends State<_TaskForm> {
                   rowIndex < _matrixQuadrantRows.length;
                   rowIndex++
                 )
-                  Padding(
-                    padding: EdgeInsets.only(top: rowIndex == 0 ? 0 : 8),
-                    child: Row(
-                      children: [
-                        for (
-                          var columnIndex = 0;
-                          columnIndex < _matrixQuadrantRows[rowIndex].length;
-                          columnIndex++
-                        ) ...[
-                          if (columnIndex > 0) const SizedBox(width: 8),
-                          Expanded(
-                            child: _quadrantChoiceChip(
-                              _matrixQuadrantRows[rowIndex][columnIndex],
-                            ),
+                  Row(
+                    children: [
+                      for (
+                        var columnIndex = 0;
+                        columnIndex < _matrixQuadrantRows[rowIndex].length;
+                        columnIndex++
+                      ) ...[
+                        if (columnIndex > 0) const SizedBox(width: 8),
+                        Expanded(
+                          child: _quadrantChoiceChip(
+                            _matrixQuadrantRows[rowIndex][columnIndex],
                           ),
-                        ],
+                        ),
                       ],
-                    ),
+                    ],
                   ),
               ],
             ),
             const SizedBox(height: 16),
             Text('Categoria', style: Theme.of(context).textTheme.labelMedium),
-            const SizedBox(height: 8),
             BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, categoryState) {
                 final categories = categoryState.categories;
@@ -279,41 +289,98 @@ class _TaskFormState extends State<_TaskForm> {
                 );
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            if (_dueDate != null) ...[
+              Text('Scadenza', style: Theme.of(context).textTheme.labelMedium),
+              Text(DateFormat('dd/MM/yyyy').format(_dueDate!)),
+              const SizedBox(height: 12),
+            ],
+
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    _dueDate == null
-                        ? 'Scadenza'
-                        : 'Scadenza: ${DateFormat('dd/MM/yyyy').format(_dueDate!)}',
+                IconButton(
+                  icon: Icon(
+                    Icons.notes,
+                    color: _showDescription
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
                   ),
-                ),
-                TextButton(
+                  tooltip: 'Descrizione',
                   onPressed: () async {
+                    if (_showDescription &&
+                        _descriptionController.text.trim().isNotEmpty) {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Rimuovi descrizione'),
+                          content: const Text('Vuoi rimuovere la descrizione?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Annulla'),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: const Text('Rimuovi'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm != true) return;
+                      _descriptionController.clear();
+                    }
+                    setState(() => _showDescription = !_showDescription);
+                    if (_showDescription) {
+                      WidgetsBinding.instance.addPostFrameCallback(
+                        (_) => _descriptionFocusNode.requestFocus(),
+                      );
+                    }
+                  },
+                ),
+                IconButton(
+                  iconSize: 20,
+                  icon: Icon(
+                    Icons.calendar_today,
+                    color: _dueDate != null
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  tooltip: 'Scadenza',
+                  onPressed: () async {
+                    if (_dueDate != null) {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Rimuovi scadenza'),
+                          content: const Text('Vuoi rimuovere la scadenza?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Annulla'),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: const Text('Rimuovi'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm != true) return;
+                      setState(() => _dueDate = null);
+                      return;
+                    }
+                    if (!mounted) return;
                     final picked = await showDatePicker(
                       context: context,
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
-                      initialDate: _dueDate ?? DateTime.now(),
+                      initialDate: DateTime.now(),
                     );
-                    if (picked != null) {
-                      setState(() => _dueDate = picked);
-                    }
+                    if (picked != null) setState(() => _dueDate = picked);
                   },
-                  child: const Text('Seleziona data'),
                 ),
-                if (_dueDate != null)
-                  IconButton(
-                    onPressed: () => setState(() => _dueDate = null),
-                    icon: const Icon(Icons.clear),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                if (isEdit)
+                const SizedBox(width: 8),
+                if (isEdit) ...[
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: _deleteExistingTask,
@@ -321,7 +388,8 @@ class _TaskFormState extends State<_TaskForm> {
                       label: const Text('Elimina'),
                     ),
                   ),
-                if (isEdit) const SizedBox(width: 12),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   child: FilledButton.icon(
                     onPressed: () {
@@ -339,6 +407,9 @@ class _TaskFormState extends State<_TaskForm> {
                               : _descriptionController.text.trim(),
                           dueDate: _dueDate,
                           categoryId: _categoryId,
+                          clearDescription: _descriptionController.text
+                              .trim()
+                              .isEmpty,
                           clearDueDate: _dueDate == null,
                           clearCategory: _categoryId == null,
                         ),
