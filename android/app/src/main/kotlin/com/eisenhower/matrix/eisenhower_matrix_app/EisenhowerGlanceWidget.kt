@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -16,8 +17,10 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -29,27 +32,30 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.appwidget.cornerRadius
 import androidx.glance.layout.wrapContentHeight
+import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 
 val taskIdKey = ActionParameters.Key<String>("task_id")
 const val EXTRA_OPEN_ADD_TASK = "open_add_task"
 
-private data class TaskEntry(val id: String, val title: String)
+data class TaskEntry(val id: String, val title: String)
 
-private data class QuadrantSpec(
+data class QuadrantSpec(
     val key: String,
     val label: String,
     val color: Color,
 )
 
-private data class AppearanceSpec(
+data class AppearanceSpec(
     val bgColor: Color,
     val labelFontSize: TextUnit,
     val taskFontSize: TextUnit,
@@ -58,30 +64,46 @@ private data class AppearanceSpec(
     val darkText: Boolean,
 )
 
-private val ALL_QUADRANTS = listOf(
+data class WidgetState(
+    val tasks: Map<String, List<TaskEntry>>,
+    val appearance: AppearanceSpec,
+)
+
+val ALL_QUADRANTS = listOf(
     QuadrantSpec("q1", "Priorità", Color(0xFFD7263D)),
     QuadrantSpec("q2", "Pianifica", Color(0xFF1B998B)),
     QuadrantSpec("q3", "Delega", Color(0xFFF4A261)),
     QuadrantSpec("q4", "Elimina", Color(0xFF457B9D)),
 )
 
-private val defaultBackgroundColor = Color(0xFF1C1B1F)
+val defaultBackgroundColor = Color(0xFF1C1B1F)
 
-class EisenhowerGlanceWidget : GlanceAppWidget() {
+fun defaultAppearance() = AppearanceSpec(
+    bgColor = defaultBackgroundColor,
+    labelFontSize = 13.sp,
+    taskFontSize = 13.sp,
+    emptyFontSize = 10.sp,
+    visibleQuadrants = setOf("q1", "q2", "q3"),
+    darkText = false,
+)
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val tasks = loadTasks(context)
-        val appearance = loadAppearance(context)
-        provideContent {
-            GlanceTheme {
-                WidgetContent(tasks = tasks, context = context, appearance = appearance)
-            }
-        }
+class EisenhowerDataStore(private val context: Context) : DataStore<WidgetState> {
+    override val data: Flow<WidgetState>
+        get() = flow { emit(readState()) }
+
+    override suspend fun updateData(transform: suspend (t: WidgetState) -> WidgetState): WidgetState {
+        throw UnsupportedOperationException("EisenhowerDataStore is a read-only proxy")
     }
 
-    private fun loadTasks(context: Context): Map<String, List<TaskEntry>> {
+    private fun readState(): WidgetState {
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-        val payload = prefs.getString("matrix_payload", null)
+        return WidgetState(
+            tasks = parseTasks(prefs.getString("matrix_payload", null)),
+            appearance = parseAppearance(prefs.getString("widget_appearance", null)),
+        )
+    }
+
+    private fun parseTasks(payload: String?): Map<String, List<TaskEntry>> {
         if (payload.isNullOrBlank()) return emptyMap()
         return try {
             val json = JSONObject(payload)
@@ -100,21 +122,17 @@ class EisenhowerGlanceWidget : GlanceAppWidget() {
         }
     }
 
-    private fun loadAppearance(context: Context): AppearanceSpec {
-        val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-        val raw = prefs.getString("widget_appearance", null)
+    private fun parseAppearance(raw: String?): AppearanceSpec {
         if (raw.isNullOrBlank()) return defaultAppearance()
         return try {
             val json = JSONObject(raw)
 
-            // Background color
             val bgHex = json.optString("bg_color", "1c1b1f")
             val bgRgb = bgHex.toLong(16).toInt()
             val bgAlpha = json.optInt("bg_alpha", 255)
             val bgArgb = (bgAlpha shl 24) or (bgRgb and 0x00FFFFFF)
             val bgColor = Color(bgArgb.toLong() and 0xFFFFFFFFL)
 
-            // Text size
             val textSizeStr = json.optString("text_size", "medium")
             val (labelSp, taskSp, emptySp) = when (textSizeStr) {
                 "small" -> Triple(11.sp, 11.sp, 9.sp)
@@ -122,7 +140,6 @@ class EisenhowerGlanceWidget : GlanceAppWidget() {
                 else    -> Triple(13.sp, 13.sp, 10.sp)
             }
 
-            // Visible quadrants
             val arr = json.optJSONArray("visible_quadrants")
             val visible = if (arr != null) {
                 (0 until arr.length()).map { arr.getString(it) }.toSet()
@@ -144,15 +161,28 @@ class EisenhowerGlanceWidget : GlanceAppWidget() {
             defaultAppearance()
         }
     }
+}
 
-    private fun defaultAppearance() = AppearanceSpec(
-        bgColor = defaultBackgroundColor,
-        labelFontSize = 13.sp,
-        taskFontSize = 13.sp,
-        emptyFontSize = 10.sp,
-        visibleQuadrants = setOf("q1", "q2", "q3"),
-        darkText = false,
-    )
+class EisenhowerStateDefinition : GlanceStateDefinition<WidgetState> {
+    override suspend fun getDataStore(context: Context, fileKey: String): DataStore<WidgetState> =
+        EisenhowerDataStore(context)
+
+    override fun getLocation(context: Context, fileKey: String): File =
+        throw UnsupportedOperationException("EisenhowerDataStore does not use a file location")
+}
+
+class EisenhowerGlanceWidget : GlanceAppWidget() {
+
+    override val stateDefinition: GlanceStateDefinition<WidgetState> = EisenhowerStateDefinition()
+
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        provideContent {
+            GlanceTheme {
+                val state = currentState<WidgetState>()
+                WidgetContent(tasks = state.tasks, context = context, appearance = state.appearance)
+            }
+        }
+    }
 }
 
 @Composable
