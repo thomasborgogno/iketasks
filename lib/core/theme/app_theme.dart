@@ -16,10 +16,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: const Color(0xFFF6F9FB),
-      cardTheme: const CardThemeData(
-        elevation: 0,
-        margin: EdgeInsets.zero,
-      ),
+      cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
     );
   }
 
@@ -32,9 +29,12 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      cardTheme: const CardThemeData(
-        elevation: 0,
-        margin: EdgeInsets.zero,
+      cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
+      snackBarTheme: const SnackBarThemeData(
+        actionTextColor: Colors.red,
+        backgroundColor: Colors.black87,
+        contentTextStyle: TextStyle(color: Colors.white),
+        elevation: 20,
       ),
     );
   }

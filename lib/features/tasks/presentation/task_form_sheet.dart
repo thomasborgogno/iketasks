@@ -99,7 +99,7 @@ class _TaskFormState extends State<_TaskForm> {
     return ChoiceChip(
       label: SizedBox(
         width: double.infinity,
-        child: Text(quadrant.cardTitle, textAlign: TextAlign.center),
+        child: Text(quadrant.name, textAlign: TextAlign.center),
       ),
       selected: selected,
       color: WidgetStateProperty.resolveWith((states) {

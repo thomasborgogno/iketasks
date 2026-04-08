@@ -12,7 +12,8 @@ import 'features/categories/presentation/category_cubit.dart';
 import 'features/google_tasks/data/google_tasks_repository.dart';
 import 'features/tasks/data/task_repository.dart';
 import 'features/tasks/presentation/task_cubit.dart';
-import 'features/widget_sync/widget_sync_service.dart';
+import 'features/widget/widget_appearance_service.dart';
+import 'features/widget/widget_sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,8 @@ Future<void> main() async {
   final googleTasksRepository = GoogleTasksRepository();
   final widgetSyncService = WidgetSyncService();
   await widgetSyncService.initialize();
+  final widgetAppearanceService = WidgetAppearanceService();
+  await widgetAppearanceService.initialize();
   final notificationService = NotificationService();
   await notificationService.initialize();
 
@@ -36,6 +39,7 @@ Future<void> main() async {
         RepositoryProvider.value(value: categoryRepository),
         RepositoryProvider.value(value: googleTasksRepository),
         RepositoryProvider.value(value: widgetSyncService),
+        RepositoryProvider.value(value: widgetAppearanceService),
         RepositoryProvider.value(value: notificationService),
       ],
       child: MultiBlocProvider(

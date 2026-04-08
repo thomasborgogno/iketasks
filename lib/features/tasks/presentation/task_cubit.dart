@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../../tasks/data/task_repository.dart';
 import '../../tasks/domain/task_item.dart';
-import '../../widget_sync/widget_sync_service.dart';
+import '../../widget/widget_sync_service.dart';
 
 part 'task_state.dart';
 
