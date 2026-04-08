@@ -30,5 +30,8 @@ class MainActivity : FlutterActivity() {
         if (intent?.getBooleanExtra(EXTRA_OPEN_ADD_TASK, false) == true) {
             methodChannel?.invokeMethod("openAddTask", null)
         }
+        if (intent?.getBooleanExtra(EXTRA_OPEN_WIDGET_SETTINGS, false) == true) {
+            methodChannel?.invokeMethod("openWidgetSettings", null)
+        }
     }
 }

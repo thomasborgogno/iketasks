@@ -47,6 +47,7 @@ class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
   _LayoutMode _layoutMode = _LayoutMode.grid;
   StreamSubscription<void>? _newTaskSubscription;
+  bool _isModalOpen = false;
 
   static const _widgetChannel = MethodChannel('com.eisenhower.matrix/widget');
 
@@ -54,8 +55,11 @@ class _MatrixPageState extends State<MatrixPage> {
   void initState() {
     super.initState();
     _widgetChannel.setMethodCallHandler((call) async {
+      if (_isModalOpen) return;
       if (call.method == 'openAddTask' && mounted) {
         await _openTaskForm(context);
+      } else if (call.method == 'openWidgetSettings' && mounted) {
+        await _openWidgetAppearance(context);
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -93,6 +97,7 @@ class _MatrixPageState extends State<MatrixPage> {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (builderContext, setState) {
@@ -320,6 +325,8 @@ class _MatrixPageState extends State<MatrixPage> {
   }
 
   Future<void> _openTaskForm(BuildContext context, {TaskItem? existing}) async {
+    if (_isModalOpen) return;
+    _isModalOpen = true;
     final categories = context.read<CategoryCubit>().state.categories;
     final result = await showModalBottomSheet<_TaskFormResult>(
       context: context,
@@ -327,6 +334,7 @@ class _MatrixPageState extends State<MatrixPage> {
       showDragHandle: true,
       builder: (_) => _TaskForm(categories: categories, existing: existing),
     );
+    _isModalOpen = false;
     if (!context.mounted) return;
 
     if (result == null) return;
@@ -364,6 +372,8 @@ class _MatrixPageState extends State<MatrixPage> {
   }
 
   Future<void> _openWidgetAppearance(BuildContext context) async {
+    if (_isModalOpen) return;
+    _isModalOpen = true;
     final service = context.read<WidgetAppearanceService>();
     await showModalBottomSheet<void>(
       context: context,
@@ -371,6 +381,7 @@ class _MatrixPageState extends State<MatrixPage> {
       showDragHandle: true,
       builder: (_) => _WidgetAppearanceSheet(service: service),
     );
+    _isModalOpen = false;
   }
 
   @override
