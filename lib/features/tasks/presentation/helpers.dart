@@ -21,7 +21,7 @@ Color quadrantColor(EisenhowerQuadrant q) {
 }
 
 extension EisenhowerQuadrantX on EisenhowerQuadrant {
-  String get label {
+  String get description {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
         return 'Importante, urgente';
@@ -34,7 +34,7 @@ extension EisenhowerQuadrantX on EisenhowerQuadrant {
     }
   }
 
-  String get cardTitle {
+  String get name {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
         return 'Priorità';
@@ -47,16 +47,29 @@ extension EisenhowerQuadrantX on EisenhowerQuadrant {
     }
   }
 
+  String get fullName {
+    switch (this) {
+      case EisenhowerQuadrant.importantUrgent:
+        return '$name ($description)';
+      case EisenhowerQuadrant.importantNotUrgent:
+        return '$name ($description)';
+      case EisenhowerQuadrant.notImportantUrgent:
+        return '$name ($description)';
+      case EisenhowerQuadrant.notImportantNotUrgent:
+        return '$name ($description)';
+    }
+  }
+
   String get importLabel {
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
-        return '$cardTitle\n$label';
+        return '$name\n$description';
       case EisenhowerQuadrant.importantNotUrgent:
-        return '$cardTitle\n$label';
+        return '$name\n$description';
       case EisenhowerQuadrant.notImportantUrgent:
-        return '$cardTitle\n$label';
+        return '$name\n$description';
       case EisenhowerQuadrant.notImportantNotUrgent:
-        return '$cardTitle\n$label';
+        return '$name\n$description';
     }
   }
 

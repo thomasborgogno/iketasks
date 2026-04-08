@@ -55,7 +55,7 @@ class _QuadrantCard extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6),
                     child: Text(
-                      quadrant.cardTitle,
+                      quadrant.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: color,
@@ -64,7 +64,7 @@ class _QuadrantCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    quadrant.label,
+                    quadrant.description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

@@ -1,9 +1,10 @@
-package com.eisenhower.matrix.todo
+﻿package com.eisenhower.matrix.todo
 
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -48,22 +49,32 @@ private data class QuadrantSpec(
     val color: Color,
 )
 
-private val QUADRANTS = listOf(
+private data class AppearanceSpec(
+    val bgColor: Color,
+    val labelFontSize: TextUnit,
+    val taskFontSize: TextUnit,
+    val emptyFontSize: TextUnit,
+    val visibleQuadrants: Set<String>,
+    val darkText: Boolean,
+)
+
+private val ALL_QUADRANTS = listOf(
     QuadrantSpec("q1", "Priorità", Color(0xFFD7263D)),
     QuadrantSpec("q2", "Pianifica", Color(0xFF1B998B)),
     QuadrantSpec("q3", "Delega", Color(0xFFF4A261)),
     QuadrantSpec("q4", "Elimina", Color(0xFF457B9D)),
 )
 
-private val backgroundColor = Color(0xFF1C1B1F)
+private val defaultBackgroundColor = Color(0xFF1C1B1F)
 
 class EisenhowerGlanceWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val tasks = loadTasks(context)
+        val appearance = loadAppearance(context)
         provideContent {
             GlanceTheme {
-                WidgetContent(tasks = tasks, context = context)
+                WidgetContent(tasks = tasks, context = context, appearance = appearance)
             }
         }
     }
@@ -73,9 +84,8 @@ class EisenhowerGlanceWidget : GlanceAppWidget() {
         val payload = prefs.getString("matrix_payload", null)
         if (payload.isNullOrBlank()) return emptyMap()
         return try {
-            val json = JSONObject(
-                payload)
-            QUADRANTS.associate { spec ->
+            val json = JSONObject(payload)
+            ALL_QUADRANTS.associate { spec ->
                 val arr: JSONArray = json.optJSONArray(spec.key) ?: JSONArray()
                 spec.key to (0 until arr.length()).map { i ->
                     val item = arr.getJSONObject(i)
@@ -89,10 +99,68 @@ class EisenhowerGlanceWidget : GlanceAppWidget() {
             emptyMap()
         }
     }
+
+    private fun loadAppearance(context: Context): AppearanceSpec {
+        val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+        val raw = prefs.getString("widget_appearance", null)
+        if (raw.isNullOrBlank()) return defaultAppearance()
+        return try {
+            val json = JSONObject(raw)
+
+            // Background color
+            val bgHex = json.optString("bg_color", "1c1b1f")
+            val bgRgb = bgHex.toLong(16).toInt()
+            val bgAlpha = json.optInt("bg_alpha", 255)
+            val bgArgb = (bgAlpha shl 24) or (bgRgb and 0x00FFFFFF)
+            val bgColor = Color(bgArgb.toLong() and 0xFFFFFFFFL)
+
+            // Text size
+            val textSizeStr = json.optString("text_size", "medium")
+            val (labelSp, taskSp, emptySp) = when (textSizeStr) {
+                "small" -> Triple(11.sp, 11.sp, 9.sp)
+                "large" -> Triple(15.sp, 15.sp, 12.sp)
+                else    -> Triple(13.sp, 13.sp, 10.sp)
+            }
+
+            // Visible quadrants
+            val arr = json.optJSONArray("visible_quadrants")
+            val visible = if (arr != null) {
+                (0 until arr.length()).map { arr.getString(it) }.toSet()
+            } else {
+                setOf("q1", "q2", "q3")
+            }
+
+            val darkText = json.optString("text_color", "white") == "black"
+
+            AppearanceSpec(
+                bgColor = bgColor,
+                labelFontSize = labelSp,
+                taskFontSize = taskSp,
+                emptyFontSize = emptySp,
+                visibleQuadrants = visible,
+                darkText = darkText,
+            )
+        } catch (_: Exception) {
+            defaultAppearance()
+        }
+    }
+
+    private fun defaultAppearance() = AppearanceSpec(
+        bgColor = defaultBackgroundColor,
+        labelFontSize = 13.sp,
+        taskFontSize = 13.sp,
+        emptyFontSize = 10.sp,
+        visibleQuadrants = setOf("q1", "q2", "q3"),
+        darkText = false,
+    )
 }
 
 @Composable
-private fun WidgetContent(tasks: Map<String, List<TaskEntry>>, context: Context) {
+private fun WidgetContent(
+    tasks: Map<String, List<TaskEntry>>,
+    context: Context,
+    appearance: AppearanceSpec,
+) {
     val addIntent = Intent(context, MainActivity::class.java).apply {
         putExtra(EXTRA_OPEN_ADD_TASK, true)
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -102,69 +170,47 @@ private fun WidgetContent(tasks: Map<String, List<TaskEntry>>, context: Context)
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
+    val visibleQuadrants = ALL_QUADRANTS.filter { it.key in appearance.visibleQuadrants }
+
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(ColorProvider(backgroundColor))
+            .background(ColorProvider(appearance.bgColor))
             .clickable(actionStartActivity(openAppIntent)),
         contentAlignment = Alignment.BottomEnd,
     ) {
         // Main content
         Column(modifier = GlanceModifier.fillMaxSize()) {
-        // Header row
-        // Row(
-        //     modifier = GlanceModifier
-        //         .fillMaxWidth()
-        //         .height(48.dp)
-        //         .background(ColorProvider(Color(0xFF2B2930)))
-        //         .padding(horizontal = 12.dp),
-        //     verticalAlignment = Alignment.CenterVertically,
-        // ) {
-        //     Text(
-        //         text = "Eisenhower",
-        //         style = TextStyle(
-        //             color = ColorProvider(Color.White),
-        //             fontSize = 14.sp,
-        //             fontWeight = FontWeight.Bold,
-        //         ),
-        //     )
-        // }
-
-        Column(modifier = GlanceModifier.wrapContentHeight().fillMaxWidth()) {
-            QuadrantSection(
-                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
-                spec = QUADRANTS[0],
-                taskList = tasks[QUADRANTS[0].key] ?: emptyList(),
-            )
-            Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
-            QuadrantSection(
-                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
-                spec = QUADRANTS[1],
-                taskList = tasks[QUADRANTS[1].key] ?: emptyList(),
-            )
-            Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
-            QuadrantSection(
-                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
-                spec = QUADRANTS[2],
-                taskList = tasks[QUADRANTS[2].key] ?: emptyList(),
-            )
-            // Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
-            // QuadrantSection(
-            //     modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
-            //     spec = QUADRANTS[3],
-            //     taskList = tasks[QUADRANTS[3].key] ?: emptyList(),
-            // )
+            Column(modifier = GlanceModifier.wrapContentHeight().fillMaxWidth()) {
+                visibleQuadrants.forEachIndexed { index, spec ->
+                    if (index > 0) {
+                        Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
+                    }
+                    QuadrantSection(
+                        modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
+                        spec = spec,
+                        taskList = tasks[spec.key] ?: emptyList(),
+                        appearance = appearance,
+                    )
+                }
+            }
         }
-    }
 
         // FAB overlay — bottom-right
+        val _bg = appearance.bgColor
+        val fabBgColor = Color(
+            red   = _bg.red   + (1f - _bg.red)   * 0.35f,
+            green = _bg.green + (1f - _bg.green) * 0.35f,
+            blue  = _bg.blue  + (1f - _bg.blue)  * 0.35f,
+            alpha = _bg.alpha,
+        )
         Box(modifier = GlanceModifier.padding(bottom = 12.dp, end = 12.dp)) {
             Box(
                 modifier = GlanceModifier
-                    .width(52.dp)
-                    .height(52.dp)
-                    .cornerRadius(26.dp)
-                    .background(ColorProvider(Color(0xFF6750A4)))
+                    .width(56.dp)
+                    .height(56.dp)
+                    .cornerRadius(16.dp)
+                    .background(ColorProvider(fabBgColor))
                     .clickable(actionStartActivity(addIntent)),
                 contentAlignment = Alignment.Center,
             ) {
@@ -185,6 +231,7 @@ private fun QuadrantSection(
     modifier: GlanceModifier,
     spec: QuadrantSpec,
     taskList: List<TaskEntry>,
+    appearance: AppearanceSpec,
 ) {
     Column(modifier = modifier) {
         // Quadrant label header
@@ -207,7 +254,7 @@ private fun QuadrantSection(
                 text = spec.label,
                 style = TextStyle(
                     color = ColorProvider(spec.color),
-                    fontSize = 13.sp,
+                    fontSize = appearance.labelFontSize,
                     fontWeight = FontWeight.Bold,
                 ),
                 maxLines = 1,
@@ -226,15 +273,17 @@ private fun QuadrantSection(
                 Text(
                     text = "Nessuna attività",
                     style = TextStyle(
-                        color = ColorProvider(Color(0x99FFFFFF)),
-                        fontSize = 10.sp,
+                        color = ColorProvider(
+                            if (appearance.darkText) Color(0x99000000) else Color(0x99FFFFFF)
+                        ),
+                        fontSize = appearance.emptyFontSize,
                     ),
                 )
             }
         } else {
             Column(modifier = GlanceModifier.fillMaxWidth().wrapContentHeight()) {
                 taskList.forEach { task ->
-                    TaskRow(task = task, accentColor = spec.color)
+                    TaskRow(task = task, accentColor = spec.color, appearance = appearance)
                 }
             }
         }
@@ -242,7 +291,7 @@ private fun QuadrantSection(
 }
 
 @Composable
-private fun TaskRow(task: TaskEntry, accentColor: Color) {
+private fun TaskRow(task: TaskEntry, accentColor: Color, appearance: AppearanceSpec) {
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
@@ -264,23 +313,27 @@ private fun TaskRow(task: TaskEntry, accentColor: Color) {
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            // Inner: "buco" che simula il contorno
+            // Inner dot to simulate an outline-only circle
             Box(
                 modifier = GlanceModifier
                     .width(12.dp)
                     .height(12.dp)
                     .cornerRadius(6.dp)
-                    .background(ColorProvider(backgroundColor.copy(alpha = 0.9f))), // stesso bg del widget
+                    .background(ColorProvider(appearance.bgColor.copy(alpha = 0.9f))),
             ) {}
         }
         Spacer(modifier = GlanceModifier.width(10.dp))
         Text(
             text = task.title,
             style = TextStyle(
-                color = ColorProvider(Color(0xDDFFFFFF)),
-                fontSize = 13.sp,
+                color = ColorProvider(
+                    if (appearance.darkText) Color(0xDD000000) else Color(0xDDFFFFFF)
+                ),
+                fontSize = appearance.taskFontSize,
             ),
             maxLines = 2,
         )
     }
 }
+
+
