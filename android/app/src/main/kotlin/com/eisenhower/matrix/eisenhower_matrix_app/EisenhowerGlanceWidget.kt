@@ -45,6 +45,7 @@ import java.io.File
 
 val taskIdKey = ActionParameters.Key<String>("task_id")
 const val EXTRA_OPEN_ADD_TASK = "open_add_task"
+const val EXTRA_OPEN_WIDGET_SETTINGS = "open_widget_settings"
 
 data class TaskEntry(val id: String, val title: String)
 
@@ -195,6 +196,11 @@ private fun WidgetContent(
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
+    val settingsIntent = Intent(context, MainActivity::class.java).apply {
+        putExtra(EXTRA_OPEN_WIDGET_SETTINGS, true)
+        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
     val openAppIntent = Intent(context, MainActivity::class.java).apply {
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
     }
@@ -233,7 +239,32 @@ private fun WidgetContent(
             blue  = _bg.blue  + (1f - _bg.blue)  * 0.35f,
             alpha = _bg.alpha,
         )
-        Box(modifier = GlanceModifier.padding(bottom = 12.dp, end = 12.dp)) {
+        Row(
+            modifier = GlanceModifier.padding(bottom = 12.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Settings button — small and subtle
+            Box(
+                modifier = GlanceModifier
+                    .width(36.dp)
+                    .height(36.dp)
+                    .cornerRadius(12.dp)
+                    .background(ColorProvider(fabBgColor.copy(alpha = fabBgColor.alpha * 0.6f)))
+                    .clickable(actionStartActivity(settingsIntent)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "⚙",
+                    style = TextStyle(
+                        color = ColorProvider(
+                            if (appearance.darkText) Color(0x88000000) else Color(0x88FFFFFF)
+                        ),
+                        fontSize = 16.sp,
+                    ),
+                )
+            }
+            Spacer(modifier = GlanceModifier.width(8.dp))
+            // FAB
             Box(
                 modifier = GlanceModifier
                     .width(56.dp)
