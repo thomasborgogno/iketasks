@@ -5,6 +5,8 @@ enum WidgetTextSize { small, medium, large }
 
 enum WidgetTextColor { white, black }
 
+enum WidgetThemeMode { system, light, dark }
+
 class WidgetAppearanceSettings {
   const WidgetAppearanceSettings({
     required this.bgColorValue,
@@ -12,6 +14,7 @@ class WidgetAppearanceSettings {
     required this.textSize,
     required this.visibleQuadrants,
     this.textColor = WidgetTextColor.white,
+    this.themeMode = WidgetThemeMode.system,
   });
 
   /// The RGB portion of the background color (alpha is controlled by [bgAlpha]).
@@ -28,12 +31,16 @@ class WidgetAppearanceSettings {
   /// Whether task text should be black (for light backgrounds) or white (for dark).
   final WidgetTextColor textColor;
 
+  /// Which theme to base colour presets and text-colour defaults on.
+  final WidgetThemeMode themeMode;
+
   factory WidgetAppearanceSettings.defaults() => const WidgetAppearanceSettings(
     bgColorValue: 0x1C1B1F,
     bgAlpha: 255,
     textSize: WidgetTextSize.medium,
     visibleQuadrants: {'q1', 'q2', 'q3'},
     textColor: WidgetTextColor.white,
+    themeMode: WidgetThemeMode.system,
   );
 
   /// The final ARGB color combining [bgColorValue] and [bgAlpha].
@@ -47,12 +54,14 @@ class WidgetAppearanceSettings {
     WidgetTextSize? textSize,
     Set<String>? visibleQuadrants,
     WidgetTextColor? textColor,
+    WidgetThemeMode? themeMode,
   }) => WidgetAppearanceSettings(
     bgColorValue: bgColorValue ?? this.bgColorValue,
     bgAlpha: bgAlpha ?? this.bgAlpha,
     textSize: textSize ?? this.textSize,
     visibleQuadrants: visibleQuadrants ?? this.visibleQuadrants,
     textColor: textColor ?? this.textColor,
+    themeMode: themeMode ?? this.themeMode,
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +70,7 @@ class WidgetAppearanceSettings {
     'text_size': textSize.name,
     'visible_quadrants': visibleQuadrants.toList(),
     'text_color': textColor.name,
+    'theme_mode': themeMode.name,
   };
 
   factory WidgetAppearanceSettings.fromJson(Map<String, dynamic> json) {
@@ -98,12 +108,19 @@ class WidgetAppearanceSettings {
         ? WidgetTextColor.black
         : WidgetTextColor.white;
 
+    final themeMode = switch (json['theme_mode'] as String?) {
+      'light' => WidgetThemeMode.light,
+      'dark' => WidgetThemeMode.dark,
+      _ => WidgetThemeMode.system,
+    };
+
     return WidgetAppearanceSettings(
       bgColorValue: bgColorValue,
       bgAlpha: bgAlpha,
       textSize: textSize,
       visibleQuadrants: visibleQuadrants,
       textColor: textColor,
+      themeMode: themeMode,
     );
   }
 

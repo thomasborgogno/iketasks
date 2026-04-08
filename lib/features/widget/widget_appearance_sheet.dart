@@ -17,15 +17,22 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
   late WidgetAppearanceSettings _settings;
   bool _themeDefaultApplied = false;
 
-  // Hand-curated dark/light presets (scaffold bg of current theme is prepended dynamically).
-  static const _bgPresets = <int>[
-    0x1C1B1F,
-    0x0D1B2A,
-    0x0F2D1F,
-    0x1E2832,
-    0x2C2C2E,
-    0x2A0D0D,
-    0x2D1A0E,
+  static const _bgPresetsDark = <int>[
+    0xFF1A2A3A, // Blu Navy
+    0xFF1B3329, // Verde Bosco
+    0xFF2E1A47, // Viola Navy
+    0xFF4A1F2D, // Borgogna
+    0xFF2D3018, // Verde Oliva
+    0xFF3C3C3C, // Grigio Antracite
+  ];
+
+  static const _bgPresetsLight = <int>[
+    0xFFD1E3F5, // Blu Cielo
+    0xFFD5EDDB, // Verde Menta
+    0xFFE1D5F5, // Lavanda
+    0xFFF5D5DC, // Rosa Antico
+    0xFFE9EDD5, // Lime Pallido
+    0xFFE5E5E5, // Grigio Perla
   ];
 
   static const _quadrantOrder = ['q1', 'q2', 'q3', 'q4'];
@@ -42,26 +49,61 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
     if (!_themeDefaultApplied) {
       _themeDefaultApplied = true;
       if (_settings.bgColorValue ==
-          WidgetAppearanceSettings.defaults().bgColorValue) {
-        final scaffoldColor = Theme.of(
-          context,
-        ).scaffoldBackgroundColor.toARGB32();
-        _settings = _settings.copyWith(bgColorValue: scaffoldColor);
+              WidgetAppearanceSettings.defaults().bgColorValue &&
+          _settings.themeMode == WidgetThemeMode.system) {
+        _settings = _settings.copyWith(
+          bgColorValue: _scaffoldBgForMode(WidgetThemeMode.system),
+        );
       }
     }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  /// Returns the scaffold bg ARGB int for [mode] (using live theme for system).
+  int _scaffoldBgForMode(WidgetThemeMode mode) {
+    switch (mode) {
+      case WidgetThemeMode.dark:
+        return 0xFF1C1B1F;
+      case WidgetThemeMode.light:
+        return 0xFFF6F9FB;
+      case WidgetThemeMode.system:
+        return Theme.of(context).scaffoldBackgroundColor.toARGB32();
+    }
+  }
+
+  bool _isDarkMode(WidgetThemeMode mode) {
+    if (mode == WidgetThemeMode.dark) return true;
+    if (mode == WidgetThemeMode.light) return false;
+    return MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+  }
+
+  List<int> _presetsForMode(WidgetThemeMode mode) =>
+      _isDarkMode(mode) ? _bgPresetsDark : _bgPresetsLight;
+
+  WidgetTextColor _defaultTextColorForMode(WidgetThemeMode mode) =>
+      _isDarkMode(mode) ? WidgetTextColor.white : WidgetTextColor.black;
+
+  void _onThemeModeChanged(WidgetThemeMode newMode) {
+    final newBgColor = newMode == WidgetThemeMode.system
+        ? _scaffoldBgForMode(newMode)
+        : _settings.bgColorValue;
+    setState(() {
+      _settings = _settings.copyWith(
+        themeMode: newMode,
+        bgColorValue: newBgColor,
+        textColor: _defaultTextColorForMode(newMode),
+      );
+    });
   }
 
   Future<void> _save() async {
     await widget.service.save(_settings);
     if (!mounted) return;
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Modifiche salvate, potrebbe essere necessario ricreare il widget per applicarle.',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Widget aggiornato.')));
   }
 
   @override
@@ -82,53 +124,89 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
+              const SizedBox(height: 8),
+
+              // ── Tema ────────────────────────────────────────────────────
+              Text('Tema', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Center(
+                child: SegmentedButton<WidgetThemeMode>(
+                  segments: const [
+                    ButtonSegment(
+                      value: WidgetThemeMode.system,
+                      label: Text('Sistema'),
+                      icon: Icon(Icons.brightness_auto_outlined),
+                    ),
+                    ButtonSegment(
+                      value: WidgetThemeMode.light,
+                      label: Text('Chiaro'),
+                      icon: Icon(Icons.light_mode_outlined),
+                    ),
+                    ButtonSegment(
+                      value: WidgetThemeMode.dark,
+                      label: Text('Scuro'),
+                      icon: Icon(Icons.dark_mode_outlined),
+                    ),
+                  ],
+                  selected: {_settings.themeMode},
+                  onSelectionChanged: (s) => _onThemeModeChanged(s.first),
+                ),
+              ),
               const SizedBox(height: 24),
 
               // ── Sfondo ──────────────────────────────────────────────────
               Text('Sfondo', style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children:
-                    [
-                      // Scaffold background of current theme is always offered first.
-                      Theme.of(context).scaffoldBackgroundColor.toARGB32(),
-                      ..._bgPresets,
-                    ].map((colorValue) {
-                      final isSelected = _settings.bgColorValue == colorValue;
-                      return GestureDetector(
-                        onTap: () => setState(
-                          () => _settings = _settings.copyWith(
-                            bgColorValue: colorValue,
-                          ),
-                        ),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Color(0xFF000000 | colorValue),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              width: 3,
+              Opacity(
+                opacity: _settings.themeMode == WidgetThemeMode.system
+                    ? 0.35
+                    : 1.0,
+                child: IgnorePointer(
+                  ignoring: _settings.themeMode == WidgetThemeMode.system,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children:
+                        [
+                          _scaffoldBgForMode(_settings.themeMode),
+                          ..._presetsForMode(_settings.themeMode),
+                        ].map((colorValue) {
+                          final isSelected =
+                              _settings.bgColorValue == colorValue;
+                          return GestureDetector(
+                            onTap: () => setState(
+                              () => _settings = _settings.copyWith(
+                                bgColorValue: colorValue,
+                              ),
                             ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withAlpha(120),
-                                      blurRadius: 8,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF000000 | colorValue),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.transparent,
+                                  width: 3,
+                                ),
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary.withAlpha(120),
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -188,16 +266,21 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
               const SizedBox(height: 8),
               Center(
                 child: SegmentedButton<WidgetTextColor>(
-                  segments: const [
+                  showSelectedIcon: false,
+                  segments: [
                     ButtonSegment(
                       value: WidgetTextColor.white,
-                      label: Text('Bianco'),
-                      icon: Icon(Icons.light_mode_outlined),
+                      label: const Text('Bianco'),
+                      icon: _isDarkMode(_settings.themeMode)
+                          ? const Icon(Icons.circle)
+                          : const Icon(Icons.circle_outlined),
                     ),
                     ButtonSegment(
                       value: WidgetTextColor.black,
-                      label: Text('Nero'),
-                      icon: Icon(Icons.dark_mode_outlined),
+                      label: const Text('Nero'),
+                      icon: _isDarkMode(_settings.themeMode)
+                          ? const Icon(Icons.circle_outlined)
+                          : const Icon(Icons.circle),
                     ),
                   ],
                   selected: {_settings.textColor},

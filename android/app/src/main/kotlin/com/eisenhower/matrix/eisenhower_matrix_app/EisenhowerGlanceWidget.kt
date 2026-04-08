@@ -26,7 +26,6 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
@@ -247,7 +246,7 @@ private fun WidgetContent(
                 Text(
                     text = "+",
                     style = TextStyle(
-                        color = ColorProvider(Color.White),
+                        color = ColorProvider(if (appearance.darkText) Color.Black else Color.White),
                         fontSize = 32.sp,
                     ),
                 )
