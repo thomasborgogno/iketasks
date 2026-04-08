@@ -5,9 +5,6 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.content.Intent
 import android.os.Bundle
-import androidx.glance.appwidget.updateAll
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 
 class MainActivity : FlutterActivity() {
 
@@ -17,22 +14,6 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
-        
-        methodChannel!!.setMethodCallHandler { call, result ->
-            when (call.method) {
-                "forceWidgetUpdate" -> {
-                    lifecycleScope.launch {
-                        try {
-                            EisenhowerGlanceWidget().updateAll(applicationContext)
-                            result.success(true)
-                        } catch (e: Exception) {
-                            result.error("UPDATE_FAILED", e.message, null)
-                        }
-                    }
-                }
-                else -> result.notImplemented()
-            }
-        }
     }
 
     override fun onPostResume() {
@@ -42,7 +23,6 @@ class MainActivity : FlutterActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        setIntent(intent)
         handleIntent(intent)
     }
 
