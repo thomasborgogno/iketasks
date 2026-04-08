@@ -15,8 +15,6 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
-import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -56,6 +54,8 @@ private val QUADRANTS = listOf(
     QuadrantSpec("q3", "Delega", Color(0xFFF4A261)),
     QuadrantSpec("q4", "Elimina", Color(0xFF457B9D)),
 )
+
+private val backgroundColor = Color(0xFF1C1B1F)
 
 class EisenhowerGlanceWidget : GlanceAppWidget() {
 
@@ -98,10 +98,15 @@ private fun WidgetContent(tasks: Map<String, List<TaskEntry>>, context: Context)
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
+    val openAppIntent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(ColorProvider(Color(0xFF1C1B1F))),
+            .background(ColorProvider(backgroundColor))
+            .clickable(actionStartActivity(openAppIntent)),
         contentAlignment = Alignment.BottomEnd,
     ) {
         // Main content
@@ -125,48 +130,52 @@ private fun WidgetContent(tasks: Map<String, List<TaskEntry>>, context: Context)
         //     )
         // }
 
-        Column(modifier = GlanceModifier.defaultWeight().fillMaxSize()) {
+        Column(modifier = GlanceModifier.wrapContentHeight().fillMaxWidth()) {
             QuadrantSection(
-                modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
+                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
                 spec = QUADRANTS[0],
                 taskList = tasks[QUADRANTS[0].key] ?: emptyList(),
             )
+            Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
             QuadrantSection(
-                modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
+                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
                 spec = QUADRANTS[1],
                 taskList = tasks[QUADRANTS[1].key] ?: emptyList(),
             )
+            Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
             QuadrantSection(
-                modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
+                modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
                 spec = QUADRANTS[2],
                 taskList = tasks[QUADRANTS[2].key] ?: emptyList(),
             )
-            QuadrantSection(
-                modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
-                spec = QUADRANTS[3],
-                taskList = tasks[QUADRANTS[3].key] ?: emptyList(),
-            )
+            // Spacer(modifier = GlanceModifier.height(20.dp).fillMaxWidth())
+            // QuadrantSection(
+            //     modifier = GlanceModifier.wrapContentHeight().fillMaxWidth(),
+            //     spec = QUADRANTS[3],
+            //     taskList = tasks[QUADRANTS[3].key] ?: emptyList(),
+            // )
         }
     }
 
         // FAB overlay — bottom-right
-        Box(
-            modifier = GlanceModifier
-                .width(52.dp)
-                .height(52.dp)
-                // .padding(bottom = 12.dp, end = 12.dp)
-                .cornerRadius(26.dp)
-                .background(ColorProvider(Color(0xFF6750A4)))
-                .clickable(actionStartActivity(addIntent)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "+",
-                style = TextStyle(
-                    color = ColorProvider(Color.White),
-                    fontSize = 32.sp,
-                ),
-            )
+        Box(modifier = GlanceModifier.padding(bottom = 12.dp, end = 12.dp)) {
+            Box(
+                modifier = GlanceModifier
+                    .width(52.dp)
+                    .height(52.dp)
+                    .cornerRadius(26.dp)
+                    .background(ColorProvider(Color(0xFF6750A4)))
+                    .clickable(actionStartActivity(addIntent)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "+",
+                    style = TextStyle(
+                        color = ColorProvider(Color.White),
+                        fontSize = 32.sp,
+                    ),
+                )
+            }
         }
     } // end root Box
 }
@@ -184,7 +193,7 @@ private fun QuadrantSection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .background(ColorProvider(spec.color.copy(alpha = 0.25f)))
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
@@ -198,7 +207,7 @@ private fun QuadrantSection(
                 text = spec.label,
                 style = TextStyle(
                     color = ColorProvider(spec.color),
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                 ),
                 maxLines = 1,
@@ -210,7 +219,7 @@ private fun QuadrantSection(
             Box(
                 modifier = GlanceModifier
                     .fillMaxWidth()
-                    .defaultWeight()
+                    .height(40.dp)
                     .padding(6.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -223,8 +232,8 @@ private fun QuadrantSection(
                 )
             }
         } else {
-            LazyColumn(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                items(taskList, itemId = { it.id.hashCode().toLong() }) { task ->
+            Column(modifier = GlanceModifier.fillMaxWidth().wrapContentHeight()) {
+                taskList.forEach { task ->
                     TaskRow(task = task, accentColor = spec.color)
                 }
             }
@@ -238,36 +247,38 @@ private fun TaskRow(task: TaskEntry, accentColor: Color) {
         modifier = GlanceModifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable(
-                actionRunCallback<ToggleTaskActionCallback>(
-                    actionParametersOf(taskIdKey to task.id),
-                ),
-            )
-            .padding(horizontal = 6.dp, vertical = 3.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Circle check indicator
         Box(
             modifier = GlanceModifier
-                .width(14.dp)
-                .height(14.dp)
-                .background(ColorProvider(accentColor.copy(alpha = 0.25f)))
-                .padding(2.dp),
+                .width(16.dp)
+                .height(16.dp)
+                .cornerRadius(8.dp)
+                .background(ColorProvider(accentColor.copy(alpha = 0.7f)))
+                .clickable(
+                    actionRunCallback<ToggleTaskActionCallback>(
+                        actionParametersOf(taskIdKey to task.id),
+                    ),
+                ),
             contentAlignment = Alignment.Center,
         ) {
+            // Inner: "buco" che simula il contorno
             Box(
                 modifier = GlanceModifier
-                    .width(8.dp)
-                    .height(8.dp)
-                    .background(ColorProvider(accentColor.copy(alpha = 0.5f))),
+                    .width(12.dp)
+                    .height(12.dp)
+                    .cornerRadius(6.dp)
+                    .background(ColorProvider(backgroundColor.copy(alpha = 0.9f))), // stesso bg del widget
             ) {}
         }
-        Spacer(modifier = GlanceModifier.width(6.dp))
+        Spacer(modifier = GlanceModifier.width(10.dp))
         Text(
             text = task.title,
             style = TextStyle(
                 color = ColorProvider(Color(0xDDFFFFFF)),
-                fontSize = 11.sp,
+                fontSize = 13.sp,
             ),
             maxLines = 2,
         )
