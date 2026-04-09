@@ -1,18 +1,12 @@
 {
   "@@locale": "de",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "Authentifizierungsfehler",
   "signInSubtitle": "Organisieren Sie Ihre Aufgaben nach Dringlichkeit und Wichtigkeit.",
   "signInWithGoogle": "Mit Google anmelden",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Google-Benutzer",
   "settings": "Einstellungen",
   "profileAndSettings": "Profil und Einstellungen",
   "signOut": "Abmelden",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "Wichtig, dringend",
   "quadrantImportantNotUrgent": "Wichtig, nicht dringend",
   "quadrantNotImportantUrgent": "Nicht wichtig, dringend",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "Planen",
   "quadrantNameDelegate": "Delegieren",
   "quadrantNameEliminate": "Eliminieren",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "Ihre Eisenhower-Matrix",
+  "greeting": "Hallo, {name}!",
   "columnView": "Spaltenansicht",
   "gridView": "Rasteransicht",
   "empty": "Leer",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "Neue Aufgabe",
   "editTask": "Aufgabe bearbeiten",
   "taskTitle": "Titel",
@@ -52,14 +43,10 @@
   "remove": "Entfernen",
   "cancel": "Abbrechen",
   "dueDateLabel": "Fällig: {date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "Erledigte Aufgaben",
   "loadingError": "Ladefehler",
   "noCompletedTasks": "Keine erledigten Aufgaben",
   "completedOn": "Erledigt am {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "Kategorien",
   "categoryManagement": "Kategorienverwaltung",
   "emoji": "Emoji",
@@ -69,8 +56,6 @@
   "deleteCategory": "Kategorie löschen",
   "deleteCategoryConfirm": "\"{name}\" löschen?",
   "deleteCategoryWarning": "Zugehörige Aufgaben verlieren ihre Kategorie.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Von Google Tasks importieren",
   "loadingGoogleTasks": "Google Tasks werden geladen...",
   "unknownError": "Unbekannter Fehler",
@@ -85,8 +70,6 @@
   "previous": "Zurück",
   "skip": "Überspringen",
   "importTasks": "Aufgaben importieren",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "Widget-Aussehen",
   "theme": "Thema",
   "systemTheme": "System",
@@ -103,8 +86,6 @@
   "black": "Schwarz",
   "quadrants": "Quadranten",
   "widgetUpdated": "Widget aktualisiert.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "Rot",
   "colorOrange": "Orange",
   "colorYellow": "Gelb",
@@ -120,16 +101,12 @@
   "colorLime": "Limette",
   "colorAmber": "Bernstein",
   "colorDeepOrange": "Dunkles Orange",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "Prioritätsaufgaben",
   "notificationChannelDescription": "Prioritätsaufgaben aus der Eisenhower-Matrix anzeigen",
   "createNewTask": "Neue Aufgabe erstellen",
   "taskCount": "{count} Aufgaben",
   "persistentNotification": "Dauerhafte Benachrichtigung",
   "persistentNotificationDescription": "Prioritätsaufgaben in der Benachrichtigungsleiste anzeigen",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "Sprache",
   "languageEnglish": "Englisch",
   "languageItalian": "Italienisch",

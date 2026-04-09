@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/locale/locale_cubit.dart';
@@ -139,7 +139,9 @@ class _MatrixPageState extends State<MatrixPage> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.cloud_download_outlined),
-                      title: Text(AppLocalizations.of(context)!.importFromGoogleTasks),
+                      title: Text(
+                        AppLocalizations.of(context)!.importFromGoogleTasks,
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -155,7 +157,9 @@ class _MatrixPageState extends State<MatrixPage> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.widgets_outlined),
-                      title: Text(AppLocalizations.of(context)!.widgetAppearance),
+                      title: Text(
+                        AppLocalizations.of(context)!.widgetAppearance,
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -173,9 +177,13 @@ class _MatrixPageState extends State<MatrixPage> {
                     ),
                     SwitchListTile(
                       secondary: const Icon(Icons.notifications_outlined),
-                      title: Text(AppLocalizations.of(context)!.persistentNotification),
+                      title: Text(
+                        AppLocalizations.of(context)!.persistentNotification,
+                      ),
                       subtitle: Text(
-                        AppLocalizations.of(context)!.persistentNotificationDescription,
+                        AppLocalizations.of(
+                          context,
+                        )!.persistentNotificationDescription,
                       ),
                       value: notificationService.isEnabled,
                       onChanged: (value) async {
@@ -204,7 +212,7 @@ class _MatrixPageState extends State<MatrixPage> {
         title: Text(
           user?.displayName?.trim().split(' ').firstOrNull == null
               ? l10n.yourEisenhowerMatrix
-              : 'Ciao, ${user?.displayName?.trim().split(' ').first}!',
+              : l10n.greeting(user!.displayName!.trim().split(' ').first),
         ),
         actions: [
           IconButton(
@@ -393,7 +401,7 @@ class _MatrixPageState extends State<MatrixPage> {
       showDragHandle: true,
       builder: (sheetContext) {
         return SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,

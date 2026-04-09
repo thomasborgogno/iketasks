@@ -1,18 +1,12 @@
 {
   "@@locale": "en",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "Authentication error",
   "signInSubtitle": "Organize your tasks by urgency and importance.",
   "signInWithGoogle": "Sign in with Google",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Google User",
   "settings": "Settings",
   "profileAndSettings": "Profile and settings",
   "signOut": "Sign out",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "Important, urgent",
   "quadrantImportantNotUrgent": "Important, not urgent",
   "quadrantNotImportantUrgent": "Not important, urgent",
@@ -21,14 +15,18 @@
   "quadrantNamePlan": "Plan",
   "quadrantNameDelegate": "Delegate",
   "quadrantNameEliminate": "Eliminate",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "Your Eisenhower Matrix",
+  "greeting": "Hello, {name}!",
+  "@greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "columnView": "Column view",
   "gridView": "Grid view",
   "empty": "Empty",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "New task",
   "editTask": "Edit task",
   "taskTitle": "Title",
@@ -59,8 +57,6 @@
       }
     }
   },
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "Completed tasks",
   "loadingError": "Loading error",
   "noCompletedTasks": "No completed tasks",
@@ -72,8 +68,6 @@
       }
     }
   },
-
-  "_comment_categories": "===== Categories =====",
   "categories": "Categories",
   "categoryManagement": "Category management",
   "emoji": "Emoji",
@@ -90,8 +84,6 @@
     }
   },
   "deleteCategoryWarning": "Associated tasks will lose their category.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Import from Google Tasks",
   "loadingGoogleTasks": "Loading Google Tasks...",
   "unknownError": "Unknown error",
@@ -123,8 +115,6 @@
   "previous": "Previous",
   "skip": "Skip",
   "importTasks": "Import tasks",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "Widget appearance",
   "theme": "Theme",
   "systemTheme": "System",
@@ -148,8 +138,6 @@
   "black": "Black",
   "quadrants": "Quadrants",
   "widgetUpdated": "Widget updated.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "Red",
   "colorOrange": "Orange",
   "colorYellow": "Yellow",
@@ -165,8 +153,6 @@
   "colorLime": "Lime",
   "colorAmber": "Amber",
   "colorDeepOrange": "Deep Orange",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "Priority tasks",
   "notificationChannelDescription": "Show priority tasks from the Eisenhower Matrix",
   "createNewTask": "Create new task",
@@ -180,8 +166,6 @@
   },
   "persistentNotification": "Persistent notification",
   "persistentNotificationDescription": "Show priority tasks in the notification bar",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "Language",
   "languageEnglish": "English",
   "languageItalian": "Italian",

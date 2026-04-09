@@ -1,18 +1,12 @@
 {
   "@@locale": "it",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "Errore autenticazione",
   "signInSubtitle": "Organizza le tue attivita per urgenza e importanza.",
   "signInWithGoogle": "Accedi con Google",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Utente Google",
   "settings": "Impostazioni",
   "profileAndSettings": "Profilo e impostazioni",
   "signOut": "Esci",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "Importante, urgente",
   "quadrantImportantNotUrgent": "Importante, non urgente",
   "quadrantNotImportantUrgent": "Non importante, urgente",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "Pianifica",
   "quadrantNameDelegate": "Delega",
   "quadrantNameEliminate": "Elimina",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "La tua matrice di Eisenhower",
+  "greeting": "Ciao, {name}!",
   "columnView": "Vista a colonne",
   "gridView": "Vista a griglia",
   "empty": "Vuoto",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "Nuova attività",
   "editTask": "Modifica attività",
   "taskTitle": "Titolo",
@@ -52,14 +43,10 @@
   "remove": "Rimuovi",
   "cancel": "Annulla",
   "dueDateLabel": "Scadenza: {date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "Attività completate",
   "loadingError": "Errore nel caricamento",
   "noCompletedTasks": "Nessuna attività completata",
   "completedOn": "Completata il {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "Categorie",
   "categoryManagement": "Gestione categorie",
   "emoji": "Emoji",
@@ -69,8 +56,6 @@
   "deleteCategory": "Elimina categoria",
   "deleteCategoryConfirm": "Eliminare \"{name}\"?",
   "deleteCategoryWarning": "Le attività associate perderanno la categoria.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Importa da Google Tasks",
   "loadingGoogleTasks": "Caricamento attività Google...",
   "unknownError": "Errore sconosciuto",
@@ -85,8 +70,6 @@
   "previous": "Precedente",
   "skip": "Salta",
   "importTasks": "Importa attività",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "Aspetto del widget",
   "theme": "Tema",
   "systemTheme": "Sistema",
@@ -103,8 +86,6 @@
   "black": "Nero",
   "quadrants": "Quadranti",
   "widgetUpdated": "Widget aggiornato.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "Rosso",
   "colorOrange": "Arancione",
   "colorYellow": "Giallo",
@@ -120,16 +101,12 @@
   "colorLime": "Lime",
   "colorAmber": "Ambra",
   "colorDeepOrange": "Arancione scuro",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "Attività prioritarie",
   "notificationChannelDescription": "Mostra le attività prioritarie della matrice di Eisenhower",
   "createNewTask": "Crea nuova attività",
   "taskCount": "{count} task",
   "persistentNotification": "Notifica persistente",
   "persistentNotificationDescription": "Mostra le attività prioritarie nella barra delle notifiche",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "Lingua",
   "languageEnglish": "Inglese",
   "languageItalian": "Italiano",

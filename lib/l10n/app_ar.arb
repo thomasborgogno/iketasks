@@ -1,18 +1,12 @@
 {
   "@@locale": "ar",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "خطأ في المصادقة",
   "signInSubtitle": "نظم مهامك حسب الإلحاح والأهمية.",
   "signInWithGoogle": "تسجيل الدخول باستخدام Google",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "مستخدم Google",
   "settings": "الإعدادات",
   "profileAndSettings": "الملف الشخصي والإعدادات",
   "signOut": "تسجيل الخروج",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "مهم، عاجل",
   "quadrantImportantNotUrgent": "مهم، غير عاجل",
   "quadrantNotImportantUrgent": "غير مهم، عاجل",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "خطط",
   "quadrantNameDelegate": "فوّض",
   "quadrantNameEliminate": "احذف",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "مصفوفة أيزنهاور الخاصة بك",
+  "greeting": "مرحباً، {name}!",
   "columnView": "عرض الأعمدة",
   "gridView": "عرض الشبكة",
   "empty": "فارغ",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "مهمة جديدة",
   "editTask": "تعديل المهمة",
   "taskTitle": "العنوان",
@@ -52,14 +43,10 @@
   "remove": "إزالة",
   "cancel": "إلغاء",
   "dueDateLabel": "الاستحقاق: {date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "المهام المكتملة",
   "loadingError": "خطأ في التحميل",
   "noCompletedTasks": "لا توجد مهام مكتملة",
   "completedOn": "اكتمل في {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "الفئات",
   "categoryManagement": "إدارة الفئات",
   "emoji": "رمز تعبيري",
@@ -69,8 +56,6 @@
   "deleteCategory": "حذف الفئة",
   "deleteCategoryConfirm": "حذف \"{name}\"؟",
   "deleteCategoryWarning": "ستفقد المهام المرتبطة فئتها.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "استيراد من Google Tasks",
   "loadingGoogleTasks": "جاري تحميل مهام Google...",
   "unknownError": "خطأ غير معروف",
@@ -85,8 +70,6 @@
   "previous": "السابق",
   "skip": "تخطي",
   "importTasks": "استيراد المهام",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "مظهر الأداة",
   "theme": "السمة",
   "systemTheme": "النظام",
@@ -103,8 +86,6 @@
   "black": "أسود",
   "quadrants": "الأرباع",
   "widgetUpdated": "تم تحديث الأداة.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "أحمر",
   "colorOrange": "برتقالي",
   "colorYellow": "أصفر",
@@ -120,16 +101,12 @@
   "colorLime": "ليموني",
   "colorAmber": "كهرماني",
   "colorDeepOrange": "برتقالي داكن",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "المهام ذات الأولوية",
   "notificationChannelDescription": "عرض المهام ذات الأولوية من مصفوفة أيزنهاور",
   "createNewTask": "إنشاء مهمة جديدة",
   "taskCount": "{count} مهام",
   "persistentNotification": "إشعار دائم",
   "persistentNotificationDescription": "عرض المهام ذات الأولوية في شريط الإشعارات",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "اللغة",
   "languageEnglish": "الإنجليزية",
   "languageItalian": "الإيطالية",

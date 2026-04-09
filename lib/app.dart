@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -10,7 +10,7 @@ import 'features/auth/presentation/sign_in_page.dart';
 import 'features/categories/presentation/category_cubit.dart';
 import 'features/tasks/presentation/matrix_page.dart';
 import 'features/tasks/presentation/task_cubit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 
 class EisenhowerApp extends StatelessWidget {
   const EisenhowerApp({super.key});

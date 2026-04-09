@@ -1,18 +1,12 @@
-{
+﻿{
   "@@locale": "zh",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "身份验证错误",
   "signInSubtitle": "按紧急性和重要性组织您的任务。",
   "signInWithGoogle": "使用 Google 登录",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Google 用户",
   "settings": "设置",
   "profileAndSettings": "个人资料和设置",
   "signOut": "退出登录",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "重要且紧急",
   "quadrantImportantNotUrgent": "重要但不紧急",
   "quadrantNotImportantUrgent": "不重要但紧急",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "计划",
   "quadrantNameDelegate": "委托",
   "quadrantNameEliminate": "消除",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "您的艾森豪威尔矩阵",
+  "greeting": "你好，{name}！",
   "columnView": "列视图",
   "gridView": "网格视图",
   "empty": "空",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "新任务",
   "editTask": "编辑任务",
   "taskTitle": "标题",
@@ -52,14 +43,10 @@
   "remove": "移除",
   "cancel": "取消",
   "dueDateLabel": "截止日期：{date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "已完成的任务",
   "loadingError": "加载错误",
   "noCompletedTasks": "没有已完成的任务",
   "completedOn": "完成于 {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "类别",
   "categoryManagement": "类别管理",
   "emoji": "表情符号",
@@ -67,10 +54,8 @@
   "add": "添加",
   "close": "关闭",
   "deleteCategory": "删除类别",
-  "deleteCategoryConfirm": "删除"{name}"？",
+  "deleteCategoryConfirm": "删除\"{name}\"？",
   "deleteCategoryWarning": "相关任务将失去其类别。",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "从 Google Tasks 导入",
   "loadingGoogleTasks": "正在加载 Google 任务...",
   "unknownError": "未知错误",
@@ -85,8 +70,6 @@
   "previous": "上一步",
   "skip": "跳过",
   "importTasks": "导入任务",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "小部件外观",
   "theme": "主题",
   "systemTheme": "系统",
@@ -103,8 +86,6 @@
   "black": "黑色",
   "quadrants": "象限",
   "widgetUpdated": "小部件已更新。",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "红色",
   "colorOrange": "橙色",
   "colorYellow": "黄色",
@@ -120,16 +101,12 @@
   "colorLime": "青柠色",
   "colorAmber": "琥珀色",
   "colorDeepOrange": "深橙色",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "优先任务",
   "notificationChannelDescription": "显示艾森豪威尔矩阵中的优先任务",
   "createNewTask": "创建新任务",
   "taskCount": "{count} 个任务",
   "persistentNotification": "持久通知",
   "persistentNotificationDescription": "在通知栏中显示优先任务",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "语言",
   "languageEnglish": "英语",
   "languageItalian": "意大利语",

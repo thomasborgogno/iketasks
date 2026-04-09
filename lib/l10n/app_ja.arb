@@ -1,18 +1,12 @@
 {
   "@@locale": "ja",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "認証エラー",
   "signInSubtitle": "緊急性と重要性でタスクを整理します。",
   "signInWithGoogle": "Googleでログイン",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Googleユーザー",
   "settings": "設定",
   "profileAndSettings": "プロフィールと設定",
   "signOut": "ログアウト",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "重要、緊急",
   "quadrantImportantNotUrgent": "重要、緊急でない",
   "quadrantNotImportantUrgent": "重要でない、緊急",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "計画",
   "quadrantNameDelegate": "委任",
   "quadrantNameEliminate": "削除",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "アイゼンハワーマトリックス",
+  "greeting": "こんにちは、{name}！",
   "columnView": "列表示",
   "gridView": "グリッド表示",
   "empty": "空",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "新しいタスク",
   "editTask": "タスクを編集",
   "taskTitle": "タイトル",
@@ -52,14 +43,10 @@
   "remove": "削除",
   "cancel": "キャンセル",
   "dueDateLabel": "期限：{date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "完了したタスク",
   "loadingError": "読み込みエラー",
   "noCompletedTasks": "完了したタスクはありません",
   "completedOn": "{date} に完了",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "カテゴリ",
   "categoryManagement": "カテゴリ管理",
   "emoji": "絵文字",
@@ -69,8 +56,6 @@
   "deleteCategory": "カテゴリを削除",
   "deleteCategoryConfirm": "「{name}」を削除しますか？",
   "deleteCategoryWarning": "関連付けられたタスクはカテゴリを失います。",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Google Tasksからインポート",
   "loadingGoogleTasks": "Google Tasksを読み込み中...",
   "unknownError": "不明なエラー",
@@ -85,8 +70,6 @@
   "previous": "前へ",
   "skip": "スキップ",
   "importTasks": "タスクをインポート",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "ウィジェットの外観",
   "theme": "テーマ",
   "systemTheme": "システム",
@@ -103,8 +86,6 @@
   "black": "黒",
   "quadrants": "象限",
   "widgetUpdated": "ウィジェットが更新されました。",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "赤",
   "colorOrange": "オレンジ",
   "colorYellow": "黄色",
@@ -120,16 +101,12 @@
   "colorLime": "ライム",
   "colorAmber": "アンバー",
   "colorDeepOrange": "深いオレンジ",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "優先タスク",
   "notificationChannelDescription": "アイゼンハワーマトリックスの優先タスクを表示",
   "createNewTask": "新しいタスクを作成",
   "taskCount": "{count} タスク",
   "persistentNotification": "永続的な通知",
   "persistentNotificationDescription": "通知バーに優先タスクを表示",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "言語",
   "languageEnglish": "英語",
   "languageItalian": "イタリア語",

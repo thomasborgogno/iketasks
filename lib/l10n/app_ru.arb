@@ -1,18 +1,12 @@
 {
   "@@locale": "ru",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "Ошибка аутентификации",
   "signInSubtitle": "Организуйте свои задачи по срочности и важности.",
   "signInWithGoogle": "Войти через Google",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Пользователь Google",
   "settings": "Настройки",
   "profileAndSettings": "Профиль и настройки",
   "signOut": "Выйти",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "Важно, срочно",
   "quadrantImportantNotUrgent": "Важно, не срочно",
   "quadrantNotImportantUrgent": "Не важно, срочно",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "Планировать",
   "quadrantNameDelegate": "Делегировать",
   "quadrantNameEliminate": "Устранить",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "Ваша матрица Эйзенхауэра",
+  "greeting": "Привет, {name}!",
   "columnView": "Вид столбцов",
   "gridView": "Вид сетки",
   "empty": "Пусто",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "Новая задача",
   "editTask": "Редактировать задачу",
   "taskTitle": "Название",
@@ -52,14 +43,10 @@
   "remove": "Убрать",
   "cancel": "Отмена",
   "dueDateLabel": "Срок: {date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "Завершенные задачи",
   "loadingError": "Ошибка загрузки",
   "noCompletedTasks": "Нет завершенных задач",
   "completedOn": "Завершено {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "Категории",
   "categoryManagement": "Управление категориями",
   "emoji": "Эмодзи",
@@ -69,8 +56,6 @@
   "deleteCategory": "Удалить категорию",
   "deleteCategoryConfirm": "Удалить \"{name}\"?",
   "deleteCategoryWarning": "Связанные задачи потеряют свою категорию.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Импорт из Google Tasks",
   "loadingGoogleTasks": "Загрузка задач Google...",
   "unknownError": "Неизвестная ошибка",
@@ -85,8 +70,6 @@
   "previous": "Назад",
   "skip": "Пропустить",
   "importTasks": "Импортировать задачи",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "Внешний вид виджета",
   "theme": "Тема",
   "systemTheme": "Система",
@@ -103,8 +86,6 @@
   "black": "Черный",
   "quadrants": "Квадранты",
   "widgetUpdated": "Виджет обновлен.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "Красный",
   "colorOrange": "Оранжевый",
   "colorYellow": "Желтый",
@@ -120,16 +101,12 @@
   "colorLime": "Лаймовый",
   "colorAmber": "Янтарный",
   "colorDeepOrange": "Темно-оранжевый",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "Приоритетные задачи",
   "notificationChannelDescription": "Показать приоритетные задачи из матрицы Эйзенхауэра",
   "createNewTask": "Создать новую задачу",
   "taskCount": "{count} задач",
   "persistentNotification": "Постоянное уведомление",
   "persistentNotificationDescription": "Показывать приоритетные задачи в панели уведомлений",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "Язык",
   "languageEnglish": "Английский",
   "languageItalian": "Итальянский",

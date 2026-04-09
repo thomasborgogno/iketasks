@@ -1,18 +1,12 @@
 {
   "@@locale": "pt",
-
-  "_comment_auth": "===== Authentication =====",
   "authError": "Erro de autenticação",
   "signInSubtitle": "Organize suas tarefas por urgência e importância.",
   "signInWithGoogle": "Entrar com Google",
-
-  "_comment_profile": "===== Profile & Settings =====",
   "googleUser": "Usuário do Google",
   "settings": "Configurações",
   "profileAndSettings": "Perfil e configurações",
   "signOut": "Sair",
-
-  "_comment_quadrants": "===== Eisenhower Quadrants =====",
   "quadrantImportantUrgent": "Importante, urgente",
   "quadrantImportantNotUrgent": "Importante, não urgente",
   "quadrantNotImportantUrgent": "Não importante, urgente",
@@ -21,14 +15,11 @@
   "quadrantNamePlan": "Planejar",
   "quadrantNameDelegate": "Delegar",
   "quadrantNameEliminate": "Eliminar",
-
-  "_comment_matrix_view": "===== Matrix View =====",
   "yourEisenhowerMatrix": "Sua matriz de Eisenhower",
+  "greeting": "Olá, {name}!",
   "columnView": "Visualização em colunas",
   "gridView": "Visualização em grade",
   "empty": "Vazio",
-
-  "_comment_tasks": "===== Tasks =====",
   "newTask": "Nova tarefa",
   "editTask": "Editar tarefa",
   "taskTitle": "Título",
@@ -52,14 +43,10 @@
   "remove": "Remover",
   "cancel": "Cancelar",
   "dueDateLabel": "Vencimento: {date}",
-
-  "_comment_completed": "===== Completed Tasks =====",
   "completedTasks": "Tarefas concluídas",
   "loadingError": "Erro ao carregar",
   "noCompletedTasks": "Nenhuma tarefa concluída",
   "completedOn": "Concluída em {date}",
-
-  "_comment_categories": "===== Categories =====",
   "categories": "Categorias",
   "categoryManagement": "Gerenciamento de categorias",
   "emoji": "Emoji",
@@ -69,8 +56,6 @@
   "deleteCategory": "Excluir categoria",
   "deleteCategoryConfirm": "Excluir \"{name}\"?",
   "deleteCategoryWarning": "As tarefas associadas perderão sua categoria.",
-
-  "_comment_google_tasks": "===== Google Tasks Import =====",
   "importFromGoogleTasks": "Importar do Google Tasks",
   "loadingGoogleTasks": "Carregando tarefas do Google...",
   "unknownError": "Erro desconhecido",
@@ -85,8 +70,6 @@
   "previous": "Anterior",
   "skip": "Pular",
   "importTasks": "Importar tarefas",
-
-  "_comment_widget": "===== Android Widget =====",
   "widgetAppearance": "Aparência do widget",
   "theme": "Tema",
   "systemTheme": "Sistema",
@@ -103,8 +86,6 @@
   "black": "Preto",
   "quadrants": "Quadrantes",
   "widgetUpdated": "Widget atualizado.",
-
-  "_comment_widget_colors": "===== Widget Color Names =====",
   "colorRed": "Vermelho",
   "colorOrange": "Laranja",
   "colorYellow": "Amarelo",
@@ -120,16 +101,12 @@
   "colorLime": "Lima",
   "colorAmber": "Âmbar",
   "colorDeepOrange": "Laranja escuro",
-
-  "_comment_notifications": "===== Notifications =====",
   "notificationChannelName": "Tarefas prioritárias",
   "notificationChannelDescription": "Mostrar tarefas prioritárias da matriz de Eisenhower",
   "createNewTask": "Criar nova tarefa",
   "taskCount": "{count} tarefas",
   "persistentNotification": "Notificação persistente",
   "persistentNotificationDescription": "Mostrar tarefas prioritárias na barra de notificações",
-
-  "_comment_language": "===== Language Settings =====",
   "language": "Idioma",
   "languageEnglish": "Inglês",
   "languageItalian": "Italiano",
