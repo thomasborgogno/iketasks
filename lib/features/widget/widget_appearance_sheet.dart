@@ -103,11 +103,14 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
     Navigator.of(context).pop();
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Widget aggiornato.')));
+    ).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.widgetUpdated)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final alphaPercent = ((_settings.bgAlpha / 255) * 100).round();
 
     return SafeArea(
@@ -120,32 +123,32 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
             children: [
               Center(
                 child: Text(
-                  'Aspetto del widget',
+                  l10n.widgetAppearance,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               const SizedBox(height: 8),
 
               // ── Tema ────────────────────────────────────────────────────
-              Text('Tema', style: Theme.of(context).textTheme.titleSmall),
+              Text(l10n.theme, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               Center(
                 child: SegmentedButton<WidgetThemeMode>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: WidgetThemeMode.system,
-                      label: Text('Sistema'),
-                      icon: Icon(Icons.brightness_auto_outlined),
+                      label: Text(l10n.systemTheme),
+                      icon: const Icon(Icons.brightness_auto_outlined),
                     ),
                     ButtonSegment(
                       value: WidgetThemeMode.light,
-                      label: Text('Chiaro'),
-                      icon: Icon(Icons.light_mode_outlined),
+                      label: Text(l10n.lightTheme),
+                      icon: const Icon(Icons.light_mode_outlined),
                     ),
                     ButtonSegment(
                       value: WidgetThemeMode.dark,
-                      label: Text('Scuro'),
-                      icon: Icon(Icons.dark_mode_outlined),
+                      label: Text(l10n.darkTheme),
+                      icon: const Icon(Icons.dark_mode_outlined),
                     ),
                   ],
                   selected: {_settings.themeMode},
@@ -155,7 +158,7 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
               const SizedBox(height: 24),
 
               // ── Sfondo ──────────────────────────────────────────────────
-              Text('Sfondo', style: Theme.of(context).textTheme.titleSmall),
+              Text(l10n.background, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               Opacity(
                 opacity: _settings.themeMode == WidgetThemeMode.system
@@ -211,7 +214,7 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Text('Trasparenza: $alphaPercent%'),
+                  Text(l10n.transparency(alphaPercent)),
                   Expanded(
                     child: Slider(
                       min: 128,
@@ -230,24 +233,24 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
 
               // ── Testo ────────────────────────────────────────────────────
               Text(
-                'Dimensione testo',
+                l10n.textSize,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
               Center(
                 child: SegmentedButton<WidgetTextSize>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: WidgetTextSize.small,
-                      label: Text('Piccolo'),
+                      label: Text(l10n.small),
                     ),
                     ButtonSegment(
                       value: WidgetTextSize.medium,
-                      label: Text('Medio'),
+                      label: Text(l10n.medium),
                     ),
                     ButtonSegment(
                       value: WidgetTextSize.large,
-                      label: Text('Grande'),
+                      label: Text(l10n.large),
                     ),
                   ],
                   selected: {_settings.textSize},
@@ -260,7 +263,7 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
 
               // ── Colore testo ─────────────────────────────────────────────
               Text(
-                'Colore testo',
+                l10n.textColor,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
@@ -270,14 +273,14 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
                   segments: [
                     ButtonSegment(
                       value: WidgetTextColor.white,
-                      label: const Text('Bianco'),
+                      label: Text(l10n.white),
                       icon: _isDarkMode(_settings.themeMode)
                           ? const Icon(Icons.circle)
                           : const Icon(Icons.circle_outlined),
                     ),
                     ButtonSegment(
                       value: WidgetTextColor.black,
-                      label: const Text('Nero'),
+                      label: Text(l10n.black),
                       icon: _isDarkMode(_settings.themeMode)
                           ? const Icon(Icons.circle_outlined)
                           : const Icon(Icons.circle),
@@ -290,14 +293,14 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('Quadranti', style: Theme.of(context).textTheme.titleSmall),
+              Text(l10n.quadrants, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 4),
               ..._quadrantOrder.map((key) {
                 final isVisible = _settings.visibleQuadrants.contains(key);
                 return CheckboxListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: Text(EisenhowerQuadrantX.fromValue(key).fullName),
+                  title: Text(EisenhowerQuadrantX.fromValue(key).fullName(context)),
                   value: isVisible,
                   onChanged: (checked) {
                     final next = Set<String>.from(_settings.visibleQuadrants);
@@ -320,7 +323,7 @@ class _WidgetAppearanceSheetState extends State<_WidgetAppearanceSheet> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _save,
-                  child: const Text('Salva'),
+                  child: Text(l10n.save),
                 ),
               ),
             ],

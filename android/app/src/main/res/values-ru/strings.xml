@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Eisenhower Matrix</string>
+    <string name="widget_description">Виджет матрицы Эйзенхауэра</string>
+    <string name="quadrant_priority">Приоритет</string>
+    <string name="quadrant_plan">Планировать</string>
+    <string name="quadrant_delegate">Делегировать</string>
+    <string name="quadrant_eliminate">Устранить</string>
+    <string name="no_tasks">Нет задач</string>
+</resources>

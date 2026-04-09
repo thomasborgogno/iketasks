@@ -14,6 +14,7 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = user.displayName?.trim();
     final email = user.email?.trim();
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         _ProfileAvatar(photoUrl: user.photoURL, radius: 28),
@@ -23,7 +24,7 @@ class _ProfileHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                (name == null || name.isEmpty) ? 'Utente Google' : name,
+                (name == null || name.isEmpty) ? l10n.googleUser : name,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               if (email != null && email.isNotEmpty)
@@ -35,7 +36,7 @@ class _ProfileHeader extends StatelessWidget {
           IconButton(
             onPressed: onLogout,
             icon: const Icon(Icons.logout),
-            tooltip: 'Esci',
+            tooltip: l10n.signOut,
           ),
       ],
     );
@@ -109,22 +110,23 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
   }
 
   Future<void> _confirmDelete(TaskCategory category) async {
+    final l10n = AppLocalizations.of(context)!;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (d) => AlertDialog(
-        title: const Text('Elimina categoria'),
+        title: Text(l10n.deleteCategory),
         content: Text(
-          'Eliminare "${category.name}"?\n'
-          'Le attività associate perderanno la categoria.',
+          l10n.deleteCategoryConfirm(category.name) + '\n' +
+          l10n.deleteCategoryWarning,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(d).pop(false),
-            child: const Text('Annulla'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(true),
-            child: const Text('Elimina'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -140,8 +142,9 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('Gestione categorie'),
+      title: Text(l10n.categoryManagement),
       content: SizedBox(
         width: 420,
         child: Column(
@@ -154,7 +157,7 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
                   width: 64,
                   child: TextField(
                     controller: _emojiController,
-                    decoration: const InputDecoration(labelText: 'Emoji'),
+                    decoration: InputDecoration(labelText: l10n.emoji),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -162,8 +165,8 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome categoria',
+                    decoration: InputDecoration(
+                      labelText: l10n.categoryName,
                     ),
                     textCapitalization: TextCapitalization.sentences,
                     onSubmitted: (_) => _addCategory(),
@@ -174,7 +177,7 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
             const SizedBox(height: 12),
             FilledButton(
               onPressed: _addCategory,
-              child: const Text('Aggiungi'),
+              child: Text(l10n.add),
             ),
             const SizedBox(height: 16),
             Flexible(
@@ -209,8 +212,40 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: _closeDialog, child: const Text('Chiudi')),
+        TextButton(onPressed: _closeDialog, child: Text(l10n.close)),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Language option widget
+// ---------------------------------------------------------------------------
+
+class _LanguageOption extends StatelessWidget {
+  const _LanguageOption({
+    required this.languageName,
+    required this.locale,
+    required this.currentLocale,
+  });
+
+  final String languageName;
+  final Locale locale;
+  final Locale? currentLocale;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = currentLocale?.languageCode == locale.languageCode;
+
+    return ListTile(
+      title: Text(languageName),
+      trailing: isSelected ? const Icon(Icons.check) : null,
+      onTap: () async {
+        await context.read<LocaleCubit>().changeLocale(locale);
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
     );
   }
 }

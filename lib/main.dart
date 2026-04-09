@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
+import 'core/locale/locale_cubit.dart';
 import 'core/notifications/notification_service.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/presentation/auth_cubit.dart';
@@ -18,7 +19,18 @@ import 'features/widget/widget_sync_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Initialize date formatting for all supported locales
+  await initializeDateFormatting('en_US');
   await initializeDateFormatting('it_IT');
+  await initializeDateFormatting('es_ES');
+  await initializeDateFormatting('fr_FR');
+  await initializeDateFormatting('de_DE');
+  await initializeDateFormatting('zh_CN');
+  await initializeDateFormatting('pt_PT');
+  await initializeDateFormatting('ru_RU');
+  await initializeDateFormatting('ja_JP');
+  await initializeDateFormatting('ar_SA');
 
   final authRepository = AuthRepository();
   final taskRepository = TaskRepository();
@@ -30,6 +42,10 @@ Future<void> main() async {
   await widgetAppearanceService.initialize();
   final notificationService = NotificationService();
   await notificationService.initialize();
+
+  // Initialize locale cubit
+  final localeCubit = LocaleCubit();
+  await localeCubit.loadSavedLocale();
 
   runApp(
     MultiRepositoryProvider(
@@ -44,6 +60,7 @@ Future<void> main() async {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider.value(value: localeCubit),
           BlocProvider(
             create: (context) => AuthCubit(context.read<AuthRepository>()),
           ),

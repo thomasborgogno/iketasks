@@ -55,7 +55,7 @@ class _QuadrantCard extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6),
                     child: Text(
-                      quadrant.name,
+                      quadrant.name(context),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: color,
@@ -64,7 +64,7 @@ class _QuadrantCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    quadrant.description,
+                    quadrant.description(context),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -75,7 +75,7 @@ class _QuadrantCard extends StatelessWidget {
                       child: tasks.isEmpty
                           ? Center(
                               child: Text(
-                                'Vuoto',
+                                AppLocalizations.of(context)!.empty,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             )
@@ -103,7 +103,7 @@ class _QuadrantCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Center(
                         child: Text(
-                          'Vuoto',
+                          AppLocalizations.of(context)!.empty,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),
@@ -260,6 +260,7 @@ class _TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final due = task.dueDate == null
         ? null
         : DateFormat('dd/MM/yyyy').format(task.dueDate!);
@@ -297,7 +298,7 @@ class _TaskTile extends StatelessWidget {
                 fontWeight: task.completed ? null : FontWeight.w500,
               ),
             ),
-            subtitle: due == null ? null : Text('Scadenza: $due'),
+            subtitle: due == null ? null : Text(l10n.dueDateLabel(due)),
           ),
         ),
       ),

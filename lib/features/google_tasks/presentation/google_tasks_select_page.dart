@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 
 import '../../tasks/presentation/task_cubit.dart';
 import '../data/google_tasks_repository.dart';
@@ -66,8 +67,9 @@ class _GoogleTasksImportBody extends StatelessWidget {
         );
       },
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         return Scaffold(
-          appBar: AppBar(title: const Text('Importa da Google Tasks')),
+          appBar: AppBar(title: Text(l10n.importFromGoogleTasks)),
           body: _buildBody(context, state),
           floatingActionButton:
               state.status == GoogleTasksImportStatus.selecting &&
@@ -77,7 +79,7 @@ class _GoogleTasksImportBody extends StatelessWidget {
                       .read<GoogleTasksImportCubit>()
                       .proceedToAssignment(),
                   icon: const Icon(Icons.arrow_forward),
-                  label: Text('Continua (${state.selected.length})'),
+                  label: Text(l10n.continueWithSelected(state.selected.length)),
                 )
               : null,
         );
@@ -86,16 +88,17 @@ class _GoogleTasksImportBody extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, GoogleTasksImportState state) {
+    final l10n = AppLocalizations.of(context)!;
     switch (state.status) {
       case GoogleTasksImportStatus.initial:
       case GoogleTasksImportStatus.loading:
-        return const Center(
+        return Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Caricamento attività Google...'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(l10n.loadingGoogleTasks),
             ],
           ),
         );
@@ -109,14 +112,14 @@ class _GoogleTasksImportBody extends StatelessWidget {
                 const Icon(Icons.error_outline, size: 48),
                 const SizedBox(height: 12),
                 Text(
-                  state.errorMessage ?? 'Errore sconosciuto',
+                  state.errorMessage ?? l10n.unknownError,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () =>
                       context.read<GoogleTasksImportCubit>().loadTasks(),
-                  child: const Text('Riprova'),
+                  child: Text(l10n.retry),
                 ),
               ],
             ),
@@ -125,8 +128,8 @@ class _GoogleTasksImportBody extends StatelessWidget {
       case GoogleTasksImportStatus.selecting:
       case GoogleTasksImportStatus.assigning:
         if (state.tasks.isEmpty) {
-          return const Center(
-            child: Text('Nessuna attività trovata su Google Tasks.'),
+          return Center(
+            child: Text(l10n.noGoogleTasksFound),
           );
         }
         return _TabbedTaskSelection(
@@ -197,6 +200,7 @@ class _TabbedTaskSelectionState extends State<_TabbedTaskSelection>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         TabBar(
@@ -221,7 +225,7 @@ class _TabbedTaskSelectionState extends State<_TabbedTaskSelection>
                         .read<GoogleTasksImportCubit>()
                         .toggleSelectAll(listTasks),
                     title: Text(
-                      allSelected ? 'Deseleziona tutto' : 'Seleziona tutto',
+                      allSelected ? l10n.deselectAll : l10n.selectAll,
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     controlAffinity: ListTileControlAffinity.leading,

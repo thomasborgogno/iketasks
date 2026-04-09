@@ -1,6 +1,7 @@
-import 'package:eisenhower_matrix_app/features/tasks/presentation/task_completion_circle.dart';
+﻿import 'package:eisenhower_matrix_app/features/tasks/presentation/task_completion_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../data/task_repository.dart';
@@ -27,8 +28,9 @@ class _CompletedPageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Attività completate')),
+      appBar: AppBar(title: Text(l10n.completedTasks)),
       body: BlocBuilder<CompletedTasksCubit, CompletedTasksState>(
         builder: (context, state) {
           if (state.status == CompletedTasksStatus.initial ||
@@ -37,11 +39,11 @@ class _CompletedPageBody extends StatelessWidget {
           }
           if (state.status == CompletedTasksStatus.error) {
             return Center(
-              child: Text(state.errorMessage ?? 'Errore nel caricamento'),
+              child: Text(state.errorMessage ?? l10n.loadingError),
             );
           }
           if (state.tasks.isEmpty) {
-            return const Center(child: Text('Nessuna attività completata'));
+            return Center(child: Text(l10n.noCompletedTasks));
           }
           return _CompletedTasksList(tasks: state.tasks);
         },
@@ -57,8 +59,10 @@ class _CompletedTasksList extends StatelessWidget {
 
   List<({String monthLabel, List<TaskItem> tasks})> _groupByMonth(
     List<TaskItem> tasks,
+    BuildContext context,
   ) {
-    final formatter = DateFormat('MMMM yyyy', 'it_IT');
+    final locale = Localizations.localeOf(context);
+    final formatter = DateFormat('MMMM yyyy', locale.toString());
     final groups = <String, List<TaskItem>>{};
     for (final task in tasks) {
       final key = formatter.format(task.updatedAt);
@@ -71,7 +75,7 @@ class _CompletedTasksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groups = _groupByMonth(tasks);
+    final groups = _groupByMonth(tasks, context);
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
       itemCount: groups.fold<int>(0, (sum, g) => sum + 1 + g.tasks.length),
@@ -121,7 +125,9 @@ class _CompletedTaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final updatedStr = DateFormat('dd/MM/yyyy', 'it_IT').format(task.updatedAt);
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final updatedStr = DateFormat('dd/MM/yyyy', locale.toString()).format(task.updatedAt);
     return ListTile(
       leading: TaskCompletionCircle(
         completed: true,
@@ -131,7 +137,7 @@ class _CompletedTaskTile extends StatelessWidget {
         task.title,
         style: const TextStyle(decoration: TextDecoration.lineThrough),
       ),
-      subtitle: Text('Completata il $updatedStr'),
+      subtitle: Text(l10n.completedOn(updatedStr)),
       dense: true,
     );
   }
