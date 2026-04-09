@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Eisenhower Matrix</string>
     <string name="widget_description">Eisenhower Matrix Widget</string>
+    <string name="minimal_widget_description">Minimal Priority Widget</string>
     <string name="quadrant_priority">Priority</string>
     <string name="quadrant_plan">Plan</string>
     <string name="quadrant_delegate">Delegate</string>

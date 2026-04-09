@@ -145,5 +145,9 @@
   "onboardingCategoriesTitle": "Создайте свои Категории",
   "onboardingCategoriesDescription": "Категории помогают организовать задачи по проектам, контексту или любым другим способом",
   "onboardingNoCategoriesYet": "Категорий пока нет. Создайте свою первую!",
-  "onboardingFinish": "Завершить"
+  "onboardingFinish": "Завершить",
+  "textAlignment": "Выравнивание текста",
+  "alignLeft": "По левому краю",
+  "alignCenter": "По центру",
+  "alignRight": "По правому краю"
 }

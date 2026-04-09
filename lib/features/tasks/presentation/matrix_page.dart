@@ -23,11 +23,13 @@ import '../../google_tasks/data/google_tasks_repository.dart';
 import '../../google_tasks/presentation/google_tasks_select_page.dart';
 import '../../widget/widget_appearance_service.dart';
 import '../../widget/widget_appearance_settings.dart';
+import '../../widget/minimal_widget_sync_service.dart';
+import '../../widget/minimal_widget_settings.dart';
 
 part 'matrix_grid_widgets.dart';
 part 'task_form_sheet.dart';
 part 'settings_widgets.dart';
-part '../../widget/widget_appearance_sheet.dart';
+part '../../widget/unified_widget_settings_sheet.dart';
 
 enum _LayoutMode { grid, stacked }
 
@@ -474,12 +476,16 @@ class _MatrixPageState extends State<MatrixPage> {
   Future<void> _openWidgetAppearance(BuildContext context) async {
     if (_isModalOpen) return;
     _isModalOpen = true;
-    final service = context.read<WidgetAppearanceService>();
+    final matrixService = context.read<WidgetAppearanceService>();
+    final minimalService = context.read<MinimalWidgetSyncService>();
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _WidgetAppearanceSheet(service: service),
+      builder: (_) => _UnifiedWidgetSettingsSheet(
+        matrixService: matrixService,
+        minimalService: minimalService,
+      ),
     );
     _isModalOpen = false;
   }

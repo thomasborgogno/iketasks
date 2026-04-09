@@ -145,5 +145,9 @@
   "onboardingCategoriesTitle": "创建您的类别",
   "onboardingCategoriesDescription": "类别可帮助您按项目、上下文或您喜欢的任何方式组织任务",
   "onboardingNoCategoriesYet": "还没有类别。创建您的第一个！",
-  "onboardingFinish": "完成"
+  "onboardingFinish": "完成",
+  "textAlignment": "文本对齐",
+  "alignLeft": "左对齐",
+  "alignCenter": "居中",
+  "alignRight": "右对齐"
 }

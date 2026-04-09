@@ -204,5 +204,17 @@
   "onboardingCategoriesTitle": "Create Your Categories",
   "onboardingCategoriesDescription": "Categories help you organize tasks by project, context, or any way you prefer",
   "onboardingNoCategoriesYet": "No categories yet. Create your first one!",
-  "onboardingFinish": "Finish"
+  "onboardingFinish": "Finish",
+  "widgetType": "Widget type",
+  "matrixWidget": "Matrix widget (5x5)",
+  "minimalWidget": "Minimal widget (4x1)",
+  "numberOfTasks": "Number of tasks to display",
+  "fallbackToNextQuadrants": "Use tasks from other quadrants",
+  "fallbackDescription": "If priority quadrant is empty, show tasks from Plan, Delegate, or Eliminate quadrants",
+  "textAlignment": "Text alignment",
+  "alignLeft": "Left",
+  "alignCenter": "Center",
+  "alignRight": "Right",
+  "task": "task",
+  "tasks": "tasks"
 }

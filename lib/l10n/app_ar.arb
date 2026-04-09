@@ -145,5 +145,9 @@
   "onboardingCategoriesTitle": "إنشاء فئاتك",
   "onboardingCategoriesDescription": "تساعدك الفئات على تنظيم المهام حسب المشروع أو السياق أو بأي طريقة تفضلها",
   "onboardingNoCategoriesYet": "لا توجد فئات بعد. أنشئ فئتك الأولى!",
-  "onboardingFinish": "إنهاء"
+  "onboardingFinish": "إنهاء",
+  "textAlignment": "محاذاة النص",
+  "alignLeft": "يسار",
+  "alignCenter": "وسط",
+  "alignRight": "يمين"
 }

@@ -145,5 +145,9 @@
   "onboardingCategoriesTitle": "Crie suas Categorias",
   "onboardingCategoriesDescription": "As categorias ajudam você a organizar tarefas por projeto, contexto ou da maneira que preferir",
   "onboardingNoCategoriesYet": "Ainda sem categorias. Crie sua primeira!",
-  "onboardingFinish": "Concluir"
+  "onboardingFinish": "Concluir",
+  "textAlignment": "Alinhamento de texto",
+  "alignLeft": "Esquerda",
+  "alignCenter": "Centro",
+  "alignRight": "Direita"
 }
