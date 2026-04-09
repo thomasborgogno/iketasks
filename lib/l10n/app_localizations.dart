@@ -821,6 +821,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic'**
   String get languageArabic;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Eisenhower Matrix'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The ultimate tool for prioritizing your tasks'**
+  String get onboardingWelcomeSubtitle;
+
+  /// No description provided for @onboardingWelcomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The Eisenhower Matrix helps you organize tasks by urgency and importance, so you can focus on what truly matters.'**
+  String get onboardingWelcomeDescription;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @onboardingNotUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Urgent'**
+  String get onboardingNotUrgent;
+
+  /// No description provided for @onboardingNotImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Important'**
+  String get onboardingNotImportant;
+
+  /// No description provided for @onboardingQ1Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Do now'**
+  String get onboardingQ1Description;
+
+  /// No description provided for @onboardingQ2Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get onboardingQ2Description;
+
+  /// No description provided for @onboardingQ3Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate'**
+  String get onboardingQ3Description;
+
+  /// No description provided for @onboardingQ4Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Eliminate'**
+  String get onboardingQ4Description;
+
+  /// No description provided for @onboardingFeaturesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful Features'**
+  String get onboardingFeaturesTitle;
+
+  /// No description provided for @onboardingFeatureCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize with Categories'**
+  String get onboardingFeatureCategories;
+
+  /// No description provided for @onboardingFeatureCategoriesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create custom categories to group your tasks by project or context'**
+  String get onboardingFeatureCategoriesDesc;
+
+  /// No description provided for @onboardingFeatureNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Persistent Notification'**
+  String get onboardingFeatureNotifications;
+
+  /// No description provided for @onboardingFeatureNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your priority tasks from the notification bar'**
+  String get onboardingFeatureNotificationsDesc;
+
+  /// No description provided for @onboardingFeatureWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Screen Widget'**
+  String get onboardingFeatureWidget;
+
+  /// No description provided for @onboardingFeatureWidgetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See your important tasks at a glance without opening the app'**
+  String get onboardingFeatureWidgetDesc;
+
+  /// No description provided for @onboardingFeatureSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get onboardingFeatureSync;
+
+  /// No description provided for @onboardingFeatureSyncDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your tasks sync across all your devices automatically'**
+  String get onboardingFeatureSyncDesc;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingSignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Continue'**
+  String get onboardingSignInTitle;
+
+  /// No description provided for @onboardingSignInDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Google account to sync your tasks and access them from anywhere'**
+  String get onboardingSignInDescription;
+
+  /// No description provided for @onboardingSignInSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully signed in!'**
+  String get onboardingSignInSuccess;
+
+  /// No description provided for @onboardingCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Categories'**
+  String get onboardingCategoriesTitle;
+
+  /// No description provided for @onboardingCategoriesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories help you organize tasks by project, context, or any way you prefer'**
+  String get onboardingCategoriesDescription;
+
+  /// No description provided for @onboardingNoCategoriesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet. Create your first one!'**
+  String get onboardingNoCategoriesYet;
+
+  /// No description provided for @onboardingFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get onboardingFinish;
 }
 
 class _AppLocalizationsDelegate

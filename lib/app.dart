@@ -65,16 +65,14 @@ class EisenhowerApp extends StatelessWidget {
             builder: (context, state) {
               return BlocBuilder<OnboardingCubit, OnboardingState>(
                 builder: (context, onboardingState) {
-                  // Show loading while checking onboarding status or auth
+                  // Show loading only while checking initial onboarding status
                   if (onboardingState.status == OnboardingStatus.loading ||
-                      state.status == AuthStatus.loading ||
                       state.status == AuthStatus.unknown) {
                     return const Scaffold(
                       body: Center(child: CircularProgressIndicator()),
                     );
                   }
 
-                  // Show onboarding wizard if not completed
                   if (onboardingState.status == OnboardingStatus.required) {
                     return const OnboardingWizard();
                   }

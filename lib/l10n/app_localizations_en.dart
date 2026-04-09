@@ -382,4 +382,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageArabic => 'Arabic';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome to Eisenhower Matrix';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'The ultimate tool for prioritizing your tasks';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'The Eisenhower Matrix helps you organize tasks by urgency and importance, so you can focus on what truly matters.';
+
+  @override
+  String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String get onboardingNotUrgent => 'Not Urgent';
+
+  @override
+  String get onboardingNotImportant => 'Not Important';
+
+  @override
+  String get onboardingQ1Description => 'Do now';
+
+  @override
+  String get onboardingQ2Description => 'Schedule';
+
+  @override
+  String get onboardingQ3Description => 'Delegate';
+
+  @override
+  String get onboardingQ4Description => 'Eliminate';
+
+  @override
+  String get onboardingFeaturesTitle => 'Powerful Features';
+
+  @override
+  String get onboardingFeatureCategories => 'Organize with Categories';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'Create custom categories to group your tasks by project or context';
+
+  @override
+  String get onboardingFeatureNotifications => 'Persistent Notification';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'Check your priority tasks from the notification bar';
+
+  @override
+  String get onboardingFeatureWidget => 'Home Screen Widget';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'See your important tasks at a glance without opening the app';
+
+  @override
+  String get onboardingFeatureSync => 'Cloud Sync';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'Your tasks sync across all your devices automatically';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingSignInTitle => 'Sign in to Continue';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Sign in with your Google account to sync your tasks and access them from anywhere';
+
+  @override
+  String get onboardingSignInSuccess => 'Successfully signed in!';
+
+  @override
+  String get onboardingCategoriesTitle => 'Create Your Categories';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'Categories help you organize tasks by project, context, or any way you prefer';
+
+  @override
+  String get onboardingNoCategoriesYet =>
+      'No categories yet. Create your first one!';
+
+  @override
+  String get onboardingFinish => 'Finish';
 }

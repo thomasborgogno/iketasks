@@ -263,9 +263,11 @@ class _TaskFormState extends State<_TaskForm> {
                 final categories = categoryState.categories;
                 if (categories.isEmpty) {
                   return TextButton.icon(
-                    onPressed: () => showDialog<void>(
+                    onPressed: () => showModalBottomSheet<void>(
                       context: context,
-                      builder: (_) => const _CategoryManagerDialog(),
+                      isScrollControlled: true,
+                      showDragHandle: true,
+                      builder: (_) => const _CategoryManagerModal(),
                     ),
                     icon: const Icon(Icons.add),
                     label: Text(l10n.createCategory),

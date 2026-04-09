@@ -56,6 +56,7 @@ class _OnboardingWizardState extends State<OnboardingWizard> {
             Expanded(
               child: PageView(
                 controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
@@ -108,13 +109,13 @@ class _WelcomePageState extends State<_WelcomePage>
       parent: _animationController,
       curve: Curves.easeIn,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
     _animationController.forward();
   }
 
@@ -339,10 +340,7 @@ class _QuadrantBox extends StatelessWidget {
 
 /// Features showcase page
 class _FeaturesPage extends StatefulWidget {
-  const _FeaturesPage({
-    required this.onNext,
-    required this.onPrevious,
-  });
+  const _FeaturesPage({required this.onNext, required this.onPrevious});
 
   final VoidCallback onNext;
   final VoidCallback onPrevious;
@@ -390,11 +388,7 @@ class _FeaturesPageState extends State<_FeaturesPage>
             opacity: _fadeAnimation,
             child: Column(
               children: [
-                Icon(
-                  Icons.star,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(Icons.star, size: 80, color: theme.colorScheme.primary),
                 const SizedBox(height: 24),
                 Text(
                   l10n.onboardingFeaturesTitle,
@@ -493,10 +487,7 @@ class _FeatureItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                description,
-                style: theme.textTheme.bodyMedium,
-              ),
+              Text(description, style: theme.textTheme.bodyMedium),
             ],
           ),
         ),
@@ -507,10 +498,7 @@ class _FeatureItem extends StatelessWidget {
 
 /// Sign-in page within onboarding
 class _SignInPage extends StatefulWidget {
-  const _SignInPage({
-    required this.onNext,
-    required this.onPrevious,
-  });
+  const _SignInPage({required this.onNext, required this.onPrevious});
 
   final VoidCallback onNext;
   final VoidCallback onPrevious;
@@ -564,11 +552,7 @@ class _SignInPageState extends State<_SignInPage>
               opacity: _fadeAnimation,
               child: Column(
                 children: [
-                  Icon(
-                    Icons.login,
-                    size: 80,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(Icons.login, size: 80, color: theme.colorScheme.primary),
                   const SizedBox(height: 24),
                   Text(
                     l10n.onboardingSignInTitle,
@@ -602,6 +586,12 @@ class _SignInPageState extends State<_SignInPage>
                                 color: theme.colorScheme.primary,
                               ),
                             ),
+                            const SizedBox(height: 24),
+                            FilledButton.icon(
+                              onPressed: widget.onNext,
+                              icon: const Icon(Icons.arrow_forward),
+                              label: Text(l10n.onboardingContinue),
+                            ),
                           ],
                         );
                       }
@@ -626,8 +616,9 @@ class _SignInPageState extends State<_SignInPage>
                                 : Image.asset(
                                     'assets/google_logo.png',
                                     height: 24,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.g_mobiledata),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.g_mobiledata),
                                   ),
                             label: Text(l10n.signInWithGoogle),
                           ),
@@ -635,9 +626,7 @@ class _SignInPageState extends State<_SignInPage>
                             const SizedBox(height: 16),
                             Text(
                               state.errorMessage ?? l10n.authError,
-                              style: TextStyle(
-                                color: theme.colorScheme.error,
-                              ),
+                              style: TextStyle(color: theme.colorScheme.error),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -754,7 +743,8 @@ class _CategorySetupPageState extends State<_CategorySetupPage>
                           itemBuilder: (context, index) {
                             final category = state.categories[index];
                             return ListTile(
-                              leading: category.emoji != null &&
+                              leading:
+                                  category.emoji != null &&
                                       category.emoji!.isNotEmpty
                                   ? Text(
                                       category.emoji!,
@@ -838,9 +828,9 @@ class _CategoryCreationModalState extends State<_CategoryCreationModal> {
     if (name.isEmpty) return;
     final emoji = _emojiController.text.trim();
     await context.read<CategoryCubit>().createCategory(
-          name,
-          emoji: emoji.isEmpty ? null : emoji,
-        );
+      name,
+      emoji: emoji.isEmpty ? null : emoji,
+    );
     if (!mounted) return;
     Navigator.of(context).pop();
   }
@@ -880,7 +870,6 @@ class _CategoryCreationModalState extends State<_CategoryCreationModal> {
                     border: const OutlineInputBorder(),
                   ),
                   textAlign: TextAlign.center,
-                  maxLength: 2,
                 ),
               ),
               const SizedBox(width: 16),
@@ -899,10 +888,7 @@ class _CategoryCreationModalState extends State<_CategoryCreationModal> {
             ],
           ),
           const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _createCategory,
-            child: Text(l10n.add),
-          ),
+          FilledButton(onPressed: _createCategory, child: Text(l10n.add)),
         ],
       ),
     );
@@ -911,10 +897,7 @@ class _CategoryCreationModalState extends State<_CategoryCreationModal> {
 
 /// Page indicator dots
 class _PageIndicator extends StatelessWidget {
-  const _PageIndicator({
-    required this.currentPage,
-    required this.totalPages,
-  });
+  const _PageIndicator({required this.currentPage, required this.totalPages});
 
   final int currentPage;
   final int totalPages;

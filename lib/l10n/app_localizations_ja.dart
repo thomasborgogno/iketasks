@@ -377,4 +377,89 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get languageArabic => 'アラビア語';
+
+  @override
+  String get onboardingWelcomeTitle => 'アイゼンハワーマトリックスへようこそ';
+
+  @override
+  String get onboardingWelcomeSubtitle => 'タスクの優先順位付けに最適なツール';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'アイゼンハワーマトリックスは、緊急度と重要度でタスクを整理し、本当に重要なことに集中できるようにします。';
+
+  @override
+  String get onboardingGetStarted => '始める';
+
+  @override
+  String get onboardingNotUrgent => '緊急でない';
+
+  @override
+  String get onboardingNotImportant => '重要でない';
+
+  @override
+  String get onboardingQ1Description => '今すぐ実行';
+
+  @override
+  String get onboardingQ2Description => 'スケジュール';
+
+  @override
+  String get onboardingQ3Description => '委任';
+
+  @override
+  String get onboardingQ4Description => '削除';
+
+  @override
+  String get onboardingFeaturesTitle => '強力な機能';
+
+  @override
+  String get onboardingFeatureCategories => 'カテゴリで整理';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'プロジェクトやコンテキストでタスクをグループ化するカスタムカテゴリを作成';
+
+  @override
+  String get onboardingFeatureNotifications => '常時通知';
+
+  @override
+  String get onboardingFeatureNotificationsDesc => '通知バーから優先タスクを確認できます';
+
+  @override
+  String get onboardingFeatureWidget => 'ホーム画面ウィジェット';
+
+  @override
+  String get onboardingFeatureWidgetDesc => 'アプリを開かずに重要なタスクを一目で確認';
+
+  @override
+  String get onboardingFeatureSync => 'クラウド同期';
+
+  @override
+  String get onboardingFeatureSyncDesc => 'すべてのデバイスでタスクが自動的に同期';
+
+  @override
+  String get onboardingContinue => '続ける';
+
+  @override
+  String get onboardingSignInTitle => 'サインインして続ける';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Googleアカウントでサインインして、タスクを同期し、どこからでもアクセス';
+
+  @override
+  String get onboardingSignInSuccess => 'サインイン成功！';
+
+  @override
+  String get onboardingCategoriesTitle => 'カテゴリを作成';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'カテゴリは、プロジェクト、コンテキスト、または好みの方法でタスクを整理するのに役立ちます';
+
+  @override
+  String get onboardingNoCategoriesYet => 'まだカテゴリがありません。最初のカテゴリを作成しましょう！';
+
+  @override
+  String get onboardingFinish => '完了';
 }
