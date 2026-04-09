@@ -8,6 +8,8 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'features/auth/presentation/sign_in_page.dart';
 import 'features/categories/presentation/category_cubit.dart';
+import 'features/onboarding/presentation/onboarding_cubit.dart';
+import 'features/onboarding/presentation/onboarding_wizard.dart';
 import 'features/tasks/presentation/matrix_page.dart';
 import 'features/tasks/presentation/task_cubit.dart';
 import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
@@ -61,32 +63,44 @@ class EisenhowerApp extends StatelessWidget {
               }
             },
             builder: (context, state) {
-              if (state.status == AuthStatus.loading ||
-                  state.status == AuthStatus.unknown) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
+              return BlocBuilder<OnboardingCubit, OnboardingState>(
+                builder: (context, onboardingState) {
+                  // Show loading only while checking initial onboarding status
+                  if (onboardingState.status == OnboardingStatus.loading ||
+                      state.status == AuthStatus.unknown) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-              if (state.status == AuthStatus.error) {
-                return Scaffold(
-                  body: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        state.errorMessage ??
-                            AppLocalizations.of(context)!.authError,
+                  if (onboardingState.status == OnboardingStatus.required) {
+                    return const OnboardingWizard();
+                  }
+
+                  // Handle auth errors
+                  if (state.status == AuthStatus.error) {
+                    return Scaffold(
+                      body: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            state.errorMessage ??
+                                AppLocalizations.of(context)!.authError,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }
+                    );
+                  }
 
-              if (state.status == AuthStatus.authenticated) {
-                return const MatrixPage();
-              }
+                  // Show main app if authenticated
+                  if (state.status == AuthStatus.authenticated) {
+                    return const MatrixPage();
+                  }
 
-              return const SignInPage();
+                  // Show sign-in if not authenticated
+                  return const SignInPage();
+                },
+              );
             },
           ),
         );

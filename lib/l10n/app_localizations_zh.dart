@@ -377,4 +377,86 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageArabic => '阿拉伯语';
+
+  @override
+  String get onboardingWelcomeTitle => '欢迎使用艾森豪威尔矩阵';
+
+  @override
+  String get onboardingWelcomeSubtitle => '优先处理任务的终极工具';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      '艾森豪威尔矩阵帮助您按紧急程度和重要程度组织任务，让您专注于真正重要的事情。';
+
+  @override
+  String get onboardingGetStarted => '开始使用';
+
+  @override
+  String get onboardingNotUrgent => '不紧急';
+
+  @override
+  String get onboardingNotImportant => '不重要';
+
+  @override
+  String get onboardingQ1Description => '立即执行';
+
+  @override
+  String get onboardingQ2Description => '计划';
+
+  @override
+  String get onboardingQ3Description => '委托';
+
+  @override
+  String get onboardingQ4Description => '删除';
+
+  @override
+  String get onboardingFeaturesTitle => '强大的功能';
+
+  @override
+  String get onboardingFeatureCategories => '使用类别组织';
+
+  @override
+  String get onboardingFeatureCategoriesDesc => '创建自定义类别，按项目或上下文对任务进行分组';
+
+  @override
+  String get onboardingFeatureNotifications => '常驻通知';
+
+  @override
+  String get onboardingFeatureNotificationsDesc => '从通知栏查看您的优先任务';
+
+  @override
+  String get onboardingFeatureWidget => '主屏幕小部件';
+
+  @override
+  String get onboardingFeatureWidgetDesc => '无需打开应用程序即可一目了然地查看重要任务';
+
+  @override
+  String get onboardingFeatureSync => '云同步';
+
+  @override
+  String get onboardingFeatureSyncDesc => '您的任务会自动在所有设备上同步';
+
+  @override
+  String get onboardingContinue => '继续';
+
+  @override
+  String get onboardingSignInTitle => '登录以继续';
+
+  @override
+  String get onboardingSignInDescription => '使用您的 Google 帐户登录以同步任务并从任何地方访问它们';
+
+  @override
+  String get onboardingSignInSuccess => '登录成功！';
+
+  @override
+  String get onboardingCategoriesTitle => '创建您的类别';
+
+  @override
+  String get onboardingCategoriesDescription => '类别可帮助您按项目、上下文或您喜欢的任何方式组织任务';
+
+  @override
+  String get onboardingNoCategoriesYet => '还没有类别。创建您的第一个！';
+
+  @override
+  String get onboardingFinish => '完成';
 }

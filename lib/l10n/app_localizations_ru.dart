@@ -382,4 +382,94 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get languageArabic => 'Арабский';
+
+  @override
+  String get onboardingWelcomeTitle => 'Добро пожаловать в Матрицу Эйзенхауэра';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Идеальный инструмент для расстановки приоритетов';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'Матрица Эйзенхауэра помогает вам организовать задачи по срочности и важности, чтобы вы могли сосредоточиться на том, что действительно важно.';
+
+  @override
+  String get onboardingGetStarted => 'Начать';
+
+  @override
+  String get onboardingNotUrgent => 'Не Срочно';
+
+  @override
+  String get onboardingNotImportant => 'Не Важно';
+
+  @override
+  String get onboardingQ1Description => 'Сделать сейчас';
+
+  @override
+  String get onboardingQ2Description => 'Запланировать';
+
+  @override
+  String get onboardingQ3Description => 'Делегировать';
+
+  @override
+  String get onboardingQ4Description => 'Исключить';
+
+  @override
+  String get onboardingFeaturesTitle => 'Мощные Функции';
+
+  @override
+  String get onboardingFeatureCategories => 'Организация с Категориями';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'Создавайте пользовательские категории для группировки задач по проектам или контексту';
+
+  @override
+  String get onboardingFeatureNotifications => 'Постоянное уведомление';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'Просматривайте приоритетные задачи из панели уведомлений';
+
+  @override
+  String get onboardingFeatureWidget => 'Виджет Главного Экрана';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'Просматривайте важные задачи с одного взгляда без открытия приложения';
+
+  @override
+  String get onboardingFeatureSync => 'Облачная Синхронизация';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'Ваши задачи автоматически синхронизируются на всех ваших устройствах';
+
+  @override
+  String get onboardingContinue => 'Продолжить';
+
+  @override
+  String get onboardingSignInTitle => 'Войдите, чтобы Продолжить';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Войдите с помощью учетной записи Google для синхронизации задач и доступа к ним из любого места';
+
+  @override
+  String get onboardingSignInSuccess => 'Вход выполнен успешно!';
+
+  @override
+  String get onboardingCategoriesTitle => 'Создайте свои Категории';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'Категории помогают организовать задачи по проектам, контексту или любым другим способом';
+
+  @override
+  String get onboardingNoCategoriesYet =>
+      'Категорий пока нет. Создайте свою первую!';
+
+  @override
+  String get onboardingFinish => 'Завершить';
 }

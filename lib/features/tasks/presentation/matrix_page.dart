@@ -386,9 +386,11 @@ class _MatrixPageState extends State<MatrixPage> {
   }
 
   Future<void> _openCategoryManager(BuildContext context) async {
-    await showDialog<void>(
+    await showModalBottomSheet<void>(
       context: context,
-      builder: (_) => const _CategoryManagerDialog(),
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => const _CategoryManagerModal(),
     );
   }
 

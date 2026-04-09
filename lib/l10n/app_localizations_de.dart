@@ -384,4 +384,94 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get languageArabic => 'Arabisch';
+
+  @override
+  String get onboardingWelcomeTitle => 'Willkommen zur Eisenhower-Matrix';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Das ultimative Tool zur Priorisierung Ihrer Aufgaben';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'Die Eisenhower-Matrix hilft Ihnen, Aufgaben nach Dringlichkeit und Wichtigkeit zu organisieren, damit Sie sich auf das konzentrieren können, was wirklich zählt.';
+
+  @override
+  String get onboardingGetStarted => 'Loslegen';
+
+  @override
+  String get onboardingNotUrgent => 'Nicht Dringend';
+
+  @override
+  String get onboardingNotImportant => 'Nicht Wichtig';
+
+  @override
+  String get onboardingQ1Description => 'Jetzt tun';
+
+  @override
+  String get onboardingQ2Description => 'Planen';
+
+  @override
+  String get onboardingQ3Description => 'Delegieren';
+
+  @override
+  String get onboardingQ4Description => 'Eliminieren';
+
+  @override
+  String get onboardingFeaturesTitle => 'Leistungsstarke Funktionen';
+
+  @override
+  String get onboardingFeatureCategories => 'Mit Kategorien Organisieren';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'Erstellen Sie benutzerdefinierte Kategorien, um Ihre Aufgaben nach Projekt oder Kontext zu gruppieren';
+
+  @override
+  String get onboardingFeatureNotifications => 'Dauerbenachrichtigung';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'Prüfen Sie Ihre prioritären Aufgaben in der Benachrichtigungsleiste';
+
+  @override
+  String get onboardingFeatureWidget => 'Startbildschirm-Widget';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'Sehen Sie Ihre wichtigen Aufgaben auf einen Blick, ohne die App zu öffnen';
+
+  @override
+  String get onboardingFeatureSync => 'Cloud-Synchronisation';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'Ihre Aufgaben werden automatisch auf allen Ihren Geräten synchronisiert';
+
+  @override
+  String get onboardingContinue => 'Weiter';
+
+  @override
+  String get onboardingSignInTitle => 'Anmelden, um Fortzufahren';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Melden Sie sich mit Ihrem Google-Konto an, um Ihre Aufgaben zu synchronisieren und von überall darauf zuzugreifen';
+
+  @override
+  String get onboardingSignInSuccess => 'Erfolgreich angemeldet!';
+
+  @override
+  String get onboardingCategoriesTitle => 'Erstellen Sie Ihre Kategorien';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'Kategorien helfen Ihnen, Aufgaben nach Projekt, Kontext oder beliebig zu organisieren';
+
+  @override
+  String get onboardingNoCategoriesYet =>
+      'Noch keine Kategorien. Erstellen Sie Ihre erste!';
+
+  @override
+  String get onboardingFinish => 'Fertig';
 }

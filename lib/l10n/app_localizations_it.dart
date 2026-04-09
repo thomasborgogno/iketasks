@@ -382,4 +382,94 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get languageArabic => 'Arabo';
+
+  @override
+  String get onboardingWelcomeTitle => 'Benvenuto nella Matrice di Eisenhower';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Lo strumento definitivo per dare priorità alle tue attività';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'La Matrice di Eisenhower ti aiuta a organizzare le attività per urgenza e importanza, così puoi concentrarti su ciò che conta davvero.';
+
+  @override
+  String get onboardingGetStarted => 'Inizia';
+
+  @override
+  String get onboardingNotUrgent => 'Non Urgente';
+
+  @override
+  String get onboardingNotImportant => 'Non Importante';
+
+  @override
+  String get onboardingQ1Description => 'Fai ora';
+
+  @override
+  String get onboardingQ2Description => 'Pianifica';
+
+  @override
+  String get onboardingQ3Description => 'Delega';
+
+  @override
+  String get onboardingQ4Description => 'Elimina';
+
+  @override
+  String get onboardingFeaturesTitle => 'Funzioni Potenti';
+
+  @override
+  String get onboardingFeatureCategories => 'Organizza con Categorie';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'Crea categorie personalizzate per raggruppare le tue attività per progetto o contesto';
+
+  @override
+  String get onboardingFeatureNotifications => 'Notifica persistente';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'Consulta le tue attività prioritarie dalla barra delle notifiche';
+
+  @override
+  String get onboardingFeatureWidget => 'Widget Schermata Home';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'Visualizza le tue attività importanti a colpo d\'occhio senza aprire l\'app';
+
+  @override
+  String get onboardingFeatureSync => 'Sincronizzazione Cloud';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'Le tue attività si sincronizzano automaticamente su tutti i tuoi dispositivi';
+
+  @override
+  String get onboardingContinue => 'Continua';
+
+  @override
+  String get onboardingSignInTitle => 'Accedi per Continuare';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Accedi con il tuo account Google per sincronizzare le tue attività e accedervi da qualsiasi luogo';
+
+  @override
+  String get onboardingSignInSuccess => 'Accesso effettuato con successo!';
+
+  @override
+  String get onboardingCategoriesTitle => 'Crea le Tue Categorie';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'Le categorie ti aiutano a organizzare le attività per progetto, contesto o in qualsiasi modo preferisci';
+
+  @override
+  String get onboardingNoCategoriesYet =>
+      'Nessuna categoria ancora. Crea la tua prima!';
+
+  @override
+  String get onboardingFinish => 'Termina';
 }

@@ -382,4 +382,94 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get languageArabic => 'Árabe';
+
+  @override
+  String get onboardingWelcomeTitle => 'Bienvenido a la Matriz de Eisenhower';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'La herramienta definitiva para priorizar tus tareas';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'La Matriz de Eisenhower te ayuda a organizar las tareas por urgencia e importancia, para que puedas centrarte en lo que realmente importa.';
+
+  @override
+  String get onboardingGetStarted => 'Comenzar';
+
+  @override
+  String get onboardingNotUrgent => 'No Urgente';
+
+  @override
+  String get onboardingNotImportant => 'No Importante';
+
+  @override
+  String get onboardingQ1Description => 'Hacer ahora';
+
+  @override
+  String get onboardingQ2Description => 'Programar';
+
+  @override
+  String get onboardingQ3Description => 'Delegar';
+
+  @override
+  String get onboardingQ4Description => 'Eliminar';
+
+  @override
+  String get onboardingFeaturesTitle => 'Funciones Potentes';
+
+  @override
+  String get onboardingFeatureCategories => 'Organizar con Categorías';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'Crea categorías personalizadas para agrupar tus tareas por proyecto o contexto';
+
+  @override
+  String get onboardingFeatureNotifications => 'Notificación persistente';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'Consulta tus tareas prioritarias desde la barra de notificaciones';
+
+  @override
+  String get onboardingFeatureWidget => 'Widget de Pantalla de Inicio';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'Ve tus tareas importantes de un vistazo sin abrir la aplicación';
+
+  @override
+  String get onboardingFeatureSync => 'Sincronización en la Nube';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'Tus tareas se sincronizan automáticamente en todos tus dispositivos';
+
+  @override
+  String get onboardingContinue => 'Continuar';
+
+  @override
+  String get onboardingSignInTitle => 'Inicia Sesión para Continuar';
+
+  @override
+  String get onboardingSignInDescription =>
+      'Inicia sesión con tu cuenta de Google para sincronizar tus tareas y acceder a ellas desde cualquier lugar';
+
+  @override
+  String get onboardingSignInSuccess => '¡Sesión iniciada con éxito!';
+
+  @override
+  String get onboardingCategoriesTitle => 'Crea tus Categorías';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'Las categorías te ayudan a organizar las tareas por proyecto, contexto o de la forma que prefieras';
+
+  @override
+  String get onboardingNoCategoriesYet =>
+      'Aún no hay categorías. ¡Crea tu primera!';
+
+  @override
+  String get onboardingFinish => 'Finalizar';
 }
