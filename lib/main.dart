@@ -17,6 +17,7 @@ import 'features/tasks/data/task_repository.dart';
 import 'features/tasks/presentation/task_cubit.dart';
 import 'features/widget/widget_appearance_service.dart';
 import 'features/widget/widget_sync_service.dart';
+import 'features/widget/minimal_widget_sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,8 @@ Future<void> main() async {
   await widgetSyncService.initialize();
   final widgetAppearanceService = WidgetAppearanceService();
   await widgetAppearanceService.initialize();
+  final minimalWidgetSyncService = MinimalWidgetSyncService();
+  await minimalWidgetSyncService.initialize();
   final notificationService = NotificationService();
   await notificationService.initialize();
 
@@ -64,6 +67,7 @@ Future<void> main() async {
         RepositoryProvider.value(value: onboardingRepository),
         RepositoryProvider.value(value: widgetSyncService),
         RepositoryProvider.value(value: widgetAppearanceService),
+        RepositoryProvider.value(value: minimalWidgetSyncService),
         RepositoryProvider.value(value: notificationService),
       ],
       child: MultiBlocProvider(
@@ -77,6 +81,7 @@ Future<void> main() async {
             create: (context) => TaskCubit(
               context.read<TaskRepository>(),
               context.read<WidgetSyncService>(),
+              context.read<MinimalWidgetSyncService>(),
               context.read<NotificationService>(),
             ),
           ),

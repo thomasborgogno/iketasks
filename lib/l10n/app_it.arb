@@ -145,5 +145,17 @@
   "onboardingCategoriesTitle": "Crea le Tue Categorie",
   "onboardingCategoriesDescription": "Le categorie ti aiutano a organizzare le attività per progetto, contesto o in qualsiasi modo preferisci",
   "onboardingNoCategoriesYet": "Nessuna categoria ancora. Crea la tua prima!",
-  "onboardingFinish": "Termina"
+  "onboardingFinish": "Termina",
+  "widgetType": "Tipo di widget",
+  "matrixWidget": "Widget matrice (5x5)",
+  "minimalWidget": "Widget minimale (4x1)",
+  "numberOfTasks": "Numero di attività da mostrare",
+  "fallbackToNextQuadrants": "Usa attività da altri quadranti",
+  "fallbackDescription": "Se il quadrante priorità è vuoto, mostra attività dai quadranti Piano, Delega o Elimina",
+  "textAlignment": "Allineamento testo",
+  "alignLeft": "Sinistra",
+  "alignCenter": "Centro",
+  "alignRight": "Destra",
+  "task": "attività",
+  "tasks": "attività"
 }

@@ -9,6 +9,7 @@ import '../../../core/notifications/notification_service.dart';
 import '../../tasks/data/task_repository.dart';
 import '../../tasks/domain/task_item.dart';
 import '../../widget/widget_sync_service.dart';
+import '../../widget/minimal_widget_sync_service.dart';
 
 part 'task_state.dart';
 
@@ -16,11 +17,13 @@ class TaskCubit extends Cubit<TaskState> {
   TaskCubit(
     this._repository,
     this._widgetSyncService,
+    this._minimalWidgetSyncService,
     this._notificationService,
   ) : super(const TaskState.initial());
 
   final TaskRepository _repository;
   final WidgetSyncService _widgetSyncService;
+  final MinimalWidgetSyncService _minimalWidgetSyncService;
   final NotificationService _notificationService;
 
   StreamSubscription<List<TaskItem>>? _taskSubscription;
@@ -59,6 +62,7 @@ class TaskCubit extends Cubit<TaskState> {
       final allIncompleteForWidget = tasks.where((t) => !t.completed).toList();
       emit(TaskState.loaded(visible));
       await _widgetSyncService.pushTasks(allIncompleteForWidget);
+      await _minimalWidgetSyncService.pushTasks(allIncompleteForWidget);
       await _notificationService.updatePriorityNotification(
         allIncompleteForWidget,
       );
@@ -70,6 +74,7 @@ class TaskCubit extends Cubit<TaskState> {
     ) async {
       if (state.status == TaskStatus.loaded && state.tasks.isNotEmpty) {
         await _widgetSyncService.pushTasks(state.tasks);
+        await _minimalWidgetSyncService.pushTasks(state.tasks);
       }
     });
   }

@@ -145,5 +145,9 @@
   "onboardingCategoriesTitle": "カテゴリを作成",
   "onboardingCategoriesDescription": "カテゴリは、プロジェクト、コンテキスト、または好みの方法でタスクを整理するのに役立ちます",
   "onboardingNoCategoriesYet": "まだカテゴリがありません。最初のカテゴリを作成しましょう！",
-  "onboardingFinish": "完了"
+  "onboardingFinish": "完了",
+  "textAlignment": "テキスト配置",
+  "alignLeft": "左沃え",
+  "alignCenter": "中央沃え",
+  "alignRight": "右沃え"
 }
