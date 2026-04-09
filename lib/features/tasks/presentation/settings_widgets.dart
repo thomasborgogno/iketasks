@@ -68,17 +68,17 @@ class _ProfileAvatar extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Category manager dialog
+// Category manager modal
 // ---------------------------------------------------------------------------
 
-class _CategoryManagerDialog extends StatefulWidget {
-  const _CategoryManagerDialog();
+class _CategoryManagerModal extends StatefulWidget {
+  const _CategoryManagerModal();
 
   @override
-  State<_CategoryManagerDialog> createState() => _CategoryManagerDialogState();
+  State<_CategoryManagerModal> createState() => _CategoryManagerModalState();
 }
 
-class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
+class _CategoryManagerModalState extends State<_CategoryManagerModal> {
   late final TextEditingController _controller;
   late final TextEditingController _emojiController;
 
@@ -135,85 +135,106 @@ class _CategoryManagerDialogState extends State<_CategoryManagerDialog> {
     await context.read<CategoryCubit>().deleteCategory(category.id);
   }
 
-  void _closeDialog() {
-    FocusScope.of(context).unfocus();
-    Navigator.of(context).pop();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(l10n.categoryManagement),
-      content: SizedBox(
-        width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 64,
-                  child: TextField(
-                    controller: _emojiController,
-                    decoration: InputDecoration(labelText: l10n.emoji),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      labelText: l10n.categoryName,
-                    ),
-                    textCapitalization: TextCapitalization.sentences,
-                    onSubmitted: (_) => _addCategory(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: _addCategory,
-              child: Text(l10n.add),
-            ),
-            const SizedBox(height: 16),
-            Flexible(
-              child: BlocBuilder<CategoryCubit, CategoryState>(
-                builder: (context, state) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: state.categories.length,
-                    itemBuilder: (context, index) {
-                      final category = state.categories[index];
-                      return ListTile(
-                        dense: true,
-                        leading:
-                            category.emoji != null && category.emoji!.isNotEmpty
-                            ? Text(
-                                category.emoji!,
-                                style: const TextStyle(fontSize: 20),
-                              )
-                            : null,
-                        title: Text(category.name),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _confirmDelete(category),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      actions: [
-        TextButton(onPressed: _closeDialog, child: Text(l10n.close)),
-      ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.categoryManagement,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 64,
+                child: TextField(
+                  controller: _emojiController,
+                  decoration: InputDecoration(
+                    labelText: l10n.emoji,
+                    border: const OutlineInputBorder(),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    labelText: l10n.categoryName,
+                    border: const OutlineInputBorder(),
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                  onSubmitted: (_) => _addCategory(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: _addCategory,
+            child: Text(l10n.add),
+          ),
+          const SizedBox(height: 16),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, state) {
+                if (state.categories.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      l10n.onboardingNoCategoriesYet,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.categories.length,
+                  itemBuilder: (context, index) {
+                    final category = state.categories[index];
+                    return ListTile(
+                      dense: true,
+                      leading:
+                          category.emoji != null && category.emoji!.isNotEmpty
+                          ? Text(
+                              category.emoji!,
+                              style: const TextStyle(fontSize: 20),
+                            )
+                          : null,
+                      title: Text(category.name),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => _confirmDelete(category),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
