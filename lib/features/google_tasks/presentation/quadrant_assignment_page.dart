@@ -1,5 +1,6 @@
-import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
+﻿import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 
 import '../domain/google_task_item.dart';
 
@@ -76,7 +77,7 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Text(
-                  quadrant.importLabel,
+                  quadrant.importLabel(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 11,
@@ -94,11 +95,12 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final assignedCount = _assignments.length;
     final total = widget.tasks.length;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Assegna quadrante ($assignedCount/$total)')),
+      appBar: AppBar(title: Text(l10n.assignQuadrant(assignedCount, total))),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -128,8 +130,8 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
             const SizedBox(height: 8),
             Text(
               _isCurrentAssigned
-                  ? 'Quadrante assegnato ✓ — tocca un altro per cambiarlo'
-                  : 'Trascina o tocca un quadrante',
+                  ? l10n.quadrantAssigned
+                  : l10n.dragOrTapQuadrant,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
@@ -170,7 +172,7 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
                   TextButton.icon(
                     onPressed: () => setState(() => _currentIndex--),
                     icon: const Icon(Icons.arrow_back),
-                    label: const Text('Precedente'),
+                    label: Text(l10n.previous),
                   ),
                 const Spacer(),
                 if (!_allAssigned && _currentIndex < total - 1)
@@ -186,7 +188,7 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
                       });
                     },
                     icon: const Icon(Icons.arrow_forward),
-                    label: const Text('Salta'),
+                    label: Text(l10n.skip),
                   ),
                 if (_allAssigned)
                   FilledButton.icon(
@@ -203,7 +205,7 @@ class _QuadrantAssignmentPageState extends State<QuadrantAssignmentPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.check),
-                    label: const Text('Importa attività'),
+                    label: Text(l10n.importTasks),
                   ),
               ],
             ),

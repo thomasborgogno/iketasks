@@ -99,7 +99,7 @@ class _TaskFormState extends State<_TaskForm> {
     return ChoiceChip(
       label: SizedBox(
         width: double.infinity,
-        child: Text(quadrant.name, textAlign: TextAlign.center),
+        child: Text(quadrant.name(context), textAlign: TextAlign.center),
       ),
       selected: selected,
       color: WidgetStateProperty.resolveWith((states) {
@@ -134,20 +134,21 @@ class _TaskFormState extends State<_TaskForm> {
     final task = widget.existing;
     if (task == null) return;
 
+    final l10n = AppLocalizations.of(context)!;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Elimina attività'),
-          content: const Text('Vuoi eliminare questa attività?'),
+          title: Text(l10n.deleteTask),
+          content: Text(l10n.deleteTaskConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Annulla'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Elimina'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -164,6 +165,7 @@ class _TaskFormState extends State<_TaskForm> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.existing != null;
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -176,14 +178,14 @@ class _TaskFormState extends State<_TaskForm> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isEdit ? 'Modifica attività' : 'Nuova attività',
+              isEdit ? l10n.editTask : l10n.newTask,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _titleController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: 'Titolo'),
+              decoration: InputDecoration(labelText: l10n.taskTitle),
               autofocus: !isEdit,
             ),
             if (_showDescription) ...[
@@ -192,11 +194,11 @@ class _TaskFormState extends State<_TaskForm> {
                 controller: _descriptionController,
                 focusNode: _descriptionFocusNode,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Descrizione'),
+                decoration: InputDecoration(labelText: l10n.taskDescription),
               ),
             ],
             const SizedBox(height: 16),
-            Text('Priorità', style: Theme.of(context).textTheme.labelMedium),
+            Text(l10n.priority, style: Theme.of(context).textTheme.labelMedium),
             Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
@@ -204,7 +206,7 @@ class _TaskFormState extends State<_TaskForm> {
                 runSpacing: 8,
                 children: [
                   FilterChip(
-                    label: const Text('Importante'),
+                    label: Text(l10n.important),
                     selected: _isImportant,
                     onSelected: (value) {
                       setState(() {
@@ -214,7 +216,7 @@ class _TaskFormState extends State<_TaskForm> {
                     },
                   ),
                   FilterChip(
-                    label: const Text('Urgente'),
+                    label: Text(l10n.urgent),
                     selected: _isUrgent,
                     onSelected: (value) {
                       setState(() {
@@ -228,7 +230,7 @@ class _TaskFormState extends State<_TaskForm> {
             ),
             const SizedBox(height: 8),
 
-            Text('Quadrante', style: Theme.of(context).textTheme.labelMedium),
+            Text(l10n.quadrant, style: Theme.of(context).textTheme.labelMedium),
             Column(
               children: [
                 for (
@@ -255,7 +257,7 @@ class _TaskFormState extends State<_TaskForm> {
               ],
             ),
             const SizedBox(height: 16),
-            Text('Categoria', style: Theme.of(context).textTheme.labelMedium),
+            Text(l10n.category, style: Theme.of(context).textTheme.labelMedium),
             BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, categoryState) {
                 final categories = categoryState.categories;
@@ -266,7 +268,7 @@ class _TaskFormState extends State<_TaskForm> {
                       builder: (_) => const _CategoryManagerDialog(),
                     ),
                     icon: const Icon(Icons.add),
-                    label: const Text('Crea una categoria'),
+                    label: Text(l10n.createCategory),
                   );
                 }
                 return Wrap(
@@ -291,7 +293,7 @@ class _TaskFormState extends State<_TaskForm> {
             ),
             const SizedBox(height: 12),
             if (_dueDate != null) ...[
-              Text('Scadenza', style: Theme.of(context).textTheme.labelMedium),
+              Text(l10n.dueDate, style: Theme.of(context).textTheme.labelMedium),
               Text(DateFormat('dd/MM/yyyy').format(_dueDate!)),
               const SizedBox(height: 12),
             ],
@@ -305,23 +307,23 @@ class _TaskFormState extends State<_TaskForm> {
                         ? Theme.of(context).colorScheme.primary
                         : null,
                   ),
-                  tooltip: 'Descrizione',
+                  tooltip: l10n.taskDescription,
                   onPressed: () async {
                     if (_showDescription &&
                         _descriptionController.text.trim().isNotEmpty) {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Rimuovi descrizione'),
-                          content: const Text('Vuoi rimuovere la descrizione?'),
+                          title: Text(l10n.removeDescription),
+                          content: Text(l10n.removeDescriptionConfirm),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(false),
-                              child: const Text('Annulla'),
+                              child: Text(l10n.cancel),
                             ),
                             FilledButton(
                               onPressed: () => Navigator.of(ctx).pop(true),
-                              child: const Text('Rimuovi'),
+                              child: Text(l10n.remove),
                             ),
                           ],
                         ),
@@ -345,22 +347,22 @@ class _TaskFormState extends State<_TaskForm> {
                         ? Theme.of(context).colorScheme.primary
                         : null,
                   ),
-                  tooltip: 'Scadenza',
+                  tooltip: l10n.dueDate,
                   onPressed: () async {
                     if (_dueDate != null) {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Rimuovi scadenza'),
-                          content: const Text('Vuoi rimuovere la scadenza?'),
+                          title: Text(l10n.removeDueDate),
+                          content: Text(l10n.removeDueDateConfirm),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(false),
-                              child: const Text('Annulla'),
+                              child: Text(l10n.cancel),
                             ),
                             FilledButton(
                               onPressed: () => Navigator.of(ctx).pop(true),
-                              child: const Text('Rimuovi'),
+                              child: Text(l10n.remove),
                             ),
                           ],
                         ),
@@ -385,7 +387,7 @@ class _TaskFormState extends State<_TaskForm> {
                     child: OutlinedButton.icon(
                       onPressed: _deleteExistingTask,
                       icon: const Icon(Icons.delete_outline),
-                      label: const Text('Elimina'),
+                      label: Text(l10n.delete),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -415,7 +417,7 @@ class _TaskFormState extends State<_TaskForm> {
                         ),
                       );
                     },
-                    label: Text(isEdit ? 'Salva' : 'Crea attività'),
+                    label: Text(isEdit ? l10n.save : l10n.createTask),
                     icon: const Icon(Icons.save_outlined),
                   ),
                 ),

@@ -1,0 +1,180 @@
+{
+  "@@locale": "en",
+  "authError": "Authentication error",
+  "signInSubtitle": "Organize your tasks by urgency and importance.",
+  "signInWithGoogle": "Sign in with Google",
+  "googleUser": "Google User",
+  "settings": "Settings",
+  "profileAndSettings": "Profile and settings",
+  "signOut": "Sign out",
+  "quadrantImportantUrgent": "Important, urgent",
+  "quadrantImportantNotUrgent": "Important, not urgent",
+  "quadrantNotImportantUrgent": "Not important, urgent",
+  "quadrantNotImportantNotUrgent": "Not important, not urgent",
+  "quadrantNamePriority": "Priority",
+  "quadrantNamePlan": "Plan",
+  "quadrantNameDelegate": "Delegate",
+  "quadrantNameEliminate": "Eliminate",
+  "yourEisenhowerMatrix": "Your Eisenhower Matrix",
+  "greeting": "Hello, {name}!",
+  "@greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "columnView": "Column view",
+  "gridView": "Grid view",
+  "empty": "Empty",
+  "newTask": "New task",
+  "editTask": "Edit task",
+  "taskTitle": "Title",
+  "taskDescription": "Description",
+  "priority": "Priority",
+  "important": "Important",
+  "urgent": "Urgent",
+  "quadrant": "Quadrant",
+  "category": "Category",
+  "createCategory": "Create a category",
+  "dueDate": "Due date",
+  "removeDescription": "Remove description",
+  "removeDescriptionConfirm": "Do you want to remove the description?",
+  "removeDueDate": "Remove due date",
+  "removeDueDateConfirm": "Do you want to remove the due date?",
+  "deleteTask": "Delete task",
+  "deleteTaskConfirm": "Do you want to delete this task?",
+  "save": "Save",
+  "createTask": "Create task",
+  "delete": "Delete",
+  "remove": "Remove",
+  "cancel": "Cancel",
+  "dueDateLabel": "Due: {date}",
+  "@dueDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "completedTasks": "Completed tasks",
+  "loadingError": "Loading error",
+  "noCompletedTasks": "No completed tasks",
+  "completedOn": "Completed on {date}",
+  "@completedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "categories": "Categories",
+  "categoryManagement": "Category management",
+  "emoji": "Emoji",
+  "categoryName": "Category name",
+  "add": "Add",
+  "close": "Close",
+  "deleteCategory": "Delete category",
+  "deleteCategoryConfirm": "Delete \"{name}\"?",
+  "@deleteCategoryConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteCategoryWarning": "Associated tasks will lose their category.",
+  "importFromGoogleTasks": "Import from Google Tasks",
+  "loadingGoogleTasks": "Loading Google Tasks...",
+  "unknownError": "Unknown error",
+  "retry": "Retry",
+  "noGoogleTasksFound": "No tasks found on Google Tasks.",
+  "continueWithSelected": "Continue ({count})",
+  "@continueWithSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectAll": "Select all",
+  "deselectAll": "Deselect all",
+  "assignQuadrant": "Assign quadrant ({assigned}/{total})",
+  "@assignQuadrant": {
+    "placeholders": {
+      "assigned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quadrantAssigned": "Quadrant assigned ✓ — tap another to change it",
+  "dragOrTapQuadrant": "Drag or tap a quadrant",
+  "previous": "Previous",
+  "skip": "Skip",
+  "importTasks": "Import tasks",
+  "widgetAppearance": "Widget appearance",
+  "theme": "Theme",
+  "systemTheme": "System",
+  "lightTheme": "Light",
+  "darkTheme": "Dark",
+  "background": "Background",
+  "transparency": "Transparency: {percent}%",
+  "@transparency": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "textSize": "Text size",
+  "small": "Small",
+  "medium": "Medium",
+  "large": "Large",
+  "textColor": "Text color",
+  "white": "White",
+  "black": "Black",
+  "quadrants": "Quadrants",
+  "widgetUpdated": "Widget updated.",
+  "colorRed": "Red",
+  "colorOrange": "Orange",
+  "colorYellow": "Yellow",
+  "colorGreen": "Green",
+  "colorBlue": "Blue",
+  "colorIndigo": "Indigo",
+  "colorPurple": "Purple",
+  "colorPink": "Pink",
+  "colorBrown": "Brown",
+  "colorGray": "Gray",
+  "colorTeal": "Teal",
+  "colorCyan": "Cyan",
+  "colorLime": "Lime",
+  "colorAmber": "Amber",
+  "colorDeepOrange": "Deep Orange",
+  "notificationChannelName": "Priority tasks",
+  "notificationChannelDescription": "Show priority tasks from the Eisenhower Matrix",
+  "createNewTask": "Create new task",
+  "taskCount": "{count} tasks",
+  "@taskCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "persistentNotification": "Persistent notification",
+  "persistentNotificationDescription": "Show priority tasks in the notification bar",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageItalian": "Italian",
+  "languageSpanish": "Spanish",
+  "languageFrench": "French",
+  "languageGerman": "German",
+  "languageChinese": "Chinese",
+  "languagePortuguese": "Portuguese",
+  "languageRussian": "Russian",
+  "languageJapanese": "Japanese",
+  "languageArabic": "Arabic"
+}

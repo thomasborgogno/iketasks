@@ -69,12 +69,14 @@ data class WidgetState(
     val appearance: AppearanceSpec,
 )
 
-val ALL_QUADRANTS = listOf(
-    QuadrantSpec("q1", "Priorità", Color(0xFFD7263D)),
-    QuadrantSpec("q2", "Pianifica", Color(0xFF1B998B)),
-    QuadrantSpec("q3", "Delega", Color(0xFFF4A261)),
-    QuadrantSpec("q4", "Elimina", Color(0xFF457B9D)),
-)
+fun getAllQuadrants(context: Context): List<QuadrantSpec> {
+    return listOf(
+        QuadrantSpec("q1", context.getString(R.string.quadrant_priority), Color(0xFFD7263D)),
+        QuadrantSpec("q2", context.getString(R.string.quadrant_plan), Color(0xFF1B998B)),
+        QuadrantSpec("q3", context.getString(R.string.quadrant_delegate), Color(0xFFF4A261)),
+        QuadrantSpec("q4", context.getString(R.string.quadrant_eliminate), Color(0xFF457B9D)),
+    )
+}
 
 val defaultBackgroundColor = Color(0xFF1C1B1F)
 
@@ -107,7 +109,7 @@ class EisenhowerDataStore(private val context: Context) : DataStore<WidgetState>
         if (payload.isNullOrBlank()) return emptyMap()
         return try {
             val json = JSONObject(payload)
-            ALL_QUADRANTS.associate { spec ->
+            getAllQuadrants(context).associate { spec ->
                 val arr: JSONArray = json.optJSONArray(spec.key) ?: JSONArray()
                 spec.key to (0 until arr.length()).map { i ->
                     val item = arr.getJSONObject(i)
@@ -205,7 +207,7 @@ private fun WidgetContent(
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
-    val visibleQuadrants = ALL_QUADRANTS.filter { it.key in appearance.visibleQuadrants }
+    val visibleQuadrants = getAllQuadrants(context).filter { it.key in appearance.visibleQuadrants }
 
     Box(
         modifier = GlanceModifier
@@ -226,6 +228,7 @@ private fun WidgetContent(
                         spec = spec,
                         taskList = tasks[spec.key] ?: emptyList(),
                         appearance = appearance,
+                        context = context,
                     )
                 }
             }
@@ -292,6 +295,7 @@ private fun QuadrantSection(
     spec: QuadrantSpec,
     taskList: List<TaskEntry>,
     appearance: AppearanceSpec,
+    context: Context,
 ) {
     Column(modifier = modifier) {
         // Quadrant label header
@@ -331,7 +335,7 @@ private fun QuadrantSection(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Nessuna attività",
+                    text = context.getString(R.string.no_tasks),
                     style = TextStyle(
                         color = ColorProvider(
                             if (appearance.darkText) Color(0x99000000) else Color(0x99FFFFFF)
