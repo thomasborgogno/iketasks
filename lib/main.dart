@@ -11,6 +11,8 @@ import 'features/auth/presentation/auth_cubit.dart';
 import 'features/categories/data/category_repository.dart';
 import 'features/categories/presentation/category_cubit.dart';
 import 'features/google_tasks/data/google_tasks_repository.dart';
+import 'features/onboarding/data/onboarding_repository.dart';
+import 'features/onboarding/presentation/onboarding_cubit.dart';
 import 'features/tasks/data/task_repository.dart';
 import 'features/tasks/presentation/task_cubit.dart';
 import 'features/widget/widget_appearance_service.dart';
@@ -36,6 +38,7 @@ Future<void> main() async {
   final taskRepository = TaskRepository();
   final categoryRepository = CategoryRepository();
   final googleTasksRepository = GoogleTasksRepository();
+  final onboardingRepository = OnboardingRepository();
   final widgetSyncService = WidgetSyncService();
   await widgetSyncService.initialize();
   final widgetAppearanceService = WidgetAppearanceService();
@@ -47,6 +50,10 @@ Future<void> main() async {
   final localeCubit = LocaleCubit();
   await localeCubit.loadSavedLocale();
 
+  // Initialize onboarding cubit
+  final onboardingCubit = OnboardingCubit(onboardingRepository);
+  await onboardingCubit.checkOnboardingStatus();
+
   runApp(
     MultiRepositoryProvider(
       providers: [
@@ -54,6 +61,7 @@ Future<void> main() async {
         RepositoryProvider.value(value: taskRepository),
         RepositoryProvider.value(value: categoryRepository),
         RepositoryProvider.value(value: googleTasksRepository),
+        RepositoryProvider.value(value: onboardingRepository),
         RepositoryProvider.value(value: widgetSyncService),
         RepositoryProvider.value(value: widgetAppearanceService),
         RepositoryProvider.value(value: notificationService),
@@ -61,6 +69,7 @@ Future<void> main() async {
       child: MultiBlocProvider(
         providers: [
           BlocProvider.value(value: localeCubit),
+          BlocProvider.value(value: onboardingCubit),
           BlocProvider(
             create: (context) => AuthCubit(context.read<AuthRepository>()),
           ),

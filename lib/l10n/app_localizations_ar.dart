@@ -379,4 +379,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get languageArabic => 'العربية';
+
+  @override
+  String get onboardingWelcomeTitle => 'مرحبًا بك في مصفوفة أيزنهاور';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'الأداة المثالية لترتيب أولويات مهامك';
+
+  @override
+  String get onboardingWelcomeDescription =>
+      'تساعدك مصفوفة أيزنهاور على تنظيم المهام حسب الإلحاح والأهمية، حتى تتمكن من التركيز على ما يهم حقًا.';
+
+  @override
+  String get onboardingGetStarted => 'ابدأ';
+
+  @override
+  String get onboardingNotUrgent => 'غير عاجل';
+
+  @override
+  String get onboardingNotImportant => 'غير مهم';
+
+  @override
+  String get onboardingQ1Description => 'نفذ الآن';
+
+  @override
+  String get onboardingQ2Description => 'جدولة';
+
+  @override
+  String get onboardingQ3Description => 'تفويض';
+
+  @override
+  String get onboardingQ4Description => 'حذف';
+
+  @override
+  String get onboardingFeaturesTitle => 'ميزات قوية';
+
+  @override
+  String get onboardingFeatureCategories => 'التنظيم بالفئات';
+
+  @override
+  String get onboardingFeatureCategoriesDesc =>
+      'إنشاء فئات مخصصة لتجميع مهامك حسب المشروع أو السياق';
+
+  @override
+  String get onboardingFeatureNotifications => 'إشعار مستمر';
+
+  @override
+  String get onboardingFeatureNotificationsDesc =>
+      'تصفح مهامك ذات الأولوية من شريط الإشعارات';
+
+  @override
+  String get onboardingFeatureWidget => 'أداة الشاشة الرئيسية';
+
+  @override
+  String get onboardingFeatureWidgetDesc =>
+      'شاهد مهامك المهمة بلمحة واحدة دون فتح التطبيق';
+
+  @override
+  String get onboardingFeatureSync => 'المزامنة السحابية';
+
+  @override
+  String get onboardingFeatureSyncDesc =>
+      'تتم مزامنة مهامك تلقائيًا عبر جميع أجهزتك';
+
+  @override
+  String get onboardingContinue => 'متابعة';
+
+  @override
+  String get onboardingSignInTitle => 'تسجيل الدخول للمتابعة';
+
+  @override
+  String get onboardingSignInDescription =>
+      'سجل الدخول باستخدام حساب Google الخاص بك لمزامنة مهامك والوصول إليها من أي مكان';
+
+  @override
+  String get onboardingSignInSuccess => 'تم تسجيل الدخول بنجاح!';
+
+  @override
+  String get onboardingCategoriesTitle => 'إنشاء فئاتك';
+
+  @override
+  String get onboardingCategoriesDescription =>
+      'تساعدك الفئات على تنظيم المهام حسب المشروع أو السياق أو بأي طريقة تفضلها';
+
+  @override
+  String get onboardingNoCategoriesYet => 'لا توجد فئات بعد. أنشئ فئتك الأولى!';
+
+  @override
+  String get onboardingFinish => 'إنهاء';
 }
