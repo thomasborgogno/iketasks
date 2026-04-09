@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Eisenhower Matrix</string>
+    <string name="widget_description">Widget Matrice di Eisenhower</string>
+    <string name="quadrant_priority">Priorità</string>
+    <string name="quadrant_plan">Pianifica</string>
+    <string name="quadrant_delegate">Delega</string>
+    <string name="quadrant_eliminate">Elimina</string>
+    <string name="no_tasks">Nessuna attività</string>
+</resources>

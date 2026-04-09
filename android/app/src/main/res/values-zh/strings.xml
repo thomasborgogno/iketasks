@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Eisenhower Matrix</string>
+    <string name="widget_description">艾森豪威尔矩阵小部件</string>
+    <string name="quadrant_priority">优先</string>
+    <string name="quadrant_plan">计划</string>
+    <string name="quadrant_delegate">委托</string>
+    <string name="quadrant_eliminate">消除</string>
+    <string name="no_tasks">无任务</string>
+</resources>

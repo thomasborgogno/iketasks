@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Eisenhower Matrix</string>
+    <string name="widget_description">أداة مصفوفة أيزنهاور</string>
+    <string name="quadrant_priority">أولوية</string>
+    <string name="quadrant_plan">خطط</string>
+    <string name="quadrant_delegate">فوّض</string>
+    <string name="quadrant_eliminate">احذف</string>
+    <string name="no_tasks">لا توجد مهام</string>
+</resources>
