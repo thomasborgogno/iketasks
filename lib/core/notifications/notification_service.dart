@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,9 +10,6 @@ import '../../features/tasks/presentation/helpers.dart';
 class NotificationService {
   static const int _notificationId = 42;
   static const String _channelId = 'priority_tasks';
-  static const String _channelName = 'Attività prioritarie';
-  static const String _channelDescription =
-      'Mostra le attività prioritarie della matrice di Eisenhower';
   static const String _prefKey = 'notification_enabled';
   static const String _actionNewTask = 'new_task';
 
@@ -22,6 +20,7 @@ class NotificationService {
   int tasksToShow = 6;
   List<TaskItem> _lastTasks = [];
   Timer? _watchdog;
+  AppLocalizations? _l10n;
 
   final StreamController<void> _newTaskController =
       StreamController<void>.broadcast();
@@ -29,6 +28,10 @@ class NotificationService {
   Stream<void> get onNewTaskRequested => _newTaskController.stream;
 
   bool get isEnabled => _enabled;
+
+  void setLocalizations(AppLocalizations l10n) {
+    _l10n = l10n;
+  }
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
@@ -50,10 +53,12 @@ class NotificationService {
 
     await androidImpl?.requestNotificationsPermission();
 
-    const channel = AndroidNotificationChannel(
+    // Create notification channel with localized strings if available
+    final channel = AndroidNotificationChannel(
       _channelId,
-      _channelName,
-      description: _channelDescription,
+      _l10n?.notificationChannelName ?? 'Priority tasks',
+      description: _l10n?.notificationChannelDescription ??
+          'Show priority tasks from the Eisenhower Matrix',
       importance: Importance.low,
     );
     await androidImpl?.createNotificationChannel(channel);
@@ -131,22 +136,23 @@ class NotificationService {
 
     final styleInformation = InboxStyleInformation(
       lines,
-      summaryText: '${top.length} task',
+      summaryText: _l10n?.taskCount(top.length) ?? '${top.length} tasks',
     );
 
     final androidDetails = AndroidNotificationDetails(
       _channelId,
-      _channelName,
-      channelDescription: _channelDescription,
+      _l10n?.notificationChannelName ?? 'Priority tasks',
+      channelDescription: _l10n?.notificationChannelDescription ??
+          'Show priority tasks from the Eisenhower Matrix',
       importance: Importance.low,
       priority: Priority.low,
       ongoing: true,
       autoCancel: false,
       styleInformation: styleInformation,
-      actions: const [
+      actions: [
         AndroidNotificationAction(
           _actionNewTask,
-          'Crea nuova attività',
+          _l10n?.createNewTask ?? 'Create new task',
           showsUserInterface: true,
         ),
       ],

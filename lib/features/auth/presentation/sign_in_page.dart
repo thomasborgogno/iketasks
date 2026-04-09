@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'auth_cubit.dart';
 
@@ -8,6 +9,8 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Center(
         child: ConstrainedBox(
@@ -24,7 +27,7 @@ class SignInPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Organizza le tue attivita per urgenza e importanza.',
+                  l10n.signInSubtitle,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -32,7 +35,7 @@ class SignInPage extends StatelessWidget {
                 FilledButton.icon(
                   icon: const Icon(Icons.login),
                   onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
-                  label: const Text('Accedi con Google'),
+                  label: Text(l10n.signInWithGoogle),
                 ),
               ],
             ),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/locale/locale_cubit.dart';
+import 'core/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'features/auth/presentation/sign_in_page.dart';
@@ -43,6 +44,14 @@ class EisenhowerApp extends StatelessWidget {
             Locale('ja'), // Japanese
             Locale('ar'), // Arabic
           ],
+          builder: (context, child) {
+            // Update notification service localizations when locale changes
+            final l10n = AppLocalizations.of(context);
+            if (l10n != null) {
+              context.read<NotificationService>().setLocalizations(l10n);
+            }
+            return child ?? const SizedBox.shrink();
+          },
           home: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               final user = state.user;

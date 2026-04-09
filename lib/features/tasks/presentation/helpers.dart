@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 enum EisenhowerQuadrant {
   importantUrgent,
   importantNotUrgent,
@@ -21,56 +24,40 @@ Color quadrantColor(EisenhowerQuadrant q) {
 }
 
 extension EisenhowerQuadrantX on EisenhowerQuadrant {
-  String get description {
+  String description(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
-        return 'Importante, urgente';
+        return l10n.quadrantImportantUrgent;
       case EisenhowerQuadrant.importantNotUrgent:
-        return 'Importante, non urgente';
+        return l10n.quadrantImportantNotUrgent;
       case EisenhowerQuadrant.notImportantUrgent:
-        return 'Non importante, urgente';
+        return l10n.quadrantNotImportantUrgent;
       case EisenhowerQuadrant.notImportantNotUrgent:
-        return 'Non importante, non urgente';
+        return l10n.quadrantNotImportantNotUrgent;
     }
   }
 
-  String get name {
+  String name(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (this) {
       case EisenhowerQuadrant.importantUrgent:
-        return 'Priorità';
+        return l10n.quadrantNamePriority;
       case EisenhowerQuadrant.importantNotUrgent:
-        return 'Pianifica';
+        return l10n.quadrantNamePlan;
       case EisenhowerQuadrant.notImportantUrgent:
-        return 'Delega';
+        return l10n.quadrantNameDelegate;
       case EisenhowerQuadrant.notImportantNotUrgent:
-        return 'Elimina';
+        return l10n.quadrantNameEliminate;
     }
   }
 
-  String get fullName {
-    switch (this) {
-      case EisenhowerQuadrant.importantUrgent:
-        return '$name ($description)';
-      case EisenhowerQuadrant.importantNotUrgent:
-        return '$name ($description)';
-      case EisenhowerQuadrant.notImportantUrgent:
-        return '$name ($description)';
-      case EisenhowerQuadrant.notImportantNotUrgent:
-        return '$name ($description)';
-    }
+  String fullName(BuildContext context) {
+    return '${name(context)} (${description(context)})';
   }
 
-  String get importLabel {
-    switch (this) {
-      case EisenhowerQuadrant.importantUrgent:
-        return '$name\n$description';
-      case EisenhowerQuadrant.importantNotUrgent:
-        return '$name\n$description';
-      case EisenhowerQuadrant.notImportantUrgent:
-        return '$name\n$description';
-      case EisenhowerQuadrant.notImportantNotUrgent:
-        return '$name\n$description';
-    }
+  String importLabel(BuildContext context) {
+    return '${name(context)}\n${description(context)}';
   }
 
   String get value {

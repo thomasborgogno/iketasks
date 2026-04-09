@@ -5,7 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+
+import '../../../core/locale/locale_cubit.dart';
 
 import '../../auth/presentation/auth_cubit.dart';
 import '../../categories/domain/task_category.dart';
@@ -108,7 +111,7 @@ class _MatrixPageState extends State<MatrixPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Impostazioni',
+                      AppLocalizations.of(context)!.settings,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 20),
@@ -123,7 +126,7 @@ class _MatrixPageState extends State<MatrixPage> {
                     const Divider(),
                     ListTile(
                       leading: const Icon(Icons.check_circle_outline),
-                      title: const Text('Attività completate'),
+                      title: Text(AppLocalizations.of(context)!.completedTasks),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -136,7 +139,7 @@ class _MatrixPageState extends State<MatrixPage> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.cloud_download_outlined),
-                      title: const Text('Importa da Google Tasks'),
+                      title: Text(AppLocalizations.of(context)!.importFromGoogleTasks),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -152,18 +155,27 @@ class _MatrixPageState extends State<MatrixPage> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.widgets_outlined),
-                      title: const Text('Aspetto del widget'),
+                      title: Text(AppLocalizations.of(context)!.widgetAppearance),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.of(sheetContext).pop();
                         _openWidgetAppearance(context);
                       },
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.language_outlined),
+                      title: Text(AppLocalizations.of(context)!.language),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        _openLanguageSelector(context);
+                      },
+                    ),
                     SwitchListTile(
                       secondary: const Icon(Icons.notifications_outlined),
-                      title: const Text('Notifica persistente'),
-                      subtitle: const Text(
-                        'Mostra le attività prioritarie nella barra delle notifiche',
+                      title: Text(AppLocalizations.of(context)!.persistentNotification),
+                      subtitle: Text(
+                        AppLocalizations.of(context)!.persistentNotificationDescription,
                       ),
                       value: notificationService.isEnabled,
                       onChanged: (value) async {
@@ -185,12 +197,13 @@ class _MatrixPageState extends State<MatrixPage> {
   @override
   Widget build(BuildContext context) {
     final user = _getUser();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           user?.displayName?.trim().split(' ').firstOrNull == null
-              ? 'La tua matrice di Eisenhower'
+              ? l10n.yourEisenhowerMatrix
               : 'Ciao, ${user?.displayName?.trim().split(' ').first}!',
         ),
         actions: [
@@ -202,13 +215,13 @@ class _MatrixPageState extends State<MatrixPage> {
                   : Icons.grid_view_outlined,
             ),
             tooltip: _layoutMode == _LayoutMode.grid
-                ? 'Vista a colonne'
-                : 'Vista a griglia',
+                ? l10n.columnView
+                : l10n.gridView,
           ),
           IconButton(
             onPressed: () => _openCategoryManager(context),
             icon: const Icon(Icons.category_outlined),
-            tooltip: 'Categorie',
+            tooltip: l10n.categories,
           ),
           BlocBuilder<AuthCubit, AuthState>(
             builder: (context, state) {
@@ -217,7 +230,7 @@ class _MatrixPageState extends State<MatrixPage> {
                 onPressed: user == null
                     ? null
                     : () => _openSettingsOverlay(context),
-                tooltip: 'Profilo e impostazioni',
+                tooltip: l10n.profileAndSettings,
                 icon: _ProfileAvatar(photoUrl: user?.photoURL, radius: 20),
               );
             },
@@ -368,6 +381,83 @@ class _MatrixPageState extends State<MatrixPage> {
     await showDialog<void>(
       context: context,
       builder: (_) => const _CategoryManagerDialog(),
+    );
+  }
+
+  Future<void> _openLanguageSelector(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = context.read<LocaleCubit>().state.locale;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.language,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 20),
+                _LanguageOption(
+                  languageName: l10n.languageEnglish,
+                  locale: const Locale('en'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageItalian,
+                  locale: const Locale('it'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageSpanish,
+                  locale: const Locale('es'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageFrench,
+                  locale: const Locale('fr'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageGerman,
+                  locale: const Locale('de'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageChinese,
+                  locale: const Locale('zh'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languagePortuguese,
+                  locale: const Locale('pt'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageRussian,
+                  locale: const Locale('ru'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageJapanese,
+                  locale: const Locale('ja'),
+                  currentLocale: currentLocale,
+                ),
+                _LanguageOption(
+                  languageName: l10n.languageArabic,
+                  locale: const Locale('ar'),
+                  currentLocale: currentLocale,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
