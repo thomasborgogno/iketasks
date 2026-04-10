@@ -53,6 +53,7 @@
   "categoryName": "Nom de la catégorie",
   "add": "Ajouter",
   "close": "Fermer",
+  "editCategory": "Modifier la catégorie",
   "deleteCategory": "Supprimer la catégorie",
   "deleteCategoryConfirm": "Supprimer \"{name}\" ?",
   "deleteCategoryWarning": "Les tâches associées perdront leur catégorie.",

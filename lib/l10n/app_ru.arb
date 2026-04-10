@@ -53,6 +53,7 @@
   "categoryName": "Название категории",
   "add": "Добавить",
   "close": "Закрыть",
+  "editCategory": "Редактировать категорию",
   "deleteCategory": "Удалить категорию",
   "deleteCategoryConfirm": "Удалить \"{name}\"?",
   "deleteCategoryWarning": "Связанные задачи потеряют свою категорию.",

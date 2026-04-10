@@ -33,6 +33,16 @@ class CategoryCubit extends Cubit<CategoryState> {
     await _repository.createCategory(uid, name, emoji: emoji);
   }
 
+  Future<void> updateCategory(
+    String categoryId, {
+    required String name,
+    String? emoji,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _repository.updateCategory(uid, categoryId, name: name, emoji: emoji);
+  }
+
   Future<void> deleteCategory(String categoryId) async {
     final uid = _uid;
     if (uid == null) return;

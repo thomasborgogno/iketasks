@@ -53,6 +53,7 @@
   "categoryName": "Kategoriename",
   "add": "Hinzufügen",
   "close": "Schließen",
+  "editCategory": "Kategorie bearbeiten",
   "deleteCategory": "Kategorie löschen",
   "deleteCategoryConfirm": "\"{name}\" löschen?",
   "deleteCategoryWarning": "Zugehörige Aufgaben verlieren ihre Kategorie.",
