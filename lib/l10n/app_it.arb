@@ -53,6 +53,7 @@
   "categoryName": "Nome categoria",
   "add": "Aggiungi",
   "close": "Chiudi",
+  "editCategory": "Modifica categoria",
   "deleteCategory": "Elimina categoria",
   "deleteCategoryConfirm": "Eliminare \"{name}\"?",
   "deleteCategoryWarning": "Le attività associate perderanno la categoria.",

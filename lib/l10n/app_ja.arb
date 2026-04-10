@@ -53,6 +53,7 @@
   "categoryName": "カテゴリ名",
   "add": "追加",
   "close": "閉じる",
+  "editCategory": "カテゴリを編集",
   "deleteCategory": "カテゴリを削除",
   "deleteCategoryConfirm": "「{name}」を削除しますか？",
   "deleteCategoryWarning": "関連付けられたタスクはカテゴリを失います。",

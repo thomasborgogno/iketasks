@@ -53,6 +53,7 @@
   "categoryName": "类别名称",
   "add": "添加",
   "close": "关闭",
+  "editCategory": "编辑类别",
   "deleteCategory": "删除类别",
   "deleteCategoryConfirm": "删除\"{name}\"？",
   "deleteCategoryWarning": "相关任务将失去其类别。",

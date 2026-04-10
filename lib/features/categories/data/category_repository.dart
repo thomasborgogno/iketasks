@@ -37,6 +37,21 @@ class CategoryRepository {
     await _categoriesRef(uid).doc(category.id).set(category.toMap());
   }
 
+  Future<void> updateCategory(
+    String uid,
+    String categoryId, {
+    required String name,
+    String? emoji,
+  }) async {
+    final data = <String, dynamic>{'name': name, 'updatedAt': Timestamp.now()};
+    if (emoji != null && emoji.isNotEmpty) {
+      data['emoji'] = emoji;
+    } else {
+      data['emoji'] = FieldValue.delete();
+    }
+    await _categoriesRef(uid).doc(categoryId).update(data);
+  }
+
   Future<void> deleteCategory(String uid, String categoryId) async {
     final tasksRef = _firestore
         .collection('users')

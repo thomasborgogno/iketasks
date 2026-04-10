@@ -53,6 +53,7 @@
   "categoryName": "Nome da categoria",
   "add": "Adicionar",
   "close": "Fechar",
+  "editCategory": "Editar categoria",
   "deleteCategory": "Excluir categoria",
   "deleteCategoryConfirm": "Excluir \"{name}\"?",
   "deleteCategoryWarning": "As tarefas associadas perderão sua categoria.",

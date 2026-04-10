@@ -74,6 +74,7 @@
   "categoryName": "Category name",
   "add": "Add",
   "close": "Close",
+  "editCategory": "Edit category",
   "deleteCategory": "Delete category",
   "deleteCategoryConfirm": "Delete \"{name}\"?",
   "@deleteCategoryConfirm": {

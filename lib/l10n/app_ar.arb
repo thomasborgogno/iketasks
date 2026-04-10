@@ -53,6 +53,7 @@
   "categoryName": "اسم الفئة",
   "add": "إضافة",
   "close": "إغلاق",
+  "editCategory": "تعديل الفئة",
   "deleteCategory": "حذف الفئة",
   "deleteCategoryConfirm": "حذف \"{name}\"؟",
   "deleteCategoryWarning": "ستفقد المهام المرتبطة فئتها.",
