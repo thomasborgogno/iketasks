@@ -1,5 +1,74 @@
 import 'package:flutter/material.dart';
 
+const _fontFamily = 'GoogleSansFlex';
+const _fontVariations = [
+  FontVariation('ROND', 100.0),
+  FontVariation('wdth', 95.0),
+];
+
+TextTheme _buildTextTheme(TextTheme base) => base.copyWith(
+  displayLarge: base.displayLarge?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  displayMedium: base.displayMedium?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  displaySmall: base.displaySmall?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  headlineLarge: base.headlineLarge?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  headlineMedium: base.headlineMedium?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  headlineSmall: base.headlineSmall?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  titleLarge: base.titleLarge?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  titleMedium: base.titleMedium?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  titleSmall: base.titleSmall?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  bodyLarge: base.bodyLarge?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  bodyMedium: base.bodyMedium?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  bodySmall: base.bodySmall?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  labelLarge: base.labelLarge?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  labelMedium: base.labelMedium?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+  labelSmall: base.labelSmall?.copyWith(
+    fontFamily: _fontFamily,
+    fontVariations: _fontVariations,
+  ),
+);
+
 class AppTheme {
   static const Color q1Color = Color(0xFFD7263D);
   static const Color q2Color = Color(0xFF1B998B);
@@ -12,12 +81,14 @@ class AppTheme {
       brightness: Brightness.light,
     );
 
-    return ThemeData(
+    final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: const Color(0xFFF6F9FB),
       cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
     );
+
+    return base.copyWith(textTheme: _buildTextTheme(base.textTheme));
   }
 
   static ThemeData dark() {
@@ -26,7 +97,7 @@ class AppTheme {
       brightness: Brightness.dark,
     );
 
-    return ThemeData(
+    final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
@@ -37,5 +108,7 @@ class AppTheme {
         elevation: 20,
       ),
     );
+
+    return base.copyWith(textTheme: _buildTextTheme(base.textTheme));
   }
 }
