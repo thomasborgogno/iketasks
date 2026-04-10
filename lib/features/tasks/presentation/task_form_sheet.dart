@@ -193,6 +193,7 @@ class _TaskFormState extends State<_TaskForm> {
               TextField(
                 controller: _descriptionController,
                 focusNode: _descriptionFocusNode,
+                maxLines: null,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(labelText: l10n.taskDescription),
               ),
@@ -295,7 +296,10 @@ class _TaskFormState extends State<_TaskForm> {
             ),
             const SizedBox(height: 12),
             if (_dueDate != null) ...[
-              Text(l10n.dueDate, style: Theme.of(context).textTheme.labelMedium),
+              Text(
+                l10n.dueDate,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
               Text(DateFormat('dd/MM/yyyy').format(_dueDate!)),
               const SizedBox(height: 12),
             ],

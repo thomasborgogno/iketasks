@@ -57,7 +57,8 @@ class NotificationService {
     final channel = AndroidNotificationChannel(
       _channelId,
       _l10n?.notificationChannelName ?? 'Priority tasks',
-      description: _l10n?.notificationChannelDescription ??
+      description:
+          _l10n?.notificationChannelDescription ??
           'Show priority tasks from the Eisenhower Matrix',
       importance: Importance.low,
     );
@@ -142,10 +143,12 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       _channelId,
       _l10n?.notificationChannelName ?? 'Priority tasks',
-      channelDescription: _l10n?.notificationChannelDescription ??
+      channelDescription:
+          _l10n?.notificationChannelDescription ??
           'Show priority tasks from the Eisenhower Matrix',
       importance: Importance.low,
       priority: Priority.low,
+      visibility: NotificationVisibility.secret,
       ongoing: true,
       autoCancel: false,
       styleInformation: styleInformation,
