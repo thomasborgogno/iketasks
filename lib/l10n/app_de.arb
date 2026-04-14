@@ -38,7 +38,6 @@
   "deleteTask": "Aufgabe löschen",
   "deleteTaskConfirm": "Möchten Sie diese Aufgabe löschen?",
   "save": "Speichern",
-  "createTask": "Aufgabe erstellen",
   "delete": "Löschen",
   "remove": "Entfernen",
   "cancel": "Abbrechen",
@@ -149,5 +148,27 @@
   "textAlignment": "Textausrichtung",
   "alignLeft": "Links",
   "alignCenter": "Mitte",
-  "alignRight": "Rechts"
+  "alignRight": "Rechts",
+  "task": "Aufgabe",
+  "tasks": "Aufgaben",
+  "showFromDate": "Anzeigen ab Datum",
+  "removeShowFromDate": "Anzeige-ab-Datum entfernen",
+  "removeShowFromDateConfirm": "Möchten Sie das Anzeige-ab-Datum entfernen?",
+  "showFromDateLabel": "Anzeigen ab: {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "Verschoben",
+  "about": "Über",
+  "appInfo": "App-Informationen",
+  "openSource": "Diese App ist Open Source",
+  "viewOnGitHub": "Auf GitHub ansehen",
+  "supportDevelopment": "Entwicklung unterstützen",
+  "donate": "Spenden",
+  "reportIssue": "Problem melden",
+  "reportIssueDescription": "Einen Fehler gefunden oder einen Vorschlag? Lassen Sie es uns wissen!"
 }

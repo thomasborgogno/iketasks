@@ -38,7 +38,6 @@
   "deleteTask": "Excluir tarefa",
   "deleteTaskConfirm": "Deseja excluir esta tarefa?",
   "save": "Salvar",
-  "createTask": "Criar tarefa",
   "delete": "Excluir",
   "remove": "Remover",
   "cancel": "Cancelar",
@@ -149,5 +148,27 @@
   "textAlignment": "Alinhamento de texto",
   "alignLeft": "Esquerda",
   "alignCenter": "Centro",
-  "alignRight": "Direita"
+  "alignRight": "Direita",
+  "task": "tarefa",
+  "tasks": "tarefas",
+  "showFromDate": "Mostrar a partir da data",
+  "removeShowFromDate": "Remover data de início",
+  "removeShowFromDateConfirm": "Deseja remover a data de início?",
+  "showFromDateLabel": "Mostrar a partir de: {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "Adiadas",
+  "about": "Sobre",
+  "appInfo": "Informações do aplicativo",
+  "openSource": "Este aplicativo é de código aberto",
+  "viewOnGitHub": "Ver no GitHub",
+  "supportDevelopment": "Apoiar o desenvolvimento",
+  "donate": "Doar",
+  "reportIssue": "Reportar um problema",
+  "reportIssueDescription": "Encontrou um bug ou tem uma sugestão? Nos avise!"
 }

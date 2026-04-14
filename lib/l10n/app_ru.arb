@@ -38,7 +38,6 @@
   "deleteTask": "Удалить задачу",
   "deleteTaskConfirm": "Вы хотите удалить эту задачу?",
   "save": "Сохранить",
-  "createTask": "Создать задачу",
   "delete": "Удалить",
   "remove": "Убрать",
   "cancel": "Отмена",
@@ -149,5 +148,27 @@
   "textAlignment": "Выравнивание текста",
   "alignLeft": "По левому краю",
   "alignCenter": "По центру",
-  "alignRight": "По правому краю"
+  "alignRight": "По правому краю",
+  "task": "задача",
+  "tasks": "задачи",
+  "showFromDate": "Показывать с даты",
+  "removeShowFromDate": "Удалить дату начала показа",
+  "removeShowFromDateConfirm": "Вы хотите удалить дату начала показа?",
+  "showFromDateLabel": "Показывать с: {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "Отложенные",
+  "about": "О приложении",
+  "appInfo": "Информация о приложении",
+  "openSource": "Это приложение с открытым исходным кодом",
+  "viewOnGitHub": "Посмотреть на GitHub",
+  "supportDevelopment": "Поддержать разработку",
+  "donate": "Пожертвовать",
+  "reportIssue": "Сообщить о проблеме",
+  "reportIssueDescription": "Нашли ошибку или есть предложение? Сообщите нам!"
 }

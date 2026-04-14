@@ -48,6 +48,7 @@ class TaskRepository {
     required EisenhowerQuadrant quadrant,
     String? description,
     DateTime? dueDate,
+    DateTime? showFromDate,
     String? categoryId,
   }) async {
     final now = DateTime.now();
@@ -56,6 +57,7 @@ class TaskRepository {
       title: title,
       description: description,
       dueDate: dueDate,
+      showFromDate: showFromDate,
       categoryId: categoryId,
       quadrant: quadrant,
       completed: false,

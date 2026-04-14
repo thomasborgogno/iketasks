@@ -35,7 +35,7 @@ class NotificationService {
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
-    _enabled = prefs.getBool(_prefKey) ?? true;
+    _enabled = prefs.getBool(_prefKey) ?? false;
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/launcher_icon',
@@ -50,8 +50,6 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-
-    await androidImpl?.requestNotificationsPermission();
 
     // Create notification channel with localized strings if available
     final channel = AndroidNotificationChannel(
@@ -94,6 +92,18 @@ class NotificationService {
   }
 
   Future<void> setEnabled(bool value, List<TaskItem> currentTasks) async {
+    if (value) {
+      // Request permission when enabling notifications
+      final androidImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      final granted = await androidImpl?.requestNotificationsPermission();
+      if (granted != true) {
+        return; // Permission denied, don't enable notifications
+      }
+    }
+
     _enabled = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefKey, value);

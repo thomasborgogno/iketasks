@@ -38,7 +38,6 @@
   "deleteTask": "حذف المهمة",
   "deleteTaskConfirm": "هل تريد حذف هذه المهمة؟",
   "save": "حفظ",
-  "createTask": "إنشاء مهمة",
   "delete": "حذف",
   "remove": "إزالة",
   "cancel": "إلغاء",
@@ -149,5 +148,27 @@
   "textAlignment": "محاذاة النص",
   "alignLeft": "يسار",
   "alignCenter": "وسط",
-  "alignRight": "يمين"
+  "alignRight": "يمين",
+  "task": "مهمة",
+  "tasks": "مهام",
+  "showFromDate": "الإظهار من التاريخ",
+  "removeShowFromDate": "إزالة تاريخ البدء",
+  "removeShowFromDateConfirm": "هل تريد إزالة تاريخ البدء؟",
+  "showFromDateLabel": "الإظهار من: {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "المؤجلة",
+  "about": "حول",
+  "appInfo": "معلومات التطبيق",
+  "openSource": "هذا التطبيق مفتوح المصدر",
+  "viewOnGitHub": "عرض على GitHub",
+  "supportDevelopment": "دعم التطوير",
+  "donate": "تبرع",
+  "reportIssue": "الإبلاغ عن مشكلة",
+  "reportIssueDescription": "وجدت خطأ أو لديك اقتراح؟ أخبرنا!"
 }

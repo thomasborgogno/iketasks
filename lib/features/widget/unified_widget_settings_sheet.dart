@@ -275,9 +275,9 @@ class _MatrixWidgetSettingsState extends State<_MatrixWidgetSettings> {
                     Text(l10n.transparency(alphaPercent)),
                     Expanded(
                       child: Slider(
-                        min: 128,
+                        min: 0,
                         max: 255,
-                        divisions: 127,
+                        divisions: 255,
                         value: _settings.bgAlpha.toDouble(),
                         onChanged: (v) => setState(
                           () => _settings = _settings.copyWith(

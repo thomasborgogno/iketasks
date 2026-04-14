@@ -38,7 +38,6 @@
   "deleteTask": "Elimina attività",
   "deleteTaskConfirm": "Vuoi eliminare questa attività?",
   "save": "Salva",
-  "createTask": "Crea attività",
   "delete": "Elimina",
   "remove": "Rimuovi",
   "cancel": "Annulla",
@@ -157,5 +156,18 @@
   "alignCenter": "Centro",
   "alignRight": "Destra",
   "task": "attività",
-  "tasks": "attività"
+  "tasks": "attività",
+  "showFromDate": "Mostra a partire da",
+  "removeShowFromDate": "Rimuovi data di inizio",
+  "removeShowFromDateConfirm": "Vuoi rimuovere la data di inizio?",
+  "showFromDateLabel": "Mostra dal: {date}",
+  "postponedTasks": "Posticipate",
+  "about": "Informazioni",
+  "appInfo": "Informazioni sull'app",
+  "openSource": "Questa app è open source",
+  "viewOnGitHub": "Visualizza su GitHub",
+  "supportDevelopment": "Supporta lo sviluppo",
+  "donate": "Dona",
+  "reportIssue": "Segnala un problema",
+  "reportIssueDescription": "Hai trovato un bug o hai un suggerimento? Faccelo sapere!"
 }

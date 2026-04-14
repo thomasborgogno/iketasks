@@ -48,10 +48,33 @@ class TaskCubit extends Cubit<TaskState> {
         return a.dueDate!.compareTo(b.dueDate!);
       }
 
-      final incomplete = tasks.where((t) => !t.completed).toList()
+      // Filter out tasks that should not be shown yet (showFromDate in the future)
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final postponed = tasks.where((t) {
+        if (t.completed || t.showFromDate == null) return false;
+        final showFromDay = DateTime(
+          t.showFromDate!.year,
+          t.showFromDate!.month,
+          t.showFromDate!.day,
+        );
+        return showFromDay.isAfter(today);
+      }).toList()..sort(sortByDueDate);
+
+      final visibleTasks = tasks.where((t) {
+        if (t.showFromDate == null) return true;
+        final showFromDay = DateTime(
+          t.showFromDate!.year,
+          t.showFromDate!.month,
+          t.showFromDate!.day,
+        );
+        return !showFromDay.isAfter(today);
+      }).toList();
+
+      final incomplete = visibleTasks.where((t) => !t.completed).toList()
         ..sort(sortByDueDate);
       final recentlyCompleted =
-          tasks
+          visibleTasks
               .where(
                 (t) => t.completed && _completedWithinLastHour(t.updatedAt),
               )
@@ -59,8 +82,10 @@ class TaskCubit extends Cubit<TaskState> {
             ..sort(sortByDueDate);
       final visible = [...incomplete, ...recentlyCompleted];
 
-      final allIncompleteForWidget = tasks.where((t) => !t.completed).toList();
-      emit(TaskState.loaded(visible));
+      final allIncompleteForWidget = visibleTasks
+          .where((t) => !t.completed)
+          .toList();
+      emit(TaskState.loaded(visible, postponedTasks: postponed));
       await _widgetSyncService.pushTasks(allIncompleteForWidget);
       await _minimalWidgetSyncService.pushTasks(allIncompleteForWidget);
       await _notificationService.updatePriorityNotification(
@@ -84,6 +109,7 @@ class TaskCubit extends Cubit<TaskState> {
     required EisenhowerQuadrant quadrant,
     String? description,
     DateTime? dueDate,
+    DateTime? showFromDate,
     String? categoryId,
   }) async {
     final uid = _uid;
@@ -95,6 +121,7 @@ class TaskCubit extends Cubit<TaskState> {
       quadrant: quadrant,
       description: description,
       dueDate: dueDate,
+      showFromDate: showFromDate,
       categoryId: categoryId,
     );
   }

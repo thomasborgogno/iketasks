@@ -12,6 +12,7 @@ class TaskItem extends Equatable {
     required this.updatedAt,
     this.description,
     this.dueDate,
+    this.showFromDate,
     this.categoryId,
   });
 
@@ -19,6 +20,7 @@ class TaskItem extends Equatable {
   final String title;
   final String? description;
   final DateTime? dueDate;
+  final DateTime? showFromDate;
   final String? categoryId;
   final EisenhowerQuadrant quadrant;
   final bool completed;
@@ -29,12 +31,14 @@ class TaskItem extends Equatable {
     String? title,
     String? description,
     DateTime? dueDate,
+    DateTime? showFromDate,
     String? categoryId,
     EisenhowerQuadrant? quadrant,
     bool? completed,
     DateTime? updatedAt,
     bool clearDescription = false,
     bool clearDueDate = false,
+    bool clearShowFromDate = false,
     bool clearCategory = false,
   }) {
     return TaskItem(
@@ -42,6 +46,7 @@ class TaskItem extends Equatable {
       title: title ?? this.title,
       description: clearDescription ? null : (description ?? this.description),
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
+      showFromDate: clearShowFromDate ? null : (showFromDate ?? this.showFromDate),
       categoryId: clearCategory ? null : (categoryId ?? this.categoryId),
       quadrant: quadrant ?? this.quadrant,
       completed: completed ?? this.completed,
@@ -55,6 +60,7 @@ class TaskItem extends Equatable {
       'title': title,
       'description': description,
       'dueDate': dueDate == null ? null : Timestamp.fromDate(dueDate!),
+      'showFromDate': showFromDate == null ? null : Timestamp.fromDate(showFromDate!),
       'categoryId': categoryId,
       'quadrant': quadrant.value,
       'completed': completed,
@@ -70,6 +76,7 @@ class TaskItem extends Equatable {
       title: (data['title'] as String?) ?? '',
       description: data['description'] as String?,
       dueDate: (data['dueDate'] as Timestamp?)?.toDate(),
+      showFromDate: (data['showFromDate'] as Timestamp?)?.toDate(),
       categoryId: data['categoryId'] as String?,
       quadrant: EisenhowerQuadrantX.fromValue(
         (data['quadrant'] as String?) ?? 'q1',
@@ -88,6 +95,7 @@ class TaskItem extends Equatable {
     title,
     description,
     dueDate,
+    showFromDate,
     categoryId,
     quadrant,
     completed,
