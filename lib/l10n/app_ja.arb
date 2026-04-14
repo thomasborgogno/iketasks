@@ -38,7 +38,6 @@
   "deleteTask": "タスクを削除",
   "deleteTaskConfirm": "このタスクを削除しますか？",
   "save": "保存",
-  "createTask": "タスクを作成",
   "delete": "削除",
   "remove": "削除",
   "cancel": "キャンセル",
@@ -149,5 +148,27 @@
   "textAlignment": "テキスト配置",
   "alignLeft": "左沃え",
   "alignCenter": "中央沃え",
-  "alignRight": "右沃え"
+  "alignRight": "右沃え",
+  "task": "タスク",
+  "tasks": "タスク",
+  "showFromDate": "表示開始日",
+  "removeShowFromDate": "表示開始日を削除",
+  "removeShowFromDateConfirm": "表示開始日を削除しますか？",
+  "showFromDateLabel": "表示開始：{date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "延期済み",
+  "about": "について",
+  "appInfo": "アプリ情報",
+  "openSource": "このアプリはオープンソースです",
+  "viewOnGitHub": "GitHubで表示",
+  "supportDevelopment": "開発をサポート",
+  "donate": "寄付",
+  "reportIssue": "問題を報告",
+  "reportIssueDescription": "バグを見つけましたか、または提案がありますか？お知らせください！"
 }

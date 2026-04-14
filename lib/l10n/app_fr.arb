@@ -38,7 +38,6 @@
   "deleteTask": "Supprimer la tâche",
   "deleteTaskConfirm": "Voulez-vous supprimer cette tâche ?",
   "save": "Enregistrer",
-  "createTask": "Créer une tâche",
   "delete": "Supprimer",
   "remove": "Retirer",
   "cancel": "Annuler",
@@ -149,5 +148,27 @@
   "textAlignment": "Alignement du texte",
   "alignLeft": "Gauche",
   "alignCenter": "Centre",
-  "alignRight": "Droite"
+  "alignRight": "Droite",
+  "task": "tâche",
+  "tasks": "tâches",
+  "showFromDate": "Afficher à partir de la date",
+  "removeShowFromDate": "Supprimer la date de début",
+  "removeShowFromDateConfirm": "Voulez-vous supprimer la date de début ?",
+  "showFromDateLabel": "Afficher à partir du : {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "Reportées",
+  "about": "À propos",
+  "appInfo": "Informations sur l'application",
+  "openSource": "Cette application est open source",
+  "viewOnGitHub": "Voir sur GitHub",
+  "supportDevelopment": "Soutenir le développement",
+  "donate": "Faire un don",
+  "reportIssue": "Signaler un problème",
+  "reportIssueDescription": "Vous avez trouvé un bug ou avez une suggestion ? Faites-le nous savoir !"
 }

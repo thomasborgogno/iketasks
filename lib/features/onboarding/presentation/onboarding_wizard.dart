@@ -130,56 +130,64 @@ class _WelcomePageState extends State<_WelcomePage>
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.grid_4x4,
-                    size: 100,
-                    color: theme.colorScheme.primary,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 48,
+              ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Icon(
+                        Icons.grid_4x4,
+                        size: 80,
+                        color: theme.colorScheme.primary,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            l10n.onboardingWelcomeTitle,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.onboardingWelcomeSubtitle,
+                            style: theme.textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      _EisenhowerMatrixDiagram(),
+                      Text(
+                        l10n.onboardingWelcomeDescription,
+                        style: theme.textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      FilledButton.icon(
+                        onPressed: widget.onNext,
+                        icon: const Icon(Icons.arrow_forward),
+                        label: Text(l10n.onboardingGetStarted),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    l10n.onboardingWelcomeTitle,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.onboardingWelcomeSubtitle,
-                    style: theme.textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  _EisenhowerMatrixDiagram(),
-                  const SizedBox(height: 32),
-                  Text(
-                    l10n.onboardingWelcomeDescription,
-                    style: theme.textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  FilledButton.icon(
-                    onPressed: widget.onNext,
-                    icon: const Icon(Icons.arrow_forward),
-                    label: Text(l10n.onboardingGetStarted),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -198,7 +206,6 @@ class _EisenhowerMatrixDiagram extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SizedBox(width: 60),
               Expanded(
                 child: Center(
                   child: Text(
@@ -379,69 +386,75 @@ class _FeaturesPageState extends State<_FeaturesPage>
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: Column(
-              children: [
-                Icon(Icons.star, size: 80, color: theme.colorScheme.primary),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.onboardingFeaturesTitle,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                _FeatureItem(
-                  icon: Icons.category,
-                  title: l10n.onboardingFeatureCategories,
-                  description: l10n.onboardingFeatureCategoriesDesc,
-                ),
-                const SizedBox(height: 20),
-                _FeatureItem(
-                  icon: Icons.notifications,
-                  title: l10n.onboardingFeatureNotifications,
-                  description: l10n.onboardingFeatureNotificationsDesc,
-                ),
-                const SizedBox(height: 20),
-                _FeatureItem(
-                  icon: Icons.widgets,
-                  title: l10n.onboardingFeatureWidget,
-                  description: l10n.onboardingFeatureWidgetDesc,
-                ),
-                const SizedBox(height: 20),
-                _FeatureItem(
-                  icon: Icons.cloud_sync,
-                  title: l10n.onboardingFeatureSync,
-                  description: l10n.onboardingFeatureSyncDesc,
-                ),
-                const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 48,
+              ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    TextButton.icon(
-                      onPressed: widget.onPrevious,
-                      icon: const Icon(Icons.arrow_back),
-                      label: Text(l10n.previous),
+                    Icon(
+                      Icons.star,
+                      size: 80,
+                      color: theme.colorScheme.primary,
                     ),
-                    FilledButton.icon(
-                      onPressed: widget.onNext,
-                      icon: const Icon(Icons.arrow_forward),
-                      label: Text(l10n.onboardingContinue),
+                    Text(
+                      l10n.onboardingFeaturesTitle,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    _FeatureItem(
+                      icon: Icons.category,
+                      title: l10n.onboardingFeatureCategories,
+                      description: l10n.onboardingFeatureCategoriesDesc,
+                    ),
+                    _FeatureItem(
+                      icon: Icons.notifications,
+                      title: l10n.onboardingFeatureNotifications,
+                      description: l10n.onboardingFeatureNotificationsDesc,
+                    ),
+                    _FeatureItem(
+                      icon: Icons.widgets,
+                      title: l10n.onboardingFeatureWidget,
+                      description: l10n.onboardingFeatureWidgetDesc,
+                    ),
+                    _FeatureItem(
+                      icon: Icons.cloud_sync,
+                      title: l10n.onboardingFeatureSync,
+                      description: l10n.onboardingFeatureSyncDesc,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton.icon(
+                          onPressed: widget.onPrevious,
+                          icon: const Icon(Icons.arrow_back),
+                          label: Text(l10n.previous),
+                        ),
+                        FilledButton.icon(
+                          onPressed: widget.onNext,
+                          icon: const Icon(Icons.arrow_forward),
+                          label: Text(l10n.onboardingContinue),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -543,108 +556,123 @@ class _SignInPageState extends State<_SignInPage>
           widget.onNext();
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: Column(
-                children: [
-                  Icon(Icons.login, size: 80, color: theme.colorScheme.primary),
-                  const SizedBox(height: 24),
-                  Text(
-                    l10n.onboardingSignInTitle,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.onboardingSignInDescription,
-                    style: theme.textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      final isLoading = state.status == AuthStatus.loading;
-                      if (state.status == AuthStatus.authenticated) {
-                        return Column(
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              size: 64,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              l10n.onboardingSignInSuccess,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            FilledButton.icon(
-                              onPressed: widget.onNext,
-                              icon: const Icon(Icons.arrow_forward),
-                              label: Text(l10n.onboardingContinue),
-                            ),
-                          ],
-                        );
-                      }
-                      return Column(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 48,
+                ),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Icon(
+                        Icons.login,
+                        size: 80,
+                        color: theme.colorScheme.primary,
+                      ),
+                      Column(
                         children: [
-                          FilledButton.icon(
-                            onPressed: isLoading
-                                ? null
-                                : () {
-                                    context
-                                        .read<AuthCubit>()
-                                        .signInWithGoogle();
-                                  },
-                            icon: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Image.asset(
-                                    'assets/google_logo.png',
-                                    height: 24,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(Icons.g_mobiledata),
-                                  ),
-                            label: Text(l10n.signInWithGoogle),
-                          ),
-                          if (state.status == AuthStatus.error) ...[
-                            const SizedBox(height: 16),
-                            Text(
-                              state.errorMessage ?? l10n.authError,
-                              style: TextStyle(color: theme.colorScheme.error),
-                              textAlign: TextAlign.center,
+                          Text(
+                            l10n.onboardingSignInTitle,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.onboardingSignInDescription,
+                            style: theme.textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
                         ],
-                      );
-                    },
+                      ),
+                      BlocBuilder<AuthCubit, AuthState>(
+                        builder: (context, state) {
+                          final isLoading = state.status == AuthStatus.loading;
+                          if (state.status == AuthStatus.authenticated) {
+                            return Column(
+                              children: [
+                                Icon(
+                                  Icons.check_circle,
+                                  size: 64,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  l10n.onboardingSignInSuccess,
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                FilledButton.icon(
+                                  onPressed: widget.onNext,
+                                  icon: const Icon(Icons.arrow_forward),
+                                  label: Text(l10n.onboardingContinue),
+                                ),
+                              ],
+                            );
+                          }
+                          return Column(
+                            children: [
+                              FilledButton.icon(
+                                onPressed: isLoading
+                                    ? null
+                                    : () {
+                                        context
+                                            .read<AuthCubit>()
+                                            .signInWithGoogle();
+                                      },
+                                icon: isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Image.asset(
+                                        'assets/google_logo.png',
+                                        height: 24,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(Icons.g_mobiledata),
+                                      ),
+                                label: Text(l10n.signInWithGoogle),
+                              ),
+                              if (state.status == AuthStatus.error) ...[
+                                const SizedBox(height: 16),
+                                Text(
+                                  state.errorMessage ?? l10n.authError,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+                      TextButton.icon(
+                        onPressed: widget.onPrevious,
+                        icon: const Icon(Icons.arrow_back),
+                        label: Text(l10n.previous),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 48),
-                  TextButton.icon(
-                    onPressed: widget.onPrevious,
-                    icon: const Icon(Icons.arrow_back),
-                    label: Text(l10n.previous),
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -702,97 +730,105 @@ class _CategorySetupPageState extends State<_CategorySetupPage>
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: Column(
-              children: [
-                Icon(
-                  Icons.category,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.onboardingCategoriesTitle,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.onboardingCategoriesDescription,
-                  style: theme.textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                BlocBuilder<CategoryCubit, CategoryState>(
-                  builder: (context, state) {
-                    if (state.status == CategoryStatus.loaded &&
-                        state.categories.isNotEmpty) {
-                      return Container(
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: state.categories.length,
-                          itemBuilder: (context, index) {
-                            final category = state.categories[index];
-                            return ListTile(
-                              leading:
-                                  category.emoji != null &&
-                                      category.emoji!.isNotEmpty
-                                  ? Text(
-                                      category.emoji!,
-                                      style: const TextStyle(fontSize: 24),
-                                    )
-                                  : const Icon(Icons.label),
-                              title: Text(category.name),
-                            );
-                          },
-                        ),
-                      );
-                    }
-                    return Text(
-                      l10n.onboardingNoCategoriesYet,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: _openCategoryCreation,
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.createCategory),
-                ),
-                const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 48,
+              ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    TextButton.icon(
-                      onPressed: widget.onPrevious,
-                      icon: const Icon(Icons.arrow_back),
-                      label: Text(l10n.previous),
+                    Icon(
+                      Icons.category,
+                      size: 80,
+                      color: theme.colorScheme.primary,
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          l10n.onboardingCategoriesTitle,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.onboardingCategoriesDescription,
+                          style: theme.textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                    BlocBuilder<CategoryCubit, CategoryState>(
+                      builder: (context, state) {
+                        if (state.status == CategoryStatus.loaded &&
+                            state.categories.isNotEmpty) {
+                          return Container(
+                            constraints: const BoxConstraints(maxHeight: 200),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: state.categories.length,
+                              itemBuilder: (context, index) {
+                                final category = state.categories[index];
+                                return ListTile(
+                                  leading:
+                                      category.emoji != null &&
+                                          category.emoji!.isNotEmpty
+                                      ? Text(
+                                          category.emoji!,
+                                          style: const TextStyle(fontSize: 24),
+                                        )
+                                      : const Icon(Icons.label),
+                                  title: Text(category.name),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return Text(
+                          l10n.onboardingNoCategoriesYet,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        );
+                      },
                     ),
                     FilledButton.icon(
-                      onPressed: widget.onComplete,
-                      icon: const Icon(Icons.check),
-                      label: Text(l10n.onboardingFinish),
+                      onPressed: _openCategoryCreation,
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.createCategory),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton.icon(
+                          onPressed: widget.onPrevious,
+                          icon: const Icon(Icons.arrow_back),
+                          label: Text(l10n.previous),
+                        ),
+                        FilledButton.icon(
+                          onPressed: widget.onComplete,
+                          icon: const Icon(Icons.check),
+                          label: Text(l10n.onboardingFinish),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

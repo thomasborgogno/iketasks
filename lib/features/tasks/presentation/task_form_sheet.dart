@@ -6,19 +6,23 @@ class _TaskFormResult {
     required this.quadrant,
     required this.description,
     required this.dueDate,
+    required this.showFromDate,
     required this.categoryId,
     required this.clearDescription,
     required this.clearDueDate,
+    required this.clearShowFromDate,
     required this.clearCategory,
   });
 
   final String title;
   final String? description;
   final DateTime? dueDate;
+  final DateTime? showFromDate;
   final String? categoryId;
   final EisenhowerQuadrant quadrant;
   final bool clearDescription;
   final bool clearDueDate;
+  final bool clearShowFromDate;
   final bool clearCategory;
 }
 
@@ -40,6 +44,7 @@ class _TaskFormState extends State<_TaskForm> {
   late bool _isImportant;
   late bool _isUrgent;
   DateTime? _dueDate;
+  DateTime? _showFromDate;
   String? _categoryId;
   bool _showDescription = false;
 
@@ -53,6 +58,7 @@ class _TaskFormState extends State<_TaskForm> {
     _quadrant = widget.existing?.quadrant ?? EisenhowerQuadrant.importantUrgent;
     _syncFlagsFromQuadrant(_quadrant);
     _dueDate = widget.existing?.dueDate;
+    _showFromDate = widget.existing?.showFromDate;
     _categoryId = widget.existing?.categoryId;
     _showDescription =
         widget.existing?.description != null &&
@@ -257,7 +263,7 @@ class _TaskFormState extends State<_TaskForm> {
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Text(l10n.category, style: Theme.of(context).textTheme.labelMedium),
             BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, categoryState) {
@@ -301,6 +307,14 @@ class _TaskFormState extends State<_TaskForm> {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               Text(DateFormat('dd/MM/yyyy').format(_dueDate!)),
+              const SizedBox(height: 12),
+            ],
+            if (_showFromDate != null) ...[
+              Text(
+                l10n.showFromDate,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Text(DateFormat('dd/MM/yyyy').format(_showFromDate!)),
               const SizedBox(height: 12),
             ],
 
@@ -387,19 +401,58 @@ class _TaskFormState extends State<_TaskForm> {
                     if (picked != null) setState(() => _dueDate = picked);
                   },
                 ),
+                IconButton(
+                  iconSize: 20,
+                  icon: Icon(
+                    Icons.schedule,
+                    color: _showFromDate != null
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  tooltip: l10n.showFromDate,
+                  onPressed: () async {
+                    if (_showFromDate != null) {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(l10n.removeShowFromDate),
+                          content: Text(l10n.removeShowFromDateConfirm),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: Text(l10n.cancel),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(l10n.remove),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm != true) return;
+                      setState(() => _showFromDate = null);
+                      return;
+                    }
+                    if (!mounted) return;
+                    final picked = await showDatePicker(
+                      context: context,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2100),
+                      initialDate: DateTime.now(),
+                    );
+                    if (picked != null) setState(() => _showFromDate = picked);
+                  },
+                ),
                 const SizedBox(width: 8),
                 if (isEdit) ...[
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _deleteExistingTask,
-                      icon: const Icon(Icons.delete_outline),
-                      label: Text(l10n.delete),
-                    ),
+                  TextButton(
+                    onPressed: _deleteExistingTask,
+                    child: Text(l10n.delete),
                   ),
                   const SizedBox(width: 8),
                 ],
                 Expanded(
-                  child: FilledButton.icon(
+                  child: FilledButton(
                     onPressed: () {
                       final title = _titleController.text.trim();
                       if (title.isEmpty) return;
@@ -414,17 +467,18 @@ class _TaskFormState extends State<_TaskForm> {
                               ? null
                               : _descriptionController.text.trim(),
                           dueDate: _dueDate,
+                          showFromDate: _showFromDate,
                           categoryId: _categoryId,
                           clearDescription: _descriptionController.text
                               .trim()
                               .isEmpty,
                           clearDueDate: _dueDate == null,
+                          clearShowFromDate: _showFromDate == null,
                           clearCategory: _categoryId == null,
                         ),
                       );
                     },
-                    label: Text(isEdit ? l10n.save : l10n.createTask),
-                    icon: const Icon(Icons.save_outlined),
+                    child: Text(l10n.save),
                   ),
                 ),
               ],

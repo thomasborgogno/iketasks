@@ -38,7 +38,6 @@
   "deleteTask": "删除任务",
   "deleteTaskConfirm": "您要删除此任务吗？",
   "save": "保存",
-  "createTask": "创建任务",
   "delete": "删除",
   "remove": "移除",
   "cancel": "取消",
@@ -149,5 +148,27 @@
   "textAlignment": "文本对齐",
   "alignLeft": "左对齐",
   "alignCenter": "居中",
-  "alignRight": "右对齐"
+  "alignRight": "右对齐",
+  "task": "任务",
+  "tasks": "任务",
+  "showFromDate": "显示起始日期",
+  "removeShowFromDate": "删除显示起始日期",
+  "removeShowFromDateConfirm": "您要删除显示起始日期吗？",
+  "showFromDateLabel": "显示自：{date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "已推迟",
+  "about": "关于",
+  "appInfo": "应用信息",
+  "openSource": "此应用是开源的",
+  "viewOnGitHub": "在 GitHub 上查看",
+  "supportDevelopment": "支持开发",
+  "donate": "捐赠",
+  "reportIssue": "报告问题",
+  "reportIssueDescription": "发现了错误或有建议？请告诉我们！"
 }

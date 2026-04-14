@@ -50,6 +50,7 @@ class MatrixPage extends StatefulWidget {
 
 class _MatrixPageState extends State<MatrixPage> {
   String? _selectedCategoryId;
+  bool _showPostponed = false;
   _LayoutMode _layoutMode = _LayoutMode.grid;
   StreamSubscription<void>? _newTaskSubscription;
   bool _isModalOpen = false;
@@ -78,7 +79,17 @@ class _MatrixPageState extends State<MatrixPage> {
   }
 
   void _setSelectedCategory(String? categoryId) {
-    setState(() => _selectedCategoryId = categoryId);
+    setState(() {
+      _selectedCategoryId = categoryId;
+      _showPostponed = false;
+    });
+  }
+
+  void _toggleShowPostponed() {
+    setState(() {
+      _showPostponed = !_showPostponed;
+      if (_showPostponed) _selectedCategoryId = null;
+    });
   }
 
   void _toggleLayoutMode() {
@@ -177,6 +188,15 @@ class _MatrixPageState extends State<MatrixPage> {
                         _openLanguageSelector(context);
                       },
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.info_outline),
+                      title: Text(AppLocalizations.of(context)!.about),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        _openAboutSection(context);
+                      },
+                    ),
                     SwitchListTile(
                       secondary: const Icon(Icons.notifications_outlined),
                       title: Text(
@@ -253,32 +273,48 @@ class _MatrixPageState extends State<MatrixPage> {
       ),
       body: Column(
         children: [
-          BlocBuilder<CategoryCubit, CategoryState>(
-            builder: (context, state) {
-              final categories = state.categories;
-              if (categories.isEmpty) return const SizedBox.shrink();
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (final category in categories)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          selected: _selectedCategoryId == category.id,
-                          onSelected: (isSelected) => _setSelectedCategory(
-                            isSelected ? category.id : null,
+          BlocBuilder<TaskCubit, TaskState>(
+            builder: (context, taskState) {
+              final hasPostponed = taskState.postponedTasks.isNotEmpty;
+              return BlocBuilder<CategoryCubit, CategoryState>(
+                builder: (context, state) {
+                  final categories = state.categories;
+                  if (categories.isEmpty && !hasPostponed)
+                    return const SizedBox.shrink();
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final category in categories)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              selected: _selectedCategoryId == category.id,
+                              onSelected: (isSelected) => _setSelectedCategory(
+                                isSelected ? category.id : null,
+                              ),
+                              label: Text(
+                                category.emoji != null &&
+                                        category.emoji!.isNotEmpty
+                                    ? '${category.emoji} ${category.name}'
+                                    : category.name,
+                              ),
+                            ),
                           ),
-                          label: Text(
-                            category.emoji != null && category.emoji!.isNotEmpty
-                                ? '${category.emoji} ${category.name}'
-                                : category.name,
+                        if (hasPostponed)
+                          FilterChip(
+                            selected: _showPostponed,
+                            onSelected: (_) => _toggleShowPostponed(),
+                            label: const Icon(
+                              Icons.schedule_outlined,
+                              size: 16,
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
-                ),
+                      ],
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -304,7 +340,9 @@ class _MatrixPageState extends State<MatrixPage> {
                       );
                     }
 
-                    final filtered = _selectedCategoryId == null
+                    final filtered = _showPostponed
+                        ? state.postponedTasks
+                        : _selectedCategoryId == null
                         ? state.tasks
                         : state.tasks
                               .where((t) => t.categoryId == _selectedCategoryId)
@@ -368,6 +406,7 @@ class _MatrixPageState extends State<MatrixPage> {
         quadrant: result.quadrant,
         description: result.description,
         dueDate: result.dueDate,
+        showFromDate: result.showFromDate,
         categoryId: result.categoryId,
       );
       return;
@@ -378,10 +417,12 @@ class _MatrixPageState extends State<MatrixPage> {
         title: result.title,
         description: result.description,
         dueDate: result.dueDate,
+        showFromDate: result.showFromDate,
         categoryId: result.categoryId,
         quadrant: result.quadrant,
         clearDescription: result.clearDescription,
         clearDueDate: result.clearDueDate,
+        clearShowFromDate: result.clearShowFromDate,
         clearCategory: result.clearCategory,
       ),
     );
@@ -464,6 +505,106 @@ class _MatrixPageState extends State<MatrixPage> {
                   languageName: l10n.languageArabic,
                   locale: const Locale('ar'),
                   currentLocale: currentLocale,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openAboutSection(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.about,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.appInfo,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.openSource,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () {
+                    // GitHub URL will be added by the user later
+                    // For now, prepare the structure
+                  },
+                  icon: const Icon(Icons.code),
+                  label: Text(l10n.viewOnGitHub),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.supportDevelopment,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          // Ko-fi URL will be added by the user later
+                        },
+                        icon: const Icon(Icons.favorite_outline),
+                        label: const Text('Ko-fi'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          // PayPal URL will be added by the user later
+                        },
+                        icon: const Icon(Icons.payment),
+                        label: const Text('PayPal'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.reportIssue,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.reportIssueDescription,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: () async {
+                    final Uri emailUri = Uri(
+                      scheme: 'mailto',
+                      path: 'thomas.borgogno99@gmail.com',
+                      query: 'subject=Eisenhower Matrix App - Issue Report',
+                    );
+                    // Note: url_launcher package would be needed to actually open this
+                    // For now, the structure is in place
+                  },
+                  icon: const Icon(Icons.email_outlined),
+                  label: Text(l10n.reportIssue),
                 ),
               ],
             ),

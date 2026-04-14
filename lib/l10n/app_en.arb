@@ -45,7 +45,6 @@
   "deleteTask": "Delete task",
   "deleteTaskConfirm": "Do you want to delete this task?",
   "save": "Save",
-  "createTask": "Create task",
   "delete": "Delete",
   "remove": "Remove",
   "cancel": "Cancel",
@@ -216,5 +215,25 @@
   "alignCenter": "Center",
   "alignRight": "Right",
   "task": "task",
-  "tasks": "tasks"
+  "tasks": "tasks",
+  "showFromDate": "Show from date",
+  "removeShowFromDate": "Remove show from date",
+  "removeShowFromDateConfirm": "Do you want to remove the show from date?",
+  "showFromDateLabel": "Show from: {date}",
+  "@showFromDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postponedTasks": "Postponed",
+  "about": "About",
+  "appInfo": "App Information",
+  "openSource": "This app is open source",
+  "viewOnGitHub": "View on GitHub",
+  "supportDevelopment": "Support Development",
+  "donate": "Donate",
+  "reportIssue": "Report an Issue",
+  "reportIssueDescription": "Found a bug or have a suggestion? Let us know!"
 }
