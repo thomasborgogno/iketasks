@@ -239,5 +239,6 @@
   "supportDevelopment": "Support Development",
   "donate": "Donate",
   "reportIssue": "Report an Issue",
-  "reportIssueDescription": "Found a bug or have a suggestion? Let me know!"
+  "reportIssueDescription": "Found a bug or have a suggestion? Let me know!",
+  "privacyPolicy": "Privacy Policy"
 }

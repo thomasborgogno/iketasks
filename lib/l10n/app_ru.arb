@@ -180,5 +180,6 @@
   "supportDevelopment": "Поддержать разработку",
   "donate": "Пожертвовать",
   "reportIssue": "Сообщить о проблеме",
-  "reportIssueDescription": "Нашли ошибку или есть предложение? Сообщите нам!"
+  "reportIssueDescription": "Нашли ошибку или есть предложение? Сообщите нам!",
+  "privacyPolicy": "Политика конфиденциальности"
 }

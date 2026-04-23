@@ -42,7 +42,7 @@ class NotificationService {
     );
     const settings = InitializationSettings(android: androidSettings);
     await _plugin.initialize(
-      settings,
+      settings: settings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
 
@@ -109,7 +109,7 @@ class NotificationService {
     await prefs.setBool(_prefKey, value);
     if (!value) {
       _lastTasks = [];
-      await _plugin.cancel(_notificationId);
+      await _plugin.cancel(id: _notificationId);
     } else {
       await updatePriorityNotification(currentTasks);
     }
@@ -135,7 +135,7 @@ class NotificationService {
     // }
 
     if (top.isEmpty) {
-      await _plugin.cancel(_notificationId);
+      await _plugin.cancel(id: _notificationId);
       return;
     }
 
@@ -172,10 +172,10 @@ class NotificationService {
     );
 
     await _plugin.show(
-      _notificationId,
-      title,
-      lines.first,
-      NotificationDetails(android: androidDetails),
+      id: _notificationId,
+      title: title,
+      body: lines.first,
+      notificationDetails: NotificationDetails(android: androidDetails),
     );
   }
 }

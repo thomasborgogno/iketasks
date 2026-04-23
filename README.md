@@ -1,140 +1,142 @@
-# Eisenhower Matrix App (Flutter Android)
+# Eisenhower Matrix — Task Manager
 
-Applicazione mobile Flutter per Android per la gestione task con Matrice di Eisenhower.
+**Prioritize smarter. Focus on what truly matters.**
 
-## Funzionalita implementate
+Eisenhower Matrix is a free, open-source Android app that helps you organize your tasks using the proven Eisenhower Matrix method. Sort everything you need to do into four quadrants based on urgency and importance, and always know what to tackle next.
 
-- Login/Logout con Google tramite Firebase Auth.
-- Persistenza cloud su Firestore per account utente (`users/{uid}/tasks` e `users/{uid}/categories`).
-- Schermata principale con 4 quadranti Eisenhower.
-- Task con checkbox completamento, titolo, descrizione opzionale, scadenza opzionale, categoria opzionale.
-- CRUD task: creazione, modifica, eliminazione, spostamento tra quadranti (drag and drop).
-- Gestione categorie: creazione, eliminazione, filtro per categoria.
-- Ordinamento task per data di scadenza.
-- Tema chiaro/scuro con Material Design 3.
-- Widget Android home screen (grande) con i 4 quadranti e task principali per quadrante.
+---
 
-## Struttura cartelle
+## Download
 
-```text
-lib/
-	app.dart
-	main.dart
-	core/
-		theme/
-			app_theme.dart
-	features/
-		auth/
-			data/auth_repository.dart
-			presentation/auth_cubit.dart
-			presentation/auth_state.dart
-			presentation/sign_in_page.dart
-		tasks/
-			data/task_repository.dart
-			domain/task_item.dart
-			presentation/task_cubit.dart
-			presentation/task_state.dart
-			presentation/matrix_page.dart
-		categories/
-			data/category_repository.dart
-			domain/task_category.dart
-			presentation/category_cubit.dart
-			presentation/category_state.dart
-		widget_sync/
-			widget_sync_service.dart
+Get the latest APK from the [**Releases page**](../../releases/latest).
 
-android/app/src/main/
-	AndroidManifest.xml
-	kotlin/com/eisenhower/matrix/eisenhower_matrix_app/
-		MainActivity.kt
-	res/layout/eisenhower_widget.xml
-	res/xml/eisenhower_widget_info.xml
-	res/values/strings.xml
-```
+> No Play Store account required — just download and install the APK directly.
 
-## Dipendenze principali
+---
 
-- `flutter_bloc`
-- `equatable`
-- `firebase_core`
-- `firebase_auth`
-- `google_sign_in`
-- `cloud_firestore`
-- `connectivity_plus`
-- `home_widget`
-- `intl`
-- `uuid`
+## Features
 
-## Setup Firebase (obbligatorio)
+### 📋 Eisenhower Matrix
+Organize all your tasks across four quadrants:
 
-1. Crea progetto Firebase.
-2. Registra app Android con package:
-	 `com.eisenhower.matrix.todo`
-3. Aggiungi SHA-1 e SHA-256 in Firebase Console (necessari per Google Sign-In).
-4. Scarica `google-services.json` e copialo in:
-	 `android/app/google-services.json`
-5. In Firebase abilita:
-	 - Authentication -> Google
-	 - Cloud Firestore
+| Quadrant | Description |
+|----------|-------------|
+| 🔴 **Priority** (Q1) | Urgent & Important — do these now |
+| 🟢 **Plan** (Q2) | Not Urgent but Important — schedule these |
+| 🟠 **Delegate** (Q3) | Urgent but Not Important — hand off if possible |
+| ⚪ **Eliminate** (Q4) | Not Urgent & Not Important — consider dropping |
 
-## Firestore data model
+### ✅ Task Management
+- Create tasks with **title**, optional **description**, **due date**, and **category**
+- Tap any task to edit or move it to a different quadrant
+- Mark tasks as complete with a single tap
+- View and restore completed tasks from the archive
 
-- `users/{uid}/tasks/{taskId}`
-	- `title` (string)
-	- `description` (string|null)
-	- `dueDate` (timestamp|null)
-	- `categoryId` (string|null)
-	- `quadrant` (`q1|q2|q3|q4`)
-	- `completed` (bool)
-	- `createdAt` (timestamp)
-	- `updatedAt` (timestamp)
+### 🏷️ Categories
+- Create custom categories with optional emoji icons (e.g. 💼 Work, 🏠 Home, 📚 Study)
+- Filter the matrix by category to focus on one area at a time
 
-- `users/{uid}/categories/{categoryId}`
-	- `name` (string)
-	- `createdAt` (timestamp)
-	- `updatedAt` (timestamp)
+### 🔔 Persistent Notification
+- Optional notification in your status bar showing your current priority tasks
+- Quick glance at what needs attention without opening the app
 
-## Build e installazione Android
+### 🏠 Home Screen Widgets
+Two widget styles to keep your tasks visible from your home screen:
+- **Matrix Widget** — shows tasks from all four quadrants at a glance
+- **Minimal Widget** — compact bar for your most urgent tasks
+- Fully customizable: theme, background, text size, text color, transparency
 
-```bash
-flutter pub get
-flutter run -d android
-```
+### 📥 Google Tasks Import
+- Import existing tasks directly from your Google Tasks lists
+- Assign imported tasks to quadrants before they land in your matrix
 
-Build APK debug:
+### 🎓 Onboarding Wizard
+- First-run guide that explains the Eisenhower method and walks you through initial setup
 
-```bash
-flutter build apk --debug
-```
+### ☁️ Cloud Sync
+- Tasks stored securely in Firebase Firestore
+- Automatically synced across all your devices when signed in
 
-Build APK release:
+### 🌍 10 Languages
+English, Italian, Spanish, French, German, Chinese, Portuguese, Russian, Japanese, Arabic
 
-```bash
-flutter build apk --release
-```
+### 🎨 Light & Dark Theme
+- Follows your system theme automatically, or override manually in settings
+- Built with Material Design 3
 
-Build AAB (Play Store):
+---
 
-```bash
-flutter build appbundle --release
-```
+## Getting Started
 
-Installazione APK su device collegato:
+1. Download the latest APK from the [Releases page](../../releases/latest)
+2. Enable *Install from unknown sources* in your Android settings if prompted
+3. Open the app and sign in with your Google account
+4. Start adding tasks!
 
-```bash
-adb install -r build/app/outputs/flutter-apk/app-debug.apk
-```
+---
 
-## Note widget Android
+## Sign-In & Data
 
-- Il widget mostra fino a 3 task per quadrante.
-- Il tap sul widget apre l'app.
-- L'aggiornamento dati del widget avviene quando cambiano i task in app e via refresh periodico.
+This app uses **Google Sign-In** to identify you and store your tasks securely in Firebase Firestore. Your data is not shared with anyone.
 
-## Stato attuale implementazione
+See the [Privacy Policy](https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy) for full details on what data is collected and how it is used.
 
-Questa base e gia eseguibile e copre il nucleo MVP richiesto. Rimangono come step successivi consigliati:
+---
 
-- Callback checkbox direttamente dal widget per toggle senza aprire app.
-- Hardening regole Firestore e suite test avanzata (unit/integration).
-- Gestione conflitti multi-device piu sofisticata oltre a `updatedAt`.
+## Support Development
+
+If you find this app useful, consider supporting its development:
+
+- ☕ [Ko-fi](https://ko-fi.com/thomasborgogno)
+- 💳 [PayPal](https://paypal.me/thomasborgogno)
+
+---
+
+## Contributing
+
+Bug reports, feature requests, and pull requests are welcome!
+Open an [issue](../../issues) or email thomas.borgogno99@gmail.com.
+
+---
+
+## License
+
+This project is open source. See [LICENSE](LICENSE) for details.
+
+
+## Getting Started
+
+1. Download the latest APK from the [Releases page](../../releases/latest)
+2. Enable *Install from unknown sources* in your Android settings if prompted
+3. Open the app and sign in with your Google account
+4. Start adding tasks!
+
+---
+
+## Sign-In & Data
+
+This app uses **Google Sign-In** to identify you and store your tasks securely in Firebase Firestore. Your data is not shared with anyone.
+
+See the [Privacy Policy](https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy) for full details on what data is collected and how it is used.
+
+---
+
+## Support Development
+
+If you find this app useful, consider supporting its development:
+
+- ☕ [Ko-fi](https://ko-fi.com/thomasborgogno)
+- 💳 [PayPal](https://paypal.me/thomasborgogno)
+
+---
+
+## Contributing
+
+Bug reports, feature requests, and pull requests are welcome!
+Open an [issue](../../issues) or email thomas.borgogno99@gmail.com.
+
+---
+
+## License
+
+This project is open source. See [LICENSE](LICENSE) for details.

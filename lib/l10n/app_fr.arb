@@ -180,5 +180,6 @@
   "supportDevelopment": "Soutenir le développement",
   "donate": "Faire un don",
   "reportIssue": "Signaler un problème",
-  "reportIssueDescription": "Vous avez trouvé un bug ou avez une suggestion ? Faites-le nous savoir !"
+  "reportIssueDescription": "Vous avez trouvé un bug ou avez une suggestion ? Faites-le nous savoir !",
+  "privacyPolicy": "Politique de confidentialité"
 }

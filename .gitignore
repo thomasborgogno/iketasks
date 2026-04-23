@@ -44,6 +44,13 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Firebase config — contains API keys, managed via CI secrets
+android/app/google-services.json
+
+# Release keystore — never commit to version control
+*.jks
+*.keystore
+
 # Generated l10n files
 lib/l10n/app_localizations.dart
 lib/l10n/app_localizations_*.dart

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 import 'package:eisenhower_matrix_app/features/auth/presentation/auth_cubit.dart';
 import 'package:eisenhower_matrix_app/features/categories/presentation/category_cubit.dart';
@@ -660,6 +661,19 @@ class _SignInPageState extends State<_SignInPage>
                             ],
                           );
                         },
+                      ),
+                      TextButton(
+                        onPressed: () => launchUrl(
+                          Uri.parse(
+                            'https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy',
+                          ),
+                        ),
+                        child: Text(
+                          l10n.privacyPolicy,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: widget.onPrevious,

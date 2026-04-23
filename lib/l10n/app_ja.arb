@@ -180,5 +180,6 @@
   "supportDevelopment": "開発をサポート",
   "donate": "寄付",
   "reportIssue": "問題を報告",
-  "reportIssueDescription": "バグを見つけましたか、または提案がありますか？お知らせください！"
+  "reportIssueDescription": "バグを見つけましたか、または提案がありますか？お知らせください！",
+  "privacyPolicy": "プライバシーポリシー"
 }

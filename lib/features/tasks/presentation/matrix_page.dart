@@ -618,6 +618,16 @@ class _MatrixPageState extends State<MatrixPage> {
                   icon: const Icon(Icons.code),
                   label: Text(l10n.viewOnGitHub),
                 ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse(
+                      'https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy',
+                    ),
+                  ),
+                  icon: const Icon(Icons.privacy_tip_outlined),
+                  label: Text(l10n.privacyPolicy),
+                ),
                 const SizedBox(height: 24),
                 Text(
                   l10n.supportDevelopment,
