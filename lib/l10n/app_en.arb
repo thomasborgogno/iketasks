@@ -166,6 +166,10 @@
   },
   "persistentNotification": "Persistent notification",
   "persistentNotificationDescription": "Show priority tasks in the notification bar",
+  "taskInputMode": "Task input mode",
+  "taskInputModeQuadrantOnly": "Quadrant only",
+  "taskInputModePriorityOnly": "Priority only",
+  "taskInputModeBoth": "Priority and quadrant",
   "language": "Language",
   "languageEnglish": "English",
   "languageItalian": "Italian",
@@ -235,5 +239,5 @@
   "supportDevelopment": "Support Development",
   "donate": "Donate",
   "reportIssue": "Report an Issue",
-  "reportIssueDescription": "Found a bug or have a suggestion? Let us know!"
+  "reportIssueDescription": "Found a bug or have a suggestion? Let me know!"
 }

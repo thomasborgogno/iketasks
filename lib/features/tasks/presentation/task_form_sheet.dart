@@ -27,9 +27,14 @@ class _TaskFormResult {
 }
 
 class _TaskForm extends StatefulWidget {
-  const _TaskForm({required this.categories, this.existing});
+  const _TaskForm({
+    required this.categories,
+    required this.inputMode,
+    this.existing,
+  });
 
   final List<TaskCategory> categories;
+  final _TaskInputMode inputMode;
   final TaskItem? existing;
 
   @override
@@ -172,6 +177,12 @@ class _TaskFormState extends State<_TaskForm> {
   Widget build(BuildContext context) {
     final isEdit = widget.existing != null;
     final l10n = AppLocalizations.of(context)!;
+    final showPrioritySection =
+        widget.inputMode == _TaskInputMode.priorityOnly ||
+        widget.inputMode == _TaskInputMode.both;
+    final showQuadrantSection =
+        widget.inputMode == _TaskInputMode.quadrantOnly ||
+        widget.inputMode == _TaskInputMode.both;
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -205,65 +216,76 @@ class _TaskFormState extends State<_TaskForm> {
               ),
             ],
             const SizedBox(height: 16),
-            Text(l10n.priority, style: Theme.of(context).textTheme.labelMedium),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
+
+            if (showPrioritySection) ...[
+              Text(
+                l10n.priority,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilterChip(
+                      label: Text(l10n.important),
+                      selected: _isImportant,
+                      onSelected: (value) {
+                        setState(() {
+                          _isImportant = value;
+                          _syncQuadrantFromFlags();
+                        });
+                      },
+                    ),
+                    FilterChip(
+                      label: Text(l10n.urgent),
+                      selected: _isUrgent,
+                      onSelected: (value) {
+                        setState(() {
+                          _isUrgent = value;
+                          _syncQuadrantFromFlags();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            if (showQuadrantSection) ...[
+              Text(
+                l10n.quadrant,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Column(
                 children: [
-                  FilterChip(
-                    label: Text(l10n.important),
-                    selected: _isImportant,
-                    onSelected: (value) {
-                      setState(() {
-                        _isImportant = value;
-                        _syncQuadrantFromFlags();
-                      });
-                    },
-                  ),
-                  FilterChip(
-                    label: Text(l10n.urgent),
-                    selected: _isUrgent,
-                    onSelected: (value) {
-                      setState(() {
-                        _isUrgent = value;
-                        _syncQuadrantFromFlags();
-                      });
-                    },
-                  ),
+                  for (
+                    var rowIndex = 0;
+                    rowIndex < _matrixQuadrantRows.length;
+                    rowIndex++
+                  )
+                    Row(
+                      children: [
+                        for (
+                          var columnIndex = 0;
+                          columnIndex < _matrixQuadrantRows[rowIndex].length;
+                          columnIndex++
+                        ) ...[
+                          if (columnIndex > 0) const SizedBox(width: 8),
+                          Expanded(
+                            child: _quadrantChoiceChip(
+                              _matrixQuadrantRows[rowIndex][columnIndex],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-
-            Text(l10n.quadrant, style: Theme.of(context).textTheme.labelMedium),
-            Column(
-              children: [
-                for (
-                  var rowIndex = 0;
-                  rowIndex < _matrixQuadrantRows.length;
-                  rowIndex++
-                )
-                  Row(
-                    children: [
-                      for (
-                        var columnIndex = 0;
-                        columnIndex < _matrixQuadrantRows[rowIndex].length;
-                        columnIndex++
-                      ) ...[
-                        if (columnIndex > 0) const SizedBox(width: 8),
-                        Expanded(
-                          child: _quadrantChoiceChip(
-                            _matrixQuadrantRows[rowIndex][columnIndex],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
+            ],
             Text(l10n.category, style: Theme.of(context).textTheme.labelMedium),
             BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, categoryState) {

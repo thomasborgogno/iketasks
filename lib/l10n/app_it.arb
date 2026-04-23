@@ -107,6 +107,10 @@
   "taskCount": "{count} task",
   "persistentNotification": "Notifica persistente",
   "persistentNotificationDescription": "Mostra le attività prioritarie nella barra delle notifiche",
+  "taskInputMode": "Modalità input attività",
+  "taskInputModeQuadrantOnly": "Solo quadrante",
+  "taskInputModePriorityOnly": "Solo priorità",
+  "taskInputModeBoth": "Priorità e quadrante",
   "language": "Lingua",
   "languageEnglish": "Inglese",
   "languageItalian": "Italiano",
@@ -169,5 +173,5 @@
   "supportDevelopment": "Supporta lo sviluppo",
   "donate": "Dona",
   "reportIssue": "Segnala un problema",
-  "reportIssueDescription": "Hai trovato un bug o hai un suggerimento? Faccelo sapere!"
+  "reportIssueDescription": "Hai trovato un bug o hai un suggerimento? Contattami!"
 }

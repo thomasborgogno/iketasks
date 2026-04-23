@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/locale/locale_cubit.dart';
 
@@ -33,6 +35,8 @@ part '../../widget/unified_widget_settings_sheet.dart';
 
 enum _LayoutMode { grid, stacked }
 
+enum _TaskInputMode { quadrantOnly, priorityOnly, both }
+
 const List<List<EisenhowerQuadrant>> _matrixQuadrantRows = [
   [EisenhowerQuadrant.importantUrgent, EisenhowerQuadrant.importantNotUrgent],
   [
@@ -49,9 +53,12 @@ class MatrixPage extends StatefulWidget {
 }
 
 class _MatrixPageState extends State<MatrixPage> {
+  static const _taskInputModePrefKey = 'task_input_mode';
+
   String? _selectedCategoryId;
   bool _showPostponed = false;
   _LayoutMode _layoutMode = _LayoutMode.grid;
+  _TaskInputMode _taskInputMode = _TaskInputMode.quadrantOnly;
   StreamSubscription<void>? _newTaskSubscription;
   bool _isModalOpen = false;
 
@@ -76,6 +83,34 @@ class _MatrixPageState extends State<MatrixPage> {
             if (mounted) _openTaskForm(context);
           });
     });
+    unawaited(_loadTaskInputMode());
+  }
+
+  Future<void> _loadTaskInputMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rawValue = prefs.getString(_taskInputModePrefKey);
+    final mode = _TaskInputMode.values.firstWhere(
+      (value) => value.name == rawValue,
+      orElse: () => _TaskInputMode.quadrantOnly,
+    );
+    if (!mounted) return;
+    setState(() => _taskInputMode = mode);
+  }
+
+  Future<void> _setTaskInputMode(_TaskInputMode mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_taskInputModePrefKey, mode.name);
+  }
+
+  String _taskInputModeLabel(AppLocalizations l10n, _TaskInputMode mode) {
+    switch (mode) {
+      case _TaskInputMode.quadrantOnly:
+        return l10n.taskInputModeQuadrantOnly;
+      case _TaskInputMode.priorityOnly:
+        return l10n.taskInputModePriorityOnly;
+      case _TaskInputMode.both:
+        return l10n.taskInputModeBoth;
+    }
   }
 
   void _setSelectedCategory(String? categoryId) {
@@ -179,6 +214,48 @@ class _MatrixPageState extends State<MatrixPage> {
                         _openWidgetAppearance(context);
                       },
                     ),
+                    SwitchListTile(
+                      secondary: const Icon(Icons.notifications_outlined),
+                      title: Text(
+                        AppLocalizations.of(context)!.persistentNotification,
+                      ),
+                      subtitle: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.persistentNotificationDescription,
+                      ),
+                      value: notificationService.isEnabled,
+                      onChanged: (value) async {
+                        final tasks = context.read<TaskCubit>().state.tasks;
+                        await notificationService.setEnabled(value, tasks);
+                        setState(() {});
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.tune_outlined),
+                      title: Text(AppLocalizations.of(context)!.taskInputMode),
+                      trailing: DropdownButton<_TaskInputMode>(
+                        value: _taskInputMode,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _taskInputMode = value);
+                          unawaited(_setTaskInputMode(value));
+                        },
+                        items: _TaskInputMode.values
+                            .map(
+                              (mode) => DropdownMenuItem<_TaskInputMode>(
+                                value: mode,
+                                child: Text(
+                                  _taskInputModeLabel(
+                                    AppLocalizations.of(context)!,
+                                    mode,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
                     ListTile(
                       leading: const Icon(Icons.language_outlined),
                       title: Text(AppLocalizations.of(context)!.language),
@@ -195,23 +272,6 @@ class _MatrixPageState extends State<MatrixPage> {
                       onTap: () {
                         Navigator.of(sheetContext).pop();
                         _openAboutSection(context);
-                      },
-                    ),
-                    SwitchListTile(
-                      secondary: const Icon(Icons.notifications_outlined),
-                      title: Text(
-                        AppLocalizations.of(context)!.persistentNotification,
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(
-                          context,
-                        )!.persistentNotificationDescription,
-                      ),
-                      value: notificationService.isEnabled,
-                      onChanged: (value) async {
-                        final tasks = context.read<TaskCubit>().state.tasks;
-                        await notificationService.setEnabled(value, tasks);
-                        setState(() {});
                       },
                     ),
                   ],
@@ -393,7 +453,11 @@ class _MatrixPageState extends State<MatrixPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _TaskForm(categories: categories, existing: existing),
+      builder: (_) => _TaskForm(
+        categories: categories,
+        existing: existing,
+        inputMode: _taskInputMode,
+      ),
     );
     _isModalOpen = false;
     if (!context.mounted) return;
@@ -546,10 +610,11 @@ class _MatrixPageState extends State<MatrixPage> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton.icon(
-                  onPressed: () {
-                    // GitHub URL will be added by the user later
-                    // For now, prepare the structure
-                  },
+                  onPressed: () => launchUrl(
+                    Uri.parse(
+                      'https://github.com/thomasborgogno/eisenhower_matrix_app',
+                    ),
+                  ),
                   icon: const Icon(Icons.code),
                   label: Text(l10n.viewOnGitHub),
                 ),
@@ -563,21 +628,21 @@ class _MatrixPageState extends State<MatrixPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          // Ko-fi URL will be added by the user later
-                        },
-                        icon: const Icon(Icons.favorite_outline),
-                        label: const Text('Ko-fi'),
+                        onPressed: () => launchUrl(
+                          Uri.parse('https://paypal.me/thomasborgogno'),
+                        ),
+                        icon: const Icon(Icons.paypal_outlined),
+                        label: const Text('PayPal'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          // PayPal URL will be added by the user later
-                        },
-                        icon: const Icon(Icons.payment),
-                        label: const Text('PayPal'),
+                        onPressed: () => launchUrl(
+                          Uri.parse('https://ko-fi.com/thomasborgogno'),
+                        ),
+                        icon: const Icon(Icons.local_cafe),
+                        label: const Text('Ko-fi'),
                       ),
                     ),
                   ],
@@ -600,8 +665,7 @@ class _MatrixPageState extends State<MatrixPage> {
                       path: 'thomas.borgogno99@gmail.com',
                       query: 'subject=Eisenhower Matrix App - Issue Report',
                     );
-                    // Note: url_launcher package would be needed to actually open this
-                    // For now, the structure is in place
+                    await launchUrl(emailUri);
                   },
                   icon: const Icon(Icons.email_outlined),
                   label: Text(l10n.reportIssue),
