@@ -12,7 +12,7 @@ import 'features/onboarding/presentation/onboarding_cubit.dart';
 import 'features/onboarding/presentation/onboarding_wizard.dart';
 import 'features/tasks/presentation/matrix_page.dart';
 import 'features/tasks/presentation/task_cubit.dart';
-import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
 
 class EisenhowerApp extends StatelessWidget {
   const EisenhowerApp({super.key});

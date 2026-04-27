@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/presentation/helpers.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

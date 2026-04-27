@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
 
 import '../../tasks/presentation/task_cubit.dart';
 import '../data/google_tasks_repository.dart';
@@ -128,9 +128,7 @@ class _GoogleTasksImportBody extends StatelessWidget {
       case GoogleTasksImportStatus.selecting:
       case GoogleTasksImportStatus.assigning:
         if (state.tasks.isEmpty) {
-          return Center(
-            child: Text(l10n.noGoogleTasksFound),
-          );
+          return Center(child: Text(l10n.noGoogleTasksFound));
         }
         return _TabbedTaskSelection(
           tasks: state.tasks,

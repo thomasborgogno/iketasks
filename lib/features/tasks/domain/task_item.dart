@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/presentation/helpers.dart';
 import 'package:equatable/equatable.dart';
 
 class TaskItem extends Equatable {
@@ -46,7 +46,9 @@ class TaskItem extends Equatable {
       title: title ?? this.title,
       description: clearDescription ? null : (description ?? this.description),
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
-      showFromDate: clearShowFromDate ? null : (showFromDate ?? this.showFromDate),
+      showFromDate: clearShowFromDate
+          ? null
+          : (showFromDate ?? this.showFromDate),
       categoryId: clearCategory ? null : (categoryId ?? this.categoryId),
       quadrant: quadrant ?? this.quadrant,
       completed: completed ?? this.completed,
@@ -60,7 +62,9 @@ class TaskItem extends Equatable {
       'title': title,
       'description': description,
       'dueDate': dueDate == null ? null : Timestamp.fromDate(dueDate!),
-      'showFromDate': showFromDate == null ? null : Timestamp.fromDate(showFromDate!),
+      'showFromDate': showFromDate == null
+          ? null
+          : Timestamp.fromDate(showFromDate!),
       'categoryId': categoryId,
       'quadrant': quadrant.value,
       'completed': completed,

@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
 
 import 'auth_cubit.dart';
 

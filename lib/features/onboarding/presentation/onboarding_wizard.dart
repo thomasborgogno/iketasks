@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
-import 'package:eisenhower_matrix_app/features/auth/presentation/auth_cubit.dart';
-import 'package:eisenhower_matrix_app/features/categories/presentation/category_cubit.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
+import 'package:iketasks/features/auth/presentation/auth_cubit.dart';
+import 'package:iketasks/features/categories/presentation/category_cubit.dart';
 import 'onboarding_cubit.dart';
 
 /// Main onboarding wizard that guides users through initial setup

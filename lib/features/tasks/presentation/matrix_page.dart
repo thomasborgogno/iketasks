@@ -1,11 +1,11 @@
 ﻿import 'dart:async';
 
-import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/presentation/helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:eisenhower_matrix_app/l10n/app_localizations.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -611,9 +611,7 @@ class _MatrixPageState extends State<MatrixPage> {
                 const SizedBox(height: 16),
                 FilledButton.icon(
                   onPressed: () => launchUrl(
-                    Uri.parse(
-                      'https://github.com/thomasborgogno/eisenhower_matrix_app',
-                    ),
+                    Uri.parse('https://github.com/thomasborgogno/iketasks'),
                   ),
                   icon: const Icon(Icons.code),
                   label: Text(l10n.viewOnGitHub),

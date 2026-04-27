@@ -1,4 +1,4 @@
-import 'package:eisenhower_matrix_app/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/presentation/helpers.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,7 +44,9 @@ class GoogleTasksImportCubit extends Cubit<GoogleTasksImportState> {
     final current = state;
     if (current.status != GoogleTasksImportStatus.selecting) return;
     final selected = List<GoogleTaskItem>.from(current.selected);
-    final allSelected = listTasks.every((t) => selected.any((s) => s.id == t.id));
+    final allSelected = listTasks.every(
+      (t) => selected.any((s) => s.id == t.id),
+    );
     if (allSelected) {
       selected.removeWhere((s) => listTasks.any((t) => t.id == s.id));
     } else {
