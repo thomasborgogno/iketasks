@@ -74,35 +74,37 @@ class AppTheme {
   static const Color q2Color = Color(0xFF1B998B);
   static const Color q3Color = Color(0xFFF4A261);
   static const Color q4Color = Color(0xFF457B9D);
+  static const Color appSeedColor = Color(0xFF1B998B);
 
-  static ThemeData light({ColorScheme? scheme}) {
-    final colorScheme = scheme ??
-        ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B998B),
-          brightness: Brightness.light,
-        );
+  static ThemeData light({Color? systemPrimary}) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: systemPrimary ?? appSeedColor,
+      brightness: Brightness.light,
+    );
 
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: const Color(0xFFF6F9FB),
-      cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
+      cardTheme: CardThemeData(elevation: 0, margin: EdgeInsets.zero),
     );
 
     return base.copyWith(textTheme: _buildTextTheme(base.textTheme));
   }
 
-  static ThemeData dark({ColorScheme? scheme}) {
-    final colorScheme = scheme ??
-        ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B998B),
-          brightness: Brightness.dark,
-        );
+  static ThemeData dark({Color? systemPrimary}) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: systemPrimary ?? appSeedColor,
+      brightness: Brightness.dark,
+    );
 
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        // color: colorScheme.surfaceContainerHighest,
+      ),
       snackBarTheme: const SnackBarThemeData(
         actionTextColor: Colors.red,
         backgroundColor: Colors.black87,

@@ -27,8 +27,8 @@ class EisenhowerApp extends StatelessWidget {
             return MaterialApp(
               title: 'IkeTasks',
               debugShowCheckedModeBanner: false,
-              theme: AppTheme.light(scheme: lightDynamic),
-              darkTheme: AppTheme.dark(scheme: darkDynamic),
+              theme: AppTheme.light(systemPrimary: lightDynamic?.primary),
+              darkTheme: AppTheme.dark(systemPrimary: darkDynamic?.primary),
               themeMode: ThemeMode.system,
               locale: localeState.locale,
               localizationsDelegates: const [
