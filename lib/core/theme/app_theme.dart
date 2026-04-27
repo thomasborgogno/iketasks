@@ -75,15 +75,16 @@ class AppTheme {
   static const Color q3Color = Color(0xFFF4A261);
   static const Color q4Color = Color(0xFF457B9D);
 
-  static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1B998B),
-      brightness: Brightness.light,
-    );
+  static ThemeData light({ColorScheme? scheme}) {
+    final colorScheme = scheme ??
+        ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1B998B),
+          brightness: Brightness.light,
+        );
 
     final base = ThemeData(
       useMaterial3: true,
-      colorScheme: scheme,
+      colorScheme: colorScheme,
       scaffoldBackgroundColor: const Color(0xFFF6F9FB),
       cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
     );
@@ -91,15 +92,16 @@ class AppTheme {
     return base.copyWith(textTheme: _buildTextTheme(base.textTheme));
   }
 
-  static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1B998B),
-      brightness: Brightness.dark,
-    );
+  static ThemeData dark({ColorScheme? scheme}) {
+    final colorScheme = scheme ??
+        ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1B998B),
+          brightness: Brightness.dark,
+        );
 
     final base = ThemeData(
       useMaterial3: true,
-      colorScheme: scheme,
+      colorScheme: colorScheme,
       cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
       snackBarTheme: const SnackBarThemeData(
         actionTextColor: Colors.red,
