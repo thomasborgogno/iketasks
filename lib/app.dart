@@ -22,7 +22,7 @@ class EisenhowerApp extends StatelessWidget {
     return BlocBuilder<LocaleCubit, LocaleState>(
       builder: (context, localeState) {
         return MaterialApp(
-          title: 'Eisenhower Matrix',
+          title: 'IkeTasks',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),

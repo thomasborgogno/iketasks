@@ -57,7 +57,7 @@ class NotificationService {
       _l10n?.notificationChannelName ?? 'Priority tasks',
       description:
           _l10n?.notificationChannelDescription ??
-          'Show priority tasks from the Eisenhower Matrix',
+          'Show priority tasks from IkeTasks',
       importance: Importance.low,
     );
     await androidImpl?.createNotificationChannel(channel);
@@ -155,7 +155,7 @@ class NotificationService {
       _l10n?.notificationChannelName ?? 'Priority tasks',
       channelDescription:
           _l10n?.notificationChannelDescription ??
-          'Show priority tasks from the Eisenhower Matrix',
+          'Show priority tasks from IkeTasks',
       importance: Importance.low,
       priority: Priority.low,
       visibility: NotificationVisibility.secret,

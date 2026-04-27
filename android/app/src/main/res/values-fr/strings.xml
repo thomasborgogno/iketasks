@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Eisenhower Matrix</string>
+    <string name="app_name">IkeTasks</string>
     <string name="widget_description">Widget Matrice d\'Eisenhower</string>
     <string name="quadrant_priority">Priorité</string>
     <string name="quadrant_plan">Planifier</string>

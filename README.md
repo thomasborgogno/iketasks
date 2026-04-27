@@ -1,8 +1,8 @@
-# Eisenhower Matrix — Task Manager
+# IkeTasks — Eisenhower to-do app
 
 **Prioritize smarter. Focus on what truly matters.**
 
-Eisenhower Matrix is a free, open-source Android app that helps you organize your tasks using the proven Eisenhower Matrix method. Sort everything you need to do into four quadrants based on urgency and importance, and always know what to tackle next.
+IkeTasks is a free, open-source Android app that helps you organize your tasks using the proven Eisenhower Matrix method. Sort everything you need to do into four quadrants based on urgency and importance, and always know what to tackle next.
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
   "authError": "Authentication error",
-  "signInSubtitle": "Organize your tasks by urgency and importance.",
+  "signInSubtitle": "Eisenhower to-do app",
   "signInWithGoogle": "Sign in with Google",
   "googleUser": "Google User",
   "settings": "Settings",
@@ -15,7 +15,7 @@
   "quadrantNamePlan": "Plan",
   "quadrantNameDelegate": "Delegate",
   "quadrantNameEliminate": "Eliminate",
-  "yourEisenhowerMatrix": "Your Eisenhower Matrix",
+  "yourEisenhowerMatrix": "IkeTasks",
   "greeting": "Hello, {name}!",
   "@greeting": {
     "placeholders": {
@@ -154,7 +154,7 @@
   "colorAmber": "Amber",
   "colorDeepOrange": "Deep Orange",
   "notificationChannelName": "Priority tasks",
-  "notificationChannelDescription": "Show priority tasks from the Eisenhower Matrix",
+  "notificationChannelDescription": "Show priority tasks from IkeTasks",
   "createNewTask": "Create new task",
   "taskCount": "{count} tasks",
   "@taskCount": {
@@ -181,9 +181,9 @@
   "languageRussian": "Russian",
   "languageJapanese": "Japanese",
   "languageArabic": "Arabic",
-  "onboardingWelcomeTitle": "Welcome to Eisenhower Matrix",
+  "onboardingWelcomeTitle": "Welcome to IkeTasks",
   "onboardingWelcomeSubtitle": "The ultimate tool for prioritizing your tasks",
-  "onboardingWelcomeDescription": "The Eisenhower Matrix helps you organize tasks by urgency and importance, so you can focus on what truly matters.",
+  "onboardingWelcomeDescription": "IkeTasks helps you organize tasks by urgency and importance, so you can focus on what truly matters.",
   "onboardingGetStarted": "Get Started",
   "onboardingNotUrgent": "Not Urgent",
   "onboardingNotImportant": "Not Important",

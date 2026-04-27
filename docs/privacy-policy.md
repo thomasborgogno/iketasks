@@ -1,8 +1,8 @@
 # Privacy Policy
 
-**Last updated:** April 23, 2026
+**Last updated:** April 27, 2026
 
-Eisenhower Matrix ("the app") is developed and maintained by Thomas Borgogno as a free, open-source project.
+"IkeTasks - Eisenhower to-do app" is developed and maintained by Thomas Borgogno as a free, open-source project.
 
 This policy describes what data the app collects, how it is used, and your rights.
 
