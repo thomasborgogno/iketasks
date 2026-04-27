@@ -622,7 +622,7 @@ class _MatrixPageState extends State<MatrixPage> {
                 OutlinedButton.icon(
                   onPressed: () => launchUrl(
                     Uri.parse(
-                      'https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy',
+                      'https://thomasborgogno.github.io/iketasks/privacy-policy',
                     ),
                   ),
                   icon: const Icon(Icons.privacy_tip_outlined),

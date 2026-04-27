@@ -79,7 +79,7 @@ English, Italian, Spanish, French, German, Chinese, Portuguese, Russian, Japanes
 
 This app uses **Google Sign-In** to identify you and store your tasks securely in Firebase Firestore. Your data is not shared with anyone.
 
-See the [Privacy Policy](https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy) for full details on what data is collected and how it is used.
+See the [Privacy Policy](https://thomasborgogno.github.io/iketasks/privacy-policy) for full details on what data is collected and how it is used.
 
 ---
 
@@ -117,7 +117,7 @@ This project is open source. See [LICENSE](LICENSE) for details.
 
 This app uses **Google Sign-In** to identify you and store your tasks securely in Firebase Firestore. Your data is not shared with anyone.
 
-See the [Privacy Policy](https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy) for full details on what data is collected and how it is used.
+See the [Privacy Policy](https://thomasborgogno.github.io/iketasks/privacy-policy) for full details on what data is collected and how it is used.
 
 ---
 

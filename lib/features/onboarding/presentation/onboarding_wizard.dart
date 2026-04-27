@@ -665,7 +665,7 @@ class _SignInPageState extends State<_SignInPage>
                       TextButton(
                         onPressed: () => launchUrl(
                           Uri.parse(
-                            'https://thomasborgogno.github.io/eisenhower_matrix_app/privacy-policy',
+                            'https://thomasborgogno.github.io/iketasks/privacy-policy',
                           ),
                         ),
                         child: Text(
