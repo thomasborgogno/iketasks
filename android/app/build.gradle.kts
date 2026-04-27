@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.eisenhower.matrix.todo"
+    namespace = "com.iketasks.eisenhower.todo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -27,7 +27,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.eisenhower.matrix.todo"
+        applicationId = "com.iketasks.eisenhower.todo"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

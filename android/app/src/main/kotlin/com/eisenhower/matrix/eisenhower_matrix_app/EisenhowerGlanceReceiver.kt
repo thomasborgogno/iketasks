@@ -1,4 +1,4 @@
-package com.eisenhower.matrix.todo
+package com.iketasks.eisenhower.todo
 
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver

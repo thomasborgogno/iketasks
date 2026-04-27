@@ -1,4 +1,4 @@
-package com.eisenhower.matrix.todo
+package com.iketasks.eisenhower.todo
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
