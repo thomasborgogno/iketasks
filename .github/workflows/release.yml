@@ -16,7 +16,7 @@
 #   KEY_ALIAS             — alias used when generating the keystore (e.g. eisenhower)
 #   KEY_PASSWORD          — key password (can be same as KEYSTORE_PASSWORD)
 #
-# VERSION STRATEGY: build number increments on every push.
+# VERSION STRATEGY: build number = github.run_number (no pubspec.yaml commit needed).
 # Version name (1.0.0) changes only via manual pubspec.yaml edits.
 
 name: Release
@@ -38,7 +38,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Setup Java 17
@@ -62,27 +61,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Bump build number
+      - name: Read version
         id: version
         run: |
           VERSION_LINE=$(grep '^version:' pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | sed 's/version: //' | cut -d'+' -f1)
-          VERSION_CODE=$(echo "$VERSION_LINE" | cut -d'+' -f2)
-          NEW_CODE=$((VERSION_CODE + 1))
+          NEW_CODE=${{ github.run_number }}
           NEW_VERSION="${VERSION_NAME}+${NEW_CODE}"
-          sed -i "s/^version: .*/version: ${NEW_VERSION}/" pubspec.yaml
           echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
           echo "version_code=${NEW_CODE}"     >> "$GITHUB_OUTPUT"
           echo "full_version=${NEW_VERSION}"  >> "$GITHUB_OUTPUT"
           echo "tag=v${VERSION_NAME}-b${NEW_CODE}" >> "$GITHUB_OUTPUT"
-
-      - name: Commit bumped version
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pubspec.yaml
-          git commit -m "chore: bump version to ${{ steps.version.outputs.full_version }} [skip ci]"
-          git push
 
       - name: Build APKs (split per ABI)
         env:
