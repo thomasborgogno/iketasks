@@ -240,5 +240,9 @@
   "donate": "Donate",
   "reportIssue": "Report an Issue",
   "reportIssueDescription": "Found a bug or have a suggestion? Let me know!",
-  "privacyPolicy": "Privacy Policy"
+  "privacyPolicy": "Privacy Policy",
+  "deleteAccount": "Delete account",
+  "deleteAccountTitle": "Delete account?",
+  "deleteAccountConfirm": "This will permanently delete your account and all your tasks and categories. This action cannot be undone.",
+  "deleteAccountError": "Failed to delete account. Please try again."
 }

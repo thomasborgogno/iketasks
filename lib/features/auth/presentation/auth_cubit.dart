@@ -4,12 +4,20 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../features/categories/data/category_repository.dart';
+import '../../../features/tasks/data/task_repository.dart';
 import '../data/auth_repository.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit(this._authRepository) : super(const AuthState.unknown()) {
+  AuthCubit(
+    this._authRepository, {
+    required TaskRepository taskRepository,
+    required CategoryRepository categoryRepository,
+  }) : _taskRepository = taskRepository,
+       _categoryRepository = categoryRepository,
+       super(const AuthState.unknown()) {
     _subscription = _authRepository.authStateChanges().listen((user) {
       if (user == null) {
         emit(const AuthState.unauthenticated());
@@ -20,6 +28,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   final AuthRepository _authRepository;
+  final TaskRepository _taskRepository;
+  final CategoryRepository _categoryRepository;
   StreamSubscription<User?>? _subscription;
 
   Future<void> signInWithGoogle() async {
@@ -35,6 +45,20 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     try {
       await _authRepository.signOut();
+      emit(const AuthState.unauthenticated());
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    final uid = _authRepository.currentUser?.uid;
+    if (uid == null) return;
+    emit(const AuthState.loading());
+    try {
+      await _taskRepository.deleteAllData(uid);
+      await _categoryRepository.deleteAllData(uid);
+      await _authRepository.deleteAccount();
       emit(const AuthState.unauthenticated());
     } catch (e) {
       emit(AuthState.error(e.toString()));

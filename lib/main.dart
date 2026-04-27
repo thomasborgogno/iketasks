@@ -75,7 +75,11 @@ Future<void> main() async {
           BlocProvider.value(value: localeCubit),
           BlocProvider.value(value: onboardingCubit),
           BlocProvider(
-            create: (context) => AuthCubit(context.read<AuthRepository>()),
+            create: (context) => AuthCubit(
+              context.read<AuthRepository>(),
+              taskRepository: context.read<TaskRepository>(),
+              categoryRepository: context.read<CategoryRepository>(),
+            ),
           ),
           BlocProvider(
             create: (context) => TaskCubit(

@@ -181,5 +181,9 @@
   "donate": "寄付",
   "reportIssue": "問題を報告",
   "reportIssueDescription": "バグを見つけましたか、または提案がありますか？お知らせください！",
-  "privacyPolicy": "プライバシーポリシー"
+  "privacyPolicy": "プライバシーポリシー",
+  "deleteAccount": "アカウントを削除",
+  "deleteAccountTitle": "アカウントを削除しますか？",
+  "deleteAccountConfirm": "アカウントとすべてのタスク・カテゴリが完全に削除されます。この操作は元に戻せません。",
+  "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。"
 }

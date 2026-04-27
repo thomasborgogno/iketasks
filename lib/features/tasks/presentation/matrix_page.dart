@@ -139,6 +139,83 @@ class _MatrixPageState extends State<MatrixPage> {
     return context.read<AuthCubit>().state.user;
   }
 
+  Future<void> _onDeleteAccount(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final authCubit = context.read<AuthCubit>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteAccountTitle),
+        content: Text(l10n.deleteAccountConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(dialogContext).colorScheme.error,
+            ),
+            child: Text(l10n.deleteAccount),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await authCubit.deleteAccount();
+    if (authCubit.state.status == AuthStatus.error && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.deleteAccountError)));
+    }
+  }
+
+  Future<void> _openAccountActionsSheet(
+    BuildContext context,
+    VoidCallback closeSettings,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(l10n.signOut),
+              onTap: () async {
+                Navigator.of(sheetContext).pop();
+                closeSettings();
+                await context.read<AuthCubit>().signOut();
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.delete_forever,
+                color: Theme.of(sheetContext).colorScheme.error,
+              ),
+              title: Text(
+                l10n.deleteAccount,
+                style: TextStyle(
+                  color: Theme.of(sheetContext).colorScheme.error,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                closeSettings();
+                _onDeleteAccount(context);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _openSettingsOverlay(BuildContext context) async {
     final user = _getUser();
     if (user == null) return;
@@ -165,9 +242,11 @@ class _MatrixPageState extends State<MatrixPage> {
                     const SizedBox(height: 20),
                     _ProfileHeader(
                       user: user,
-                      onLogout: () async {
-                        Navigator.of(sheetContext).pop();
-                        await context.read<AuthCubit>().signOut();
+                      onLogout: () {
+                        _openAccountActionsSheet(
+                          context,
+                          () => Navigator.of(sheetContext).pop(),
+                        );
                       },
                     ),
                     const SizedBox(height: 10),

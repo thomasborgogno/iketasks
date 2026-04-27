@@ -2,11 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
-  AuthRepository({
-    FirebaseAuth? firebaseAuth,
-    GoogleSignIn? googleSignIn,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
+  AuthRepository({FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
+    : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+      _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
@@ -20,9 +18,7 @@ class AuthRepository {
     final account = await _googleSignIn.authenticate();
     final auth = account.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      idToken: auth.idToken,
-    );
+    final credential = GoogleAuthProvider.credential(idToken: auth.idToken);
 
     return _firebaseAuth.signInWithCredential(credential);
   }
@@ -30,5 +26,24 @@ class AuthRepository {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
+  }
+
+  Future<void> deleteAccount() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) return;
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        await _googleSignIn.initialize();
+        final account = await _googleSignIn.authenticate();
+        final auth = account.authentication;
+        final credential = GoogleAuthProvider.credential(idToken: auth.idToken);
+        await user.reauthenticateWithCredential(credential);
+        await user.delete();
+      } else {
+        rethrow;
+      }
+    }
   }
 }

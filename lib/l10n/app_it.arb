@@ -174,5 +174,9 @@
   "donate": "Dona",
   "reportIssue": "Segnala un problema",
   "reportIssueDescription": "Hai trovato un bug o hai un suggerimento? Contattami!",
-  "privacyPolicy": "Informativa sulla privacy"
+  "privacyPolicy": "Informativa sulla privacy",
+  "deleteAccount": "Elimina account",
+  "deleteAccountTitle": "Eliminare l'account?",
+  "deleteAccountConfirm": "L'account e tutti i dati (attività e categorie) verranno eliminati definitivamente. Questa azione è irreversibile.",
+  "deleteAccountError": "Eliminazione dell'account non riuscita. Riprova."
 }

@@ -181,5 +181,9 @@
   "donate": "Faire un don",
   "reportIssue": "Signaler un problème",
   "reportIssueDescription": "Vous avez trouvé un bug ou avez une suggestion ? Faites-le nous savoir !",
-  "privacyPolicy": "Politique de confidentialité"
+  "privacyPolicy": "Politique de confidentialité",
+  "deleteAccount": "Supprimer le compte",
+  "deleteAccountTitle": "Supprimer le compte ?",
+  "deleteAccountConfirm": "Cela supprimera définitivement votre compte et toutes vos données (tâches et catégories). Cette action est irréversible.",
+  "deleteAccountError": "Échec de la suppression du compte. Veuillez réessayer."
 }

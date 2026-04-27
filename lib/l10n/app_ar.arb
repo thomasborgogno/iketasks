@@ -181,5 +181,9 @@
   "donate": "تبرع",
   "reportIssue": "الإبلاغ عن مشكلة",
   "reportIssueDescription": "وجدت خطأ أو لديك اقتراح؟ أخبرنا!",
-  "privacyPolicy": "سياسة الخصوصية"
+  "privacyPolicy": "سياسة الخصوصية",
+  "deleteAccount": "حذف الحساب",
+  "deleteAccountTitle": "حذف الحساب؟",
+  "deleteAccountConfirm": "سيؤدي ذلك إلى حذف حسابك وجميع بياناتك (المهام والفئات) نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+  "deleteAccountError": "فشل حذف الحساب. يرجى المحاولة مرة أخرى."
 }

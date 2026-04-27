@@ -181,5 +181,9 @@
   "donate": "Spenden",
   "reportIssue": "Problem melden",
   "reportIssueDescription": "Einen Fehler gefunden oder einen Vorschlag? Lassen Sie es uns wissen!",
-  "privacyPolicy": "Datenschutzerklärung"
+  "privacyPolicy": "Datenschutzerklärung",
+  "deleteAccount": "Konto löschen",
+  "deleteAccountTitle": "Konto löschen?",
+  "deleteAccountConfirm": "Dadurch werden dein Konto und alle deine Daten (Aufgaben und Kategorien) dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "deleteAccountError": "Konto konnte nicht gelöscht werden. Bitte versuche es erneut."
 }

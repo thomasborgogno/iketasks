@@ -181,5 +181,9 @@
   "donate": "Doar",
   "reportIssue": "Reportar um problema",
   "reportIssueDescription": "Encontrou um bug ou tem uma sugestão? Nos avise!",
-  "privacyPolicy": "Política de privacidade"
+  "privacyPolicy": "Política de privacidade",
+  "deleteAccount": "Eliminar conta",
+  "deleteAccountTitle": "Eliminar conta?",
+  "deleteAccountConfirm": "Isto eliminará permanentemente a sua conta e todos os seus dados (tarefas e categorias). Esta ação não pode ser revertida.",
+  "deleteAccountError": "Não foi possível eliminar a conta. Por favor, tente novamente."
 }

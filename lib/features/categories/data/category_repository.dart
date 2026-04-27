@@ -72,4 +72,19 @@ class CategoryRepository {
 
     await batch.commit();
   }
+
+  Future<void> deleteAllData(String uid) async {
+    const chunkSize = 500;
+    final ref = _categoriesRef(uid);
+    QuerySnapshot<Map<String, dynamic>> snapshot;
+    do {
+      snapshot = await ref.limit(chunkSize).get();
+      if (snapshot.docs.isEmpty) break;
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } while (snapshot.docs.length == chunkSize);
+  }
 }
