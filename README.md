@@ -50,13 +50,15 @@ Two widget styles to keep your tasks visible from your home screen:
 ### 🔔 Persistent Notification
 - Optional notification in your status bar showing your current priority tasks
 
-### ☁️ Cloud Sync and other features
+### ☁️ Cloud Sync and Google Tasks import
 - Tasks stored securely in Firebase Cloud, automatically synced across all your devices when signed in
 - Import existing tasks from your Google Tasks lists and assign them to quadrants before they land in your matrix
+
+### 🎨 App Theme
 - Light & Dark Theme follows your system automatically, built with Material Design 3
 
 ### 🌍 10 Languages
-English, Italian, Spanish, French, German, Chinese, Portuguese, Russian, Japanese, Arabic
+- English, Italian, Spanish, French, German, Chinese, Portuguese, Russian, Japanese, Arabic
 
 ---
 

@@ -16,8 +16,9 @@
 #   KEY_ALIAS             — alias used when generating the keystore (e.g. eisenhower)
 #   KEY_PASSWORD          — key password (can be same as KEYSTORE_PASSWORD)
 #
-# VERSION STRATEGY: build number = github.run_number (no pubspec.yaml commit needed).
-# Version name (1.0.0) changes only via manual pubspec.yaml edits.
+# VERSION STRATEGY: patch version auto-incremented on every push (e.g. 1.0.0 → 1.0.1).
+# build number = github.run_number. Version is passed directly to flutter build — pubspec.yaml
+# is never modified. Bump major/minor manually in pubspec.yaml when needed.
 
 name: Release
 
@@ -61,17 +62,26 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Read version
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Check auto-fixable issues
+        run: dart fix --dry-run
+
+      - name: Compute version
         id: version
         run: |
           VERSION_LINE=$(grep '^version:' pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | sed 's/version: //' | cut -d'+' -f1)
+          MAJOR=$(echo "$VERSION_NAME" | cut -d'.' -f1)
+          MINOR=$(echo "$VERSION_NAME" | cut -d'.' -f2)
+          PATCH=$(echo "$VERSION_NAME" | cut -d'.' -f3)
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION_NAME="${MAJOR}.${MINOR}.${NEW_PATCH}"
           NEW_CODE=${{ github.run_number }}
-          NEW_VERSION="${VERSION_NAME}+${NEW_CODE}"
-          echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
-          echo "version_code=${NEW_CODE}"     >> "$GITHUB_OUTPUT"
-          echo "full_version=${NEW_VERSION}"  >> "$GITHUB_OUTPUT"
-          echo "tag=v${VERSION_NAME}-b${NEW_CODE}" >> "$GITHUB_OUTPUT"
+          echo "version_name=${NEW_VERSION_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version_code=${NEW_CODE}"          >> "$GITHUB_OUTPUT"
+          echo "tag=v${NEW_VERSION_NAME}"          >> "$GITHUB_OUTPUT"
 
       - name: Build APKs (split per ABI)
         env:
@@ -79,13 +89,13 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD:      ${{ secrets.KEY_PASSWORD }}
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --build-name=${{ steps.version.outputs.version_name }} --build-number=${{ steps.version.outputs.version_code }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: "v${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})"
+          name: "v${{ steps.version.outputs.version_name }}"
           generate_release_notes: true
           files: |
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
