@@ -1,3 +1,6 @@
+import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -18,8 +21,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
 
     buildFeatures {
@@ -35,16 +40,16 @@ android {
     }
 
     val keyPropsFile = rootProject.file("key.properties")
-    val keyProps = java.util.Properties().apply {
+    val keyProps = Properties().apply {
         if (keyPropsFile.exists()) load(keyPropsFile.inputStream())
     }
 
     signingConfigs {
         create("release") {
-            val ksPath = System.getenv("KEYSTORE_PATH") ?: keyProps.getProperty("storeFile")
-            val ksPassword = System.getenv("KEYSTORE_PASSWORD") ?: keyProps.getProperty("storePassword")
-            val ksAlias = System.getenv("KEY_ALIAS") ?: keyProps.getProperty("keyAlias")
-            val ksKeyPassword = System.getenv("KEY_PASSWORD") ?: keyProps.getProperty("keyPassword")
+            val ksPath: String? = System.getenv("KEYSTORE_PATH") ?: keyProps.getProperty("storeFile")
+            val ksPassword: String? = System.getenv("KEYSTORE_PASSWORD") ?: keyProps.getProperty("storePassword")
+            val ksAlias: String? = System.getenv("KEY_ALIAS") ?: keyProps.getProperty("keyAlias")
+            val ksKeyPassword: String? = System.getenv("KEY_PASSWORD") ?: keyProps.getProperty("keyPassword")
             if (ksPath != null && ksPassword != null && ksAlias != null && ksKeyPassword != null) {
                 storeFile = file(ksPath)
                 storePassword = ksPassword
@@ -55,14 +60,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null || keyPropsFile.exists()
+            if (hasReleaseKeys) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
         release {
             val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null
                 || keyPropsFile.exists()
-            signingConfig = if (hasReleaseKeys) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            if (!hasReleaseKeys) {
+                throw GradleException("Release signing keys not found. Set KEYSTORE_PATH env var or provide key.properties.")
             }
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
