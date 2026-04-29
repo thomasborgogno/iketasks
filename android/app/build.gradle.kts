@@ -34,12 +34,17 @@ android {
         versionName = flutter.versionName
     }
 
+    val keyPropsFile = rootProject.file("key.properties")
+    val keyProps = java.util.Properties().apply {
+        if (keyPropsFile.exists()) load(keyPropsFile.inputStream())
+    }
+
     signingConfigs {
         create("release") {
-            val ksPath = System.getenv("KEYSTORE_PATH")
-            val ksPassword = System.getenv("KEYSTORE_PASSWORD")
-            val ksAlias = System.getenv("KEY_ALIAS")
-            val ksKeyPassword = System.getenv("KEY_PASSWORD")
+            val ksPath = System.getenv("KEYSTORE_PATH") ?: keyProps.getProperty("storeFile")
+            val ksPassword = System.getenv("KEYSTORE_PASSWORD") ?: keyProps.getProperty("storePassword")
+            val ksAlias = System.getenv("KEY_ALIAS") ?: keyProps.getProperty("keyAlias")
+            val ksKeyPassword = System.getenv("KEY_PASSWORD") ?: keyProps.getProperty("keyPassword")
             if (ksPath != null && ksPassword != null && ksAlias != null && ksKeyPassword != null) {
                 storeFile = file(ksPath)
                 storePassword = ksPassword
@@ -52,6 +57,7 @@ android {
     buildTypes {
         release {
             val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null
+                || keyPropsFile.exists()
             signingConfig = if (hasReleaseKeys) {
                 signingConfigs.getByName("release")
             } else {
