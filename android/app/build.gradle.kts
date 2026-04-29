@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.iketasks.eisenhower.todo"
+    namespace = "com.bortho.iketasks"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -27,7 +27,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.iketasks.eisenhower.todo"
+        applicationId = "com.bortho.iketasks"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

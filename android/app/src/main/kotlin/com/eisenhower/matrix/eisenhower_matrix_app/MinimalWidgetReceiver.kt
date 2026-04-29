@@ -1,4 +1,4 @@
-package com.iketasks.eisenhower.todo
+package com.bortho.iketasks
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

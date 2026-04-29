@@ -1,4 +1,4 @@
-package com.iketasks.eisenhower.todo
+package com.bortho.iketasks
 
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver

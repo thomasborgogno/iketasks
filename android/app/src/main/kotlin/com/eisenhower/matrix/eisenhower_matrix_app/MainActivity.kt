@@ -1,4 +1,4 @@
-package com.iketasks.eisenhower.todo
+package com.bortho.iketasks
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
