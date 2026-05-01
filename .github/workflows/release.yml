@@ -16,9 +16,11 @@
 #   KEY_ALIAS             — alias used when generating the keystore (e.g. eisenhower)
 #   KEY_PASSWORD          — key password (can be same as KEYSTORE_PASSWORD)
 #
-# VERSION STRATEGY: patch version auto-incremented on every push (e.g. 1.0.0 → 1.0.1).
-# build number = github.run_number. Version is passed directly to flutter build — pubspec.yaml
-# is never modified. Bump major/minor manually in pubspec.yaml when needed.
+# VERSION STRATEGY: patch auto-incremented on every push based on the latest git tag.
+# If no tag exists yet, pubspec.yaml version is used as the base.
+# build number = github.run_number (always unique).
+# Git tag format: v{major}.{minor}.{patch}+{run_number} (e.g. v1.0.7+52).
+# To bump major/minor: push a manual tag v2.0.0+0 — next build will increment from there.
 
 name: Release
 
@@ -62,26 +64,37 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Run tests
+        run: flutter test
+
       - name: Analyze code
         run: flutter analyze
-
-      - name: Check auto-fixable issues
-        run: dart fix --dry-run
 
       - name: Compute version
         id: version
         run: |
-          VERSION_LINE=$(grep '^version:' pubspec.yaml)
-          VERSION_NAME=$(echo "$VERSION_LINE" | sed 's/version: //' | cut -d'+' -f1)
-          MAJOR=$(echo "$VERSION_NAME" | cut -d'.' -f1)
-          MINOR=$(echo "$VERSION_NAME" | cut -d'.' -f2)
-          PATCH=$(echo "$VERSION_NAME" | cut -d'.' -f3)
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION_NAME="${MAJOR}.${MINOR}.${NEW_PATCH}"
-          NEW_CODE=${{ github.run_number }}
-          echo "version_name=${NEW_VERSION_NAME}" >> "$GITHUB_OUTPUT"
-          echo "version_code=${NEW_CODE}"          >> "$GITHUB_OUTPUT"
-          echo "tag=v${NEW_VERSION_NAME}"          >> "$GITHUB_OUTPUT"
+          # Find the latest semver tag (format vX.Y.Z or vX.Y.Z+N)
+          LATEST_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' \
+            | sort -t. -k1,1V -k2,2n -k3,3n \
+            | tail -1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            # No tag yet — use pubspec.yaml as base, patch stays as-is
+            BASE=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          else
+            # Strip leading 'v' and build suffix (+N)
+            BASE=$(echo "$LATEST_TAG" | sed 's/^v//' | cut -d'+' -f1)
+            # Increment patch
+            MAJOR=$(echo "$BASE" | cut -d'.' -f1)
+            MINOR=$(echo "$BASE" | cut -d'.' -f2)
+            PATCH=$(echo "$BASE" | cut -d'.' -f3)
+            BASE="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          fi
+
+          VERSION_CODE=${{ github.run_number }}
+          echo "version_name=${BASE}"                  >> "$GITHUB_OUTPUT"
+          echo "version_code=${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
+          echo "tag=v${BASE}+${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
 
       - name: Build APKs (split per ABI)
         env:
@@ -95,7 +108,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: "v${{ steps.version.outputs.version_name }}"
+          name: "v${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})"
           generate_release_notes: true
           files: |
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
