@@ -96,6 +96,28 @@ jobs:
           echo "version_code=${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
           echo "tag=v${BASE}+${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
 
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' \
+            | sort -t. -k1,1V -k2,2n -k3,3n \
+            | tail -1)
+
+          if [ -z "$PREV_TAG" ]; then
+            LOG=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            LOG=$(git log --pretty=format:"- %s (%h)" "${PREV_TAG}..HEAD")
+          fi
+
+          if [ -z "$LOG" ]; then
+            LOG="- No changes recorded"
+          fi
+
+          # Write to file to avoid multiline env-var quoting issues
+          echo "## What's changed" > changelog.md
+          echo "" >> changelog.md
+          echo "$LOG" >> changelog.md
+
       - name: Build APKs (split per ABI)
         env:
           KEYSTORE_PATH:     ${{ github.workspace }}/eisenhower-keystore.jks
@@ -109,7 +131,7 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: "v${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})"
-          generate_release_notes: true
+          body_path: changelog.md
           files: |
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
