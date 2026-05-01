@@ -244,5 +244,10 @@
   "deleteAccount": "Delete account",
   "deleteAccountTitle": "Delete account?",
   "deleteAccountConfirm": "This will permanently delete your account and all your tasks and categories. This action cannot be undone.",
-  "deleteAccountError": "Failed to delete account. Please try again."
+  "deleteAccountError": "Failed to delete account. Please try again.",
+  "continueAsGuest": "Continue as guest",
+  "guestUser": "Guest",
+  "upgradeToGoogle": "Sign in with Google",
+  "upgradeSuccess": "Account linked successfully",
+  "upgradeError": "This Google account already exists. Guest data was not migrated."
 }

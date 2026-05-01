@@ -61,10 +61,8 @@ android {
 
     buildTypes {
         debug {
-            val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null || keyPropsFile.exists()
-            if (hasReleaseKeys) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
         release {
             val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null

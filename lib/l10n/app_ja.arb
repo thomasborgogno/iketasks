@@ -185,5 +185,10 @@
   "deleteAccount": "アカウントを削除",
   "deleteAccountTitle": "アカウントを削除しますか？",
   "deleteAccountConfirm": "アカウントとすべてのタスク・カテゴリが完全に削除されます。この操作は元に戻せません。",
-  "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。"
+  "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。",
+  "continueAsGuest": "ゲストとして続ける",
+  "guestUser": "ゲスト",
+  "upgradeToGoogle": "Googleでログイン",
+  "upgradeSuccess": "アカウントの連携が完了しました",
+  "upgradeError": "このGoogleアカウントはすでに存在します。ゲストデータは移行されませんでした。"
 }

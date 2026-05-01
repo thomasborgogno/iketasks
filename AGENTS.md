@@ -14,7 +14,7 @@ lib/
 ├── app.dart               # MaterialApp + AuthCubit routing (sign-in ↔ matrix)
 ├── core/theme/            # Material Design 3, light/dark themes
 └── features/
-    ├── auth/              # Google Sign-In, Firebase Auth
+    ├── auth/              # Google Sign-In + Anonymous Sign-In, Firebase Auth, Google→Guest upgrade
     ├── tasks/             # Core CRUD, quadrant assignment, due dates, categories
     ├── categories/        # Category management and filtering
     └── widget_sync/       # Android home widget sync
@@ -52,3 +52,6 @@ flutter test
 - **Quadrant naming**: Quadrants are `q1`–`q4` strings in Firestore. Map: q1=Urgent+Important, q2=Not Urgent+Important, q3=Urgent+Not Important, q4=Not Urgent+Not Important.
 - **Connectivity**: `connectivity_plus` is used to detect network state; offline scenarios should degrade gracefully without hard crashes.
 - **Theme**: Always support both light and dark via `app_theme.dart`; never hardcode colors directly in widgets.
+- **Guest mode**: `AuthState.isAnonymous` (`user.isAnonymous`) distinguishes anonymous from Google users. Use this flag to hide Google-only features (Google Tasks import, Delete Account). Anonymous UIDs use the same Firestore path as Google UIDs — no special handling needed in repositories.
+- **Guest upgrade**: `AuthRepository.upgradeToGoogle()` returns `UpgradeResult.success` (UID preserved, data intact) or `UpgradeResult.conflict` (existing Google account — user signed in, guest data abandoned). Show a snackbar for both outcomes.
+- **Anonymous Auth**: Must be enabled in Firebase Console → Authentication → Sign-in method → Anonymous.

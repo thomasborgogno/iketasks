@@ -178,5 +178,10 @@
   "deleteAccount": "Elimina account",
   "deleteAccountTitle": "Eliminare l'account?",
   "deleteAccountConfirm": "L'account e tutti i dati (attività e categorie) verranno eliminati definitivamente. Questa azione è irreversibile.",
-  "deleteAccountError": "Eliminazione dell'account non riuscita. Riprova."
+  "deleteAccountError": "Eliminazione account non riuscita. Riprova.",
+  "continueAsGuest": "Continua come ospite",
+  "guestUser": "Ospite",
+  "upgradeToGoogle": "Accedi con Google",
+  "upgradeSuccess": "Account collegato con successo",
+  "upgradeError": "Questo account Google esiste già. I dati ospite non sono stati migrati."
 }

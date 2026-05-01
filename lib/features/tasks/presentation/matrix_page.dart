@@ -173,8 +173,9 @@ class _MatrixPageState extends State<MatrixPage> {
 
   Future<void> _openAccountActionsSheet(
     BuildContext context,
-    VoidCallback closeSettings,
-  ) async {
+    VoidCallback closeSettings, {
+    bool isAnonymous = false,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
@@ -183,6 +184,26 @@ class _MatrixPageState extends State<MatrixPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (isAnonymous)
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: Text(l10n.upgradeToGoogle),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  closeSettings();
+                  try {
+                    final result =
+                        await context.read<AuthCubit>().upgradeToGoogle();
+                    if (context.mounted) {
+                      final message = result == UpgradeResult.success
+                          ? l10n.upgradeSuccess
+                          : l10n.upgradeError;
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(message)));
+                    }
+                  } catch (_) {}
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: Text(l10n.signOut),
@@ -192,23 +213,24 @@ class _MatrixPageState extends State<MatrixPage> {
                 await context.read<AuthCubit>().signOut();
               },
             ),
-            ListTile(
-              leading: Icon(
-                Icons.delete_forever,
-                color: Theme.of(sheetContext).colorScheme.error,
-              ),
-              title: Text(
-                l10n.deleteAccount,
-                style: TextStyle(
+            if (!isAnonymous)
+              ListTile(
+                leading: Icon(
+                  Icons.delete_forever,
                   color: Theme.of(sheetContext).colorScheme.error,
                 ),
+                title: Text(
+                  l10n.deleteAccount,
+                  style: TextStyle(
+                    color: Theme.of(sheetContext).colorScheme.error,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  closeSettings();
+                  _onDeleteAccount(context);
+                },
               ),
-              onTap: () {
-                Navigator.of(sheetContext).pop();
-                closeSettings();
-                _onDeleteAccount(context);
-              },
-            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -219,6 +241,7 @@ class _MatrixPageState extends State<MatrixPage> {
   Future<void> _openSettingsOverlay(BuildContext context) async {
     final user = _getUser();
     if (user == null) return;
+    final isAnonymous = context.read<AuthCubit>().state.isAnonymous;
 
     final notificationService = context.read<NotificationService>();
 
@@ -246,6 +269,7 @@ class _MatrixPageState extends State<MatrixPage> {
                         _openAccountActionsSheet(
                           context,
                           () => Navigator.of(sheetContext).pop(),
+                          isAnonymous: isAnonymous,
                         );
                       },
                     ),
@@ -264,24 +288,25 @@ class _MatrixPageState extends State<MatrixPage> {
                         );
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.cloud_download_outlined),
-                      title: Text(
-                        AppLocalizations.of(context)!.importFromGoogleTasks,
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (pageContext) => RepositoryProvider.value(
-                              value: pageContext.read<GoogleTasksRepository>(),
-                              child: const GoogleTasksImportPage(),
+                    if (!isAnonymous)
+                      ListTile(
+                        leading: const Icon(Icons.cloud_download_outlined),
+                        title: Text(
+                          AppLocalizations.of(context)!.importFromGoogleTasks,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (pageContext) => RepositoryProvider.value(
+                                value: pageContext.read<GoogleTasksRepository>(),
+                                child: const GoogleTasksImportPage(),
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
                     ListTile(
                       leading: const Icon(Icons.widgets_outlined),
                       title: Text(

@@ -185,5 +185,10 @@
   "deleteAccount": "حذف الحساب",
   "deleteAccountTitle": "حذف الحساب؟",
   "deleteAccountConfirm": "سيؤدي ذلك إلى حذف حسابك وجميع بياناتك (المهام والفئات) نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
-  "deleteAccountError": "فشل حذف الحساب. يرجى المحاولة مرة أخرى."
+  "deleteAccountError": "فشل حذف الحساب. يرجى المحاولة مرة أخرى.",
+  "continueAsGuest": "المتابعة كضيف",
+  "guestUser": "ضيف",
+  "upgradeToGoogle": "تسجيل الدخول باستخدام Google",
+  "upgradeSuccess": "تم ربط الحساب بنجاح",
+  "upgradeError": "هذا الحساب على Google موجود بالفعل. لم يتم نقل بيانات الضيف."
 }

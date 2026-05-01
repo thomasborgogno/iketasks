@@ -185,5 +185,10 @@
   "deleteAccount": "Supprimer le compte",
   "deleteAccountTitle": "Supprimer le compte ?",
   "deleteAccountConfirm": "Cela supprimera définitivement votre compte et toutes vos données (tâches et catégories). Cette action est irréversible.",
-  "deleteAccountError": "Échec de la suppression du compte. Veuillez réessayer."
+  "deleteAccountError": "Échec de la suppression du compte. Veuillez réessayer.",
+  "continueAsGuest": "Continuer en tant qu'invité",
+  "guestUser": "Invité",
+  "upgradeToGoogle": "Se connecter avec Google",
+  "upgradeSuccess": "Compte lié avec succès",
+  "upgradeError": "Ce compte Google existe déjà. Les données invité n'ont pas été migrées."
 }

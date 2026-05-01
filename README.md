@@ -51,8 +51,9 @@ Two widget styles to keep your tasks visible from your home screen:
 - Optional notification in your status bar showing your current priority tasks
 
 ### ☁️ Cloud Sync and Google Tasks import
-- Tasks stored securely in Firebase Cloud, automatically synced across all your devices when signed in
+- Tasks stored securely in Firebase Cloud, automatically synced across all your devices when signed in with Google
 - Import existing tasks from your Google Tasks lists and assign them to quadrants before they land in your matrix
+- **Guest mode** — use the full app without a Google account; your data is saved locally on the device and can be linked to a Google account at any time to enable cloud sync
 
 ### 🎨 App Theme
 - Light & Dark Theme follows your system automatically, built with Material Design 3
@@ -66,14 +67,19 @@ Two widget styles to keep your tasks visible from your home screen:
 
 1. Download the latest APK from the [Releases page](../../releases/latest)
 2. Enable *Install from unknown sources* in your Android settings if prompted
-3. Open the app and sign in with your Google account
+3. Open the app and **sign in with Google** for cloud sync, or tap **Continue as guest** to start immediately without an account
 4. Start adding tasks!
+
+   > As a guest you can sign in with Google at any time from the settings menu to link your data and enable cross-device sync.
 
 ## Sign-In & Data
 
-This app uses **Google Sign-In** to identify you and store your tasks securely in Firebase Firestore. Your data is not shared with anyone.
+You can use IkeTasks in two ways:
 
-See the [Privacy Policy](https://thomasborgogno.github.io/iketasks/privacy-policy) for full details on what data is collected and how it is used.
+- **Google Sign-In** — tasks are stored in Firebase Firestore and synced across all your devices. Required to import from Google Tasks.
+- **Guest mode** — no account needed. Data is saved in Firebase under an anonymous ID tied to the device. You can upgrade to a Google account at any time from the settings menu to enable cloud sync; if the Google account already exists, you will be notified that guest data cannot be merged.
+
+Your data is never shared with anyone. See the [Privacy Policy](https://thomasborgogno.github.io/iketasks/privacy-policy) for full details.
 
 ## Support Development
 

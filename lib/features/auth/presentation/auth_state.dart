@@ -21,6 +21,8 @@ class AuthState extends Equatable {
   final User? user;
   final String? errorMessage;
 
+  bool get isAnonymous => user?.isAnonymous ?? false;
+
   @override
   List<Object?> get props => [status, user?.uid, errorMessage];
 }

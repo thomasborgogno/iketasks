@@ -32,10 +32,40 @@ class SignInPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
-                FilledButton.icon(
-                  icon: const Icon(Icons.login),
-                  onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
-                  label: Text(l10n.signInWithGoogle),
+                BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, state) {
+                    final isLoading = state.status == AuthStatus.loading;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        FilledButton.icon(
+                          icon: isLoading
+                              ? const SizedBox.square(
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.login),
+                          onPressed: isLoading
+                              ? null
+                              : () =>
+                                    context.read<AuthCubit>().signInWithGoogle(),
+                          label: Text(l10n.signInWithGoogle),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: isLoading
+                              ? null
+                              : () => context
+                                    .read<AuthCubit>()
+                                    .signInAnonymously(),
+                          child: Text(l10n.continueAsGuest),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

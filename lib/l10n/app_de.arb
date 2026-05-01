@@ -185,5 +185,10 @@
   "deleteAccount": "Konto löschen",
   "deleteAccountTitle": "Konto löschen?",
   "deleteAccountConfirm": "Dadurch werden dein Konto und alle deine Daten (Aufgaben und Kategorien) dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
-  "deleteAccountError": "Konto konnte nicht gelöscht werden. Bitte versuche es erneut."
+  "deleteAccountError": "Konto konnte nicht gelöscht werden. Bitte versuche es erneut.",
+  "continueAsGuest": "Als Gast fortfahren",
+  "guestUser": "Gast",
+  "upgradeToGoogle": "Mit Google anmelden",
+  "upgradeSuccess": "Konto erfolgreich verknüpft",
+  "upgradeError": "Dieses Google-Konto existiert bereits. Gastdaten wurden nicht übertragen."
 }

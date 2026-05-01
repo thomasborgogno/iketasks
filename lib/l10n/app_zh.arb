@@ -185,5 +185,10 @@
   "deleteAccount": "删除账户",
   "deleteAccountTitle": "删除账户？",
   "deleteAccountConfirm": "这将永久删除您的账户及所有任务和分类。此操作无法撤消。",
-  "deleteAccountError": "删除账户失败，请重试。"
+  "deleteAccountError": "删除账号失败，请重试。",
+  "continueAsGuest": "以访客身份继续",
+  "guestUser": "访客",
+  "upgradeToGoogle": "使用 Google 登录",
+  "upgradeSuccess": "账号关联成功",
+  "upgradeError": "此 Google 账号已存在，访客数据未迁移。"
 }

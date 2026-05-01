@@ -12,19 +12,24 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = user.displayName?.trim();
-    final email = user.email?.trim();
+    final isAnonymous = user.isAnonymous;
+    final name = isAnonymous ? null : user.displayName?.trim();
+    final email = isAnonymous ? null : user.email?.trim();
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        _ProfileAvatar(photoUrl: user.photoURL, radius: 28),
+        _ProfileAvatar(photoUrl: isAnonymous ? null : user.photoURL, radius: 28),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                (name == null || name.isEmpty) ? l10n.googleUser : name,
+                isAnonymous
+                    ? l10n.guestUser
+                    : (name == null || name.isEmpty)
+                        ? l10n.googleUser
+                        : name,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               if (email != null && email.isNotEmpty)
@@ -35,8 +40,8 @@ class _ProfileHeader extends StatelessWidget {
         if (onLogout != null)
           IconButton(
             onPressed: onLogout,
-            icon: const Icon(Icons.logout),
-            tooltip: l10n.signOut,
+            icon: const Icon(Icons.manage_accounts_outlined),
+            tooltip: l10n.profileAndSettings,
           ),
       ],
     );

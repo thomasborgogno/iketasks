@@ -185,5 +185,10 @@
   "deleteAccount": "Eliminar conta",
   "deleteAccountTitle": "Eliminar conta?",
   "deleteAccountConfirm": "Isto eliminará permanentemente a sua conta e todos os seus dados (tarefas e categorias). Esta ação não pode ser revertida.",
-  "deleteAccountError": "Não foi possível eliminar a conta. Por favor, tente novamente."
+  "deleteAccountError": "Não foi possível eliminar a conta. Por favor, tente novamente.",
+  "continueAsGuest": "Continuar como convidado",
+  "guestUser": "Convidado",
+  "upgradeToGoogle": "Entrar com Google",
+  "upgradeSuccess": "Conta vinculada com sucesso",
+  "upgradeError": "Esta conta Google já existe. Os dados do convidado não foram migrados."
 }
