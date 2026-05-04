@@ -16,6 +16,7 @@ class CategoryRepository {
 
   Stream<List<TaskCategory>> watchCategories(String uid) {
     return _categoriesRef(uid)
+        .orderBy('order')
         .orderBy('name')
         .snapshots()
         .map(
@@ -24,17 +25,37 @@ class CategoryRepository {
         );
   }
 
-  Future<void> createCategory(String uid, String name, {String? emoji}) async {
+  Future<void> createCategory(
+    String uid,
+    String name, {
+    String? emoji,
+    int order = 0,
+  }) async {
     final now = DateTime.now();
     final category = TaskCategory(
       id: _uuid.v4(),
       name: name,
       emoji: emoji,
+      order: order,
       createdAt: now,
       updatedAt: now,
     );
 
     await _categoriesRef(uid).doc(category.id).set(category.toMap());
+  }
+
+  Future<void> reorderCategories(
+    String uid,
+    List<TaskCategory> categories,
+  ) async {
+    final batch = _firestore.batch();
+    for (var i = 0; i < categories.length; i++) {
+      batch.update(
+        _categoriesRef(uid).doc(categories[i].id),
+        {'order': i},
+      );
+    }
+    await batch.commit();
   }
 
   Future<void> updateCategory(

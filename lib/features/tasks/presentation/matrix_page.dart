@@ -54,8 +54,10 @@ class MatrixPage extends StatefulWidget {
 
 class _MatrixPageState extends State<MatrixPage> {
   static const _taskInputModePrefKey = 'task_input_mode';
+  static const _selectedCategoryIdsPrefKey = 'selected_category_ids';
+  static const _layoutModePrefKey = 'layout_mode';
 
-  String? _selectedCategoryId;
+  Set<String> _selectedCategoryIds = {};
   bool _showPostponed = false;
   _LayoutMode _layoutMode = _LayoutMode.grid;
   _TaskInputMode _taskInputMode = _TaskInputMode.quadrantOnly;
@@ -84,6 +86,8 @@ class _MatrixPageState extends State<MatrixPage> {
           });
     });
     unawaited(_loadTaskInputMode());
+    unawaited(_loadSelectedCategories());
+    unawaited(_loadLayoutMode());
   }
 
   Future<void> _loadTaskInputMode() async {
@@ -102,6 +106,32 @@ class _MatrixPageState extends State<MatrixPage> {
     await prefs.setString(_taskInputModePrefKey, mode.name);
   }
 
+  Future<void> _loadSelectedCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = prefs.getStringList(_selectedCategoryIdsPrefKey);
+    if (!mounted) return;
+    setState(() => _selectedCategoryIds = Set<String>.from(ids ?? []));
+  }
+
+  Future<void> _saveSelectedCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _selectedCategoryIdsPrefKey,
+      _selectedCategoryIds.toList(),
+    );
+  }
+
+  Future<void> _loadLayoutMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_layoutModePrefKey);
+    final mode = _LayoutMode.values.firstWhere(
+      (v) => v.name == raw,
+      orElse: () => _LayoutMode.grid,
+    );
+    if (!mounted) return;
+    setState(() => _layoutMode = mode);
+  }
+
   String _taskInputModeLabel(AppLocalizations l10n, _TaskInputMode mode) {
     switch (mode) {
       case _TaskInputMode.quadrantOnly:
@@ -113,17 +143,26 @@ class _MatrixPageState extends State<MatrixPage> {
     }
   }
 
-  void _setSelectedCategory(String? categoryId) {
+  void _toggleCategorySelection(String categoryId) {
     setState(() {
-      _selectedCategoryId = categoryId;
-      _showPostponed = false;
+      if (_selectedCategoryIds.contains(categoryId)) {
+        _selectedCategoryIds = Set<String>.from(_selectedCategoryIds)
+          ..remove(categoryId);
+      } else {
+        _selectedCategoryIds = Set<String>.from(_selectedCategoryIds)
+          ..add(categoryId);
+        _showPostponed = false;
+      }
     });
+    unawaited(_saveSelectedCategories());
   }
 
   void _toggleShowPostponed() {
     setState(() {
       _showPostponed = !_showPostponed;
-      if (_showPostponed) _selectedCategoryId = null;
+      // Clear selected categories in memory only — not saved to prefs,
+      // so they are restored when toggling postponed off or reopening the app.
+      if (_showPostponed) _selectedCategoryIds = {};
     });
   }
 
@@ -133,6 +172,11 @@ class _MatrixPageState extends State<MatrixPage> {
           ? _LayoutMode.stacked
           : _LayoutMode.grid;
     });
+    unawaited(
+      SharedPreferences.getInstance().then(
+        (prefs) => prefs.setString(_layoutModePrefKey, _layoutMode.name),
+      ),
+    );
   }
 
   User? _getUser() {
@@ -454,10 +498,11 @@ class _MatrixPageState extends State<MatrixPage> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: FilterChip(
-                              selected: _selectedCategoryId == category.id,
-                              onSelected: (isSelected) => _setSelectedCategory(
-                                isSelected ? category.id : null,
+                              selected: _selectedCategoryIds.contains(
+                                category.id,
                               ),
+                              onSelected: (_) =>
+                                  _toggleCategorySelection(category.id),
                               label: Text(
                                 category.emoji != null &&
                                         category.emoji!.isNotEmpty
@@ -485,12 +530,10 @@ class _MatrixPageState extends State<MatrixPage> {
           Expanded(
             child: BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, categoryState) {
-                final categoryEmojiMap = _selectedCategoryId == null
-                    ? {
-                        for (final c in categoryState.categories)
-                          c.id: c.emoji ?? '',
-                      }
-                    : null;
+                final categoryEmojiMap = {
+                  for (final c in categoryState.categories)
+                    c.id: c.emoji ?? '',
+                };
                 return BlocBuilder<TaskCubit, TaskState>(
                   builder: (context, state) {
                     if (state.status == TaskStatus.loading ||
@@ -506,10 +549,14 @@ class _MatrixPageState extends State<MatrixPage> {
 
                     final filtered = _showPostponed
                         ? state.postponedTasks
-                        : _selectedCategoryId == null
+                        : _selectedCategoryIds.isEmpty
                         ? state.tasks
                         : state.tasks
-                              .where((t) => t.categoryId == _selectedCategoryId)
+                              .where(
+                                (t) => _selectedCategoryIds.contains(
+                                  t.categoryId,
+                                ),
+                              )
                               .toList();
 
                     final grid = _layoutMode == _LayoutMode.grid

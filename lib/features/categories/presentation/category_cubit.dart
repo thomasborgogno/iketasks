@@ -30,7 +30,14 @@ class CategoryCubit extends Cubit<CategoryState> {
   Future<void> createCategory(String name, {String? emoji}) async {
     final uid = _uid;
     if (uid == null) return;
-    await _repository.createCategory(uid, name, emoji: emoji);
+    final order = state.categories.length;
+    await _repository.createCategory(uid, name, emoji: emoji, order: order);
+  }
+
+  Future<void> reorderCategories(List<TaskCategory> reordered) async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _repository.reorderCategories(uid, reordered);
   }
 
   Future<void> updateCategory(

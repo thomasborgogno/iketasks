@@ -251,12 +251,20 @@ class _CategoryManagerModalState extends State<_CategoryManagerModal> {
                   ),
                 );
               }
-              return ListView.builder(
+              return ReorderableListView.builder(
                 shrinkWrap: true,
+                onReorder: (oldIndex, newIndex) {
+                  if (newIndex > oldIndex) newIndex--;
+                  final updated = List<TaskCategory>.from(state.categories);
+                  final item = updated.removeAt(oldIndex);
+                  updated.insert(newIndex, item);
+                  context.read<CategoryCubit>().reorderCategories(updated);
+                },
                 itemCount: state.categories.length,
                 itemBuilder: (context, index) {
                   final category = state.categories[index];
                   return ListTile(
+                    key: ValueKey(category.id),
                     dense: true,
                     leading:
                         category.emoji != null && category.emoji!.isNotEmpty
@@ -266,7 +274,6 @@ class _CategoryManagerModalState extends State<_CategoryManagerModal> {
                           )
                         : null,
                     title: Text(category.name),
-                    trailing: const Icon(Icons.chevron_right),
                     onTap: () => _startEdit(category),
                   );
                 },
