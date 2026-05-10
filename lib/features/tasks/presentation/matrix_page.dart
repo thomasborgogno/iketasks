@@ -55,9 +55,11 @@ class MatrixPage extends StatefulWidget {
 class _MatrixPageState extends State<MatrixPage> {
   static const _taskInputModePrefKey = 'task_input_mode';
   static const _selectedCategoryIdsPrefKey = 'selected_category_ids';
+  static const _excludedCategoryIdsPrefKey = 'excluded_category_ids';
   static const _layoutModePrefKey = 'layout_mode';
 
   Set<String> _selectedCategoryIds = {};
+  Set<String> _excludedCategoryIds = {};
   bool _showPostponed = false;
   _LayoutMode _layoutMode = _LayoutMode.grid;
   _TaskInputMode _taskInputMode = _TaskInputMode.quadrantOnly;
@@ -87,6 +89,7 @@ class _MatrixPageState extends State<MatrixPage> {
     });
     unawaited(_loadTaskInputMode());
     unawaited(_loadSelectedCategories());
+    unawaited(_loadExcludedCategories());
     unawaited(_loadLayoutMode());
   }
 
@@ -121,6 +124,21 @@ class _MatrixPageState extends State<MatrixPage> {
     );
   }
 
+  Future<void> _loadExcludedCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = prefs.getStringList(_excludedCategoryIdsPrefKey);
+    if (!mounted) return;
+    setState(() => _excludedCategoryIds = Set<String>.from(ids ?? []));
+  }
+
+  Future<void> _saveExcludedCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _excludedCategoryIdsPrefKey,
+      _excludedCategoryIds.toList(),
+    );
+  }
+
   Future<void> _loadLayoutMode() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_layoutModePrefKey);
@@ -151,10 +169,27 @@ class _MatrixPageState extends State<MatrixPage> {
       } else {
         _selectedCategoryIds = Set<String>.from(_selectedCategoryIds)
           ..add(categoryId);
+        _excludedCategoryIds = {};
         _showPostponed = false;
       }
     });
     unawaited(_saveSelectedCategories());
+    unawaited(_saveExcludedCategories());
+  }
+
+  void _excludeCategory(String categoryId) {
+    setState(() {
+      _selectedCategoryIds = {};
+      if (_excludedCategoryIds.contains(categoryId)) {
+        _excludedCategoryIds = Set<String>.from(_excludedCategoryIds)
+          ..remove(categoryId);
+      } else {
+        _excludedCategoryIds = Set<String>.from(_excludedCategoryIds)
+          ..add(categoryId);
+      }
+    });
+    unawaited(_saveSelectedCategories());
+    unawaited(_saveExcludedCategories());
   }
 
   void _toggleShowPostponed() {
@@ -162,7 +197,10 @@ class _MatrixPageState extends State<MatrixPage> {
       _showPostponed = !_showPostponed;
       // Clear selected categories in memory only — not saved to prefs,
       // so they are restored when toggling postponed off or reopening the app.
-      if (_showPostponed) _selectedCategoryIds = {};
+      if (_showPostponed) {
+        _selectedCategoryIds = {};
+        _excludedCategoryIds = {};
+      }
     });
   }
 
@@ -497,18 +535,40 @@ class _MatrixPageState extends State<MatrixPage> {
                         for (final category in categories)
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              selected: _selectedCategoryIds.contains(
-                                category.id,
-                              ),
-                              onSelected: (_) =>
-                                  _toggleCategorySelection(category.id),
-                              label: Text(
-                                category.emoji != null &&
+                            child: GestureDetector(
+                              onLongPress: () =>
+                                  _excludeCategory(category.id),
+                              child: () {
+                                final isSelected =
+                                    _selectedCategoryIds.contains(category.id);
+                                final isExcluded =
+                                    _excludedCategoryIds.contains(category.id);
+                                final labelText = category.emoji != null &&
                                         category.emoji!.isNotEmpty
                                     ? '${category.emoji} ${category.name}'
-                                    : category.name,
-                              ),
+                                    : category.name;
+                                final errorColor =
+                                    Theme.of(context).colorScheme.error;
+                                return FilterChip(
+                                  selected: isSelected,
+                                  onSelected: (_) =>
+                                      _toggleCategorySelection(category.id),
+                                  backgroundColor: isExcluded
+                                      ? errorColor.withValues(alpha: 0.15)
+                                      : null,
+                                  labelStyle: isExcluded
+                                      ? TextStyle(color: errorColor)
+                                      : null,
+                                  avatar: isExcluded
+                                      ? Icon(
+                                          Icons.close,
+                                          size: 14,
+                                          color: errorColor,
+                                        )
+                                      : null,
+                                  label: Text(labelText),
+                                );
+                              }(),
                             ),
                           ),
                         if (hasPostponed)
@@ -547,15 +607,28 @@ class _MatrixPageState extends State<MatrixPage> {
                       );
                     }
 
+                    final existingCategoryIds = {
+                      for (final c in categoryState.categories) c.id,
+                    };
+                    final validSelectedIds = _selectedCategoryIds
+                        .intersection(existingCategoryIds);
+                    final validExcludedIds = _excludedCategoryIds
+                        .intersection(existingCategoryIds);
+
                     final filtered = _showPostponed
                         ? state.postponedTasks
-                        : _selectedCategoryIds.isEmpty
+                        : validSelectedIds.isNotEmpty
+                        ? state.tasks
+                              .where(
+                                (t) => validSelectedIds.contains(t.categoryId),
+                              )
+                              .toList()
+                        : validExcludedIds.isEmpty
                         ? state.tasks
                         : state.tasks
                               .where(
-                                (t) => _selectedCategoryIds.contains(
-                                  t.categoryId,
-                                ),
+                                (t) =>
+                                    !validExcludedIds.contains(t.categoryId),
                               )
                               .toList();
 
