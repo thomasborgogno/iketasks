@@ -1,11 +1,17 @@
-part of '../tasks/presentation/matrix_page.dart';
+import 'package:flutter/material.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
+import 'package:iketasks/features/tasks/domain/eisenhower_quadrant.dart';
+import 'widget_appearance_service.dart';
+import 'data/widget_appearance_settings.dart';
+import 'minimal_widget_sync_service.dart';
+import 'data/minimal_widget_settings.dart';
 
 // ---------------------------------------------------------------------------
 // Unified Widget Settings Sheet - Supports both Matrix (5x5) and Minimal (4x1)
 // ---------------------------------------------------------------------------
 
-class _UnifiedWidgetSettingsSheet extends StatefulWidget {
-  const _UnifiedWidgetSettingsSheet({
+class UnifiedWidgetSettingsSheet extends StatefulWidget {
+  const UnifiedWidgetSettingsSheet({
     required this.matrixService,
     required this.minimalService,
   });
@@ -14,12 +20,12 @@ class _UnifiedWidgetSettingsSheet extends StatefulWidget {
   final MinimalWidgetSyncService minimalService;
 
   @override
-  State<_UnifiedWidgetSettingsSheet> createState() =>
+  State<UnifiedWidgetSettingsSheet> createState() =>
       _UnifiedWidgetSettingsSheetState();
 }
 
 class _UnifiedWidgetSettingsSheetState
-    extends State<_UnifiedWidgetSettingsSheet> {
+    extends State<UnifiedWidgetSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;

@@ -13,6 +13,7 @@ import 'features/categories/presentation/category_cubit.dart';
 import 'features/google_tasks/data/google_tasks_repository.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/presentation/onboarding_cubit.dart';
+import 'features/tasks/data/matrix_prefs_service.dart';
 import 'features/tasks/data/task_repository.dart';
 import 'features/tasks/presentation/task_cubit.dart';
 import 'features/widget/widget_appearance_service.dart';
@@ -40,6 +41,7 @@ Future<void> main() async {
   final categoryRepository = CategoryRepository();
   final googleTasksRepository = GoogleTasksRepository();
   final onboardingRepository = OnboardingRepository();
+  final matrixPrefsService = MatrixPrefsService();
   final widgetSyncService = WidgetSyncService();
   await widgetSyncService.initialize();
   final widgetAppearanceService = WidgetAppearanceService();
@@ -65,6 +67,7 @@ Future<void> main() async {
         RepositoryProvider.value(value: categoryRepository),
         RepositoryProvider.value(value: googleTasksRepository),
         RepositoryProvider.value(value: onboardingRepository),
+        RepositoryProvider.value(value: matrixPrefsService),
         RepositoryProvider.value(value: widgetSyncService),
         RepositoryProvider.value(value: widgetAppearanceService),
         RepositoryProvider.value(value: minimalWidgetSyncService),

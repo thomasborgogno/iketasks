@@ -5,7 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/tasks/domain/task_item.dart';
-import '../../features/tasks/presentation/helpers.dart';
+import '../../features/tasks/domain/eisenhower_quadrant.dart';
 
 class NotificationService {
   static const int _notificationId = 42;

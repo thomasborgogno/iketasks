@@ -1,49 +1,23 @@
 ﻿import 'dart:async';
 
-import 'package:iketasks/features/tasks/presentation/helpers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iketasks/l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../../core/locale/locale_cubit.dart';
-
-import '../../auth/presentation/auth_cubit.dart';
-import '../../categories/domain/task_category.dart';
-import '../../categories/presentation/category_cubit.dart';
-import '../domain/task_item.dart';
-import 'completed_page.dart';
-import 'task_cubit.dart';
-import 'task_completion_circle.dart';
 
 import '../../../core/notifications/notification_service.dart';
-import '../../google_tasks/data/google_tasks_repository.dart';
-import '../../google_tasks/presentation/google_tasks_select_page.dart';
-import '../../widget/widget_appearance_service.dart';
-import '../../widget/widget_appearance_settings.dart';
-import '../../widget/minimal_widget_sync_service.dart';
-import '../../widget/minimal_widget_settings.dart';
-
-part 'matrix_grid_widgets.dart';
-part 'task_form_sheet.dart';
-part 'settings_widgets.dart';
-part '../../widget/unified_widget_settings_sheet.dart';
-
-enum _LayoutMode { grid, stacked }
-
-enum _TaskInputMode { quadrantOnly, priorityOnly, both }
-
-const List<List<EisenhowerQuadrant>> _matrixQuadrantRows = [
-  [EisenhowerQuadrant.importantUrgent, EisenhowerQuadrant.importantNotUrgent],
-  [
-    EisenhowerQuadrant.notImportantUrgent,
-    EisenhowerQuadrant.notImportantNotUrgent,
-  ],
-];
+import '../../auth/presentation/auth_cubit.dart';
+import '../../categories/presentation/category_cubit.dart';
+import '../domain/task_item.dart';
+import 'matrix_enums.dart';
+import 'widgets/matrix_grid_widgets.dart';
+import 'package:iketasks/features/categories/presentation/category_manager_modal.dart';
+import '../data/matrix_prefs_service.dart';
+import 'matrix_settings_sheet.dart';
+import 'matrix_support_widgets.dart';
+import 'task_cubit.dart';
+import 'task_form_sheet.dart';
 
 class MatrixPage extends StatefulWidget {
   const MatrixPage({super.key});
@@ -53,16 +27,11 @@ class MatrixPage extends StatefulWidget {
 }
 
 class _MatrixPageState extends State<MatrixPage> {
-  static const _taskInputModePrefKey = 'task_input_mode';
-  static const _selectedCategoryIdsPrefKey = 'selected_category_ids';
-  static const _excludedCategoryIdsPrefKey = 'excluded_category_ids';
-  static const _layoutModePrefKey = 'layout_mode';
-
   Set<String> _selectedCategoryIds = {};
   Set<String> _excludedCategoryIds = {};
   bool _showPostponed = false;
-  _LayoutMode _layoutMode = _LayoutMode.grid;
-  _TaskInputMode _taskInputMode = _TaskInputMode.quadrantOnly;
+  MatrixLayoutMode _layoutMode = MatrixLayoutMode.grid;
+  TaskInputMode _taskInputMode = TaskInputMode.quadrantOnly;
   StreamSubscription<void>? _newTaskSubscription;
   bool _isModalOpen = false;
 
@@ -76,7 +45,7 @@ class _MatrixPageState extends State<MatrixPage> {
       if (call.method == 'openAddTask' && mounted) {
         await _openTaskForm(context);
       } else if (call.method == 'openWidgetSettings' && mounted) {
-        await _openWidgetAppearance(context);
+        await showWidgetAppearanceSheet(context);
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -86,79 +55,23 @@ class _MatrixPageState extends State<MatrixPage> {
           .listen((_) {
             if (mounted) _openTaskForm(context);
           });
+      unawaited(_loadPrefs());
     });
-    unawaited(_loadTaskInputMode());
-    unawaited(_loadSelectedCategories());
-    unawaited(_loadExcludedCategories());
-    unawaited(_loadLayoutMode());
   }
 
-  Future<void> _loadTaskInputMode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final rawValue = prefs.getString(_taskInputModePrefKey);
-    final mode = _TaskInputMode.values.firstWhere(
-      (value) => value.name == rawValue,
-      orElse: () => _TaskInputMode.quadrantOnly,
-    );
+  Future<void> _loadPrefs() async {
+    final prefs = context.read<MatrixPrefsService>();
+    final inputMode = await prefs.loadTaskInputMode();
+    final selectedIds = await prefs.loadSelectedCategories();
+    final excludedIds = await prefs.loadExcludedCategories();
+    final layoutMode = await prefs.loadLayoutMode();
     if (!mounted) return;
-    setState(() => _taskInputMode = mode);
-  }
-
-  Future<void> _setTaskInputMode(_TaskInputMode mode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_taskInputModePrefKey, mode.name);
-  }
-
-  Future<void> _loadSelectedCategories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final ids = prefs.getStringList(_selectedCategoryIdsPrefKey);
-    if (!mounted) return;
-    setState(() => _selectedCategoryIds = Set<String>.from(ids ?? []));
-  }
-
-  Future<void> _saveSelectedCategories() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _selectedCategoryIdsPrefKey,
-      _selectedCategoryIds.toList(),
-    );
-  }
-
-  Future<void> _loadExcludedCategories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final ids = prefs.getStringList(_excludedCategoryIdsPrefKey);
-    if (!mounted) return;
-    setState(() => _excludedCategoryIds = Set<String>.from(ids ?? []));
-  }
-
-  Future<void> _saveExcludedCategories() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _excludedCategoryIdsPrefKey,
-      _excludedCategoryIds.toList(),
-    );
-  }
-
-  Future<void> _loadLayoutMode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_layoutModePrefKey);
-    final mode = _LayoutMode.values.firstWhere(
-      (v) => v.name == raw,
-      orElse: () => _LayoutMode.grid,
-    );
-    if (!mounted) return;
-    setState(() => _layoutMode = mode);
-  }
-
-  String _taskInputModeLabel(AppLocalizations l10n, _TaskInputMode mode) {
-    switch (mode) {
-      case _TaskInputMode.quadrantOnly:
-        return l10n.taskInputModeQuadrantOnly;
-      case _TaskInputMode.priorityOnly:
-        return l10n.taskInputModePriorityOnly;
-      case _TaskInputMode.both:
-        return l10n.taskInputModeBoth;
-    }
+    setState(() {
+      _taskInputMode = inputMode;
+      _selectedCategoryIds = selectedIds;
+      _excludedCategoryIds = excludedIds;
+      _layoutMode = layoutMode;
+    });
   }
 
   void _toggleCategorySelection(String categoryId) {
@@ -173,8 +86,8 @@ class _MatrixPageState extends State<MatrixPage> {
         _showPostponed = false;
       }
     });
-    unawaited(_saveSelectedCategories());
-    unawaited(_saveExcludedCategories());
+    unawaited(context.read<MatrixPrefsService>().saveSelectedCategories(_selectedCategoryIds));
+    unawaited(context.read<MatrixPrefsService>().saveExcludedCategories(_excludedCategoryIds));
   }
 
   void _excludeCategory(String categoryId) {
@@ -188,8 +101,8 @@ class _MatrixPageState extends State<MatrixPage> {
           ..add(categoryId);
       }
     });
-    unawaited(_saveSelectedCategories());
-    unawaited(_saveExcludedCategories());
+    unawaited(context.read<MatrixPrefsService>().saveSelectedCategories(_selectedCategoryIds));
+    unawaited(context.read<MatrixPrefsService>().saveExcludedCategories(_excludedCategoryIds));
   }
 
   void _toggleShowPostponed() {
@@ -206,267 +119,33 @@ class _MatrixPageState extends State<MatrixPage> {
 
   void _toggleLayoutMode() {
     setState(() {
-      _layoutMode = _layoutMode == _LayoutMode.grid
-          ? _LayoutMode.stacked
-          : _LayoutMode.grid;
+      _layoutMode = _layoutMode == MatrixLayoutMode.grid
+          ? MatrixLayoutMode.stacked
+          : MatrixLayoutMode.grid;
     });
-    unawaited(
-      SharedPreferences.getInstance().then(
-        (prefs) => prefs.setString(_layoutModePrefKey, _layoutMode.name),
-      ),
-    );
+    unawaited(context.read<MatrixPrefsService>().saveLayoutMode(_layoutMode));
   }
 
-  User? _getUser() {
-    return context.read<AuthCubit>().state.user;
-  }
-
-  Future<void> _onDeleteAccount(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final authCubit = context.read<AuthCubit>();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.deleteAccountTitle),
-        content: Text(l10n.deleteAccountConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(dialogContext).colorScheme.error,
-            ),
-            child: Text(l10n.deleteAccount),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    await authCubit.deleteAccount();
-    if (authCubit.state.status == AuthStatus.error && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.deleteAccountError)));
-    }
-  }
-
-  Future<void> _openAccountActionsSheet(
-    BuildContext context,
-    VoidCallback closeSettings, {
-    bool isAnonymous = false,
-  }) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isAnonymous)
-              ListTile(
-                leading: const Icon(Icons.login),
-                title: Text(l10n.upgradeToGoogle),
-                onTap: () async {
-                  Navigator.of(sheetContext).pop();
-                  closeSettings();
-                  try {
-                    final result =
-                        await context.read<AuthCubit>().upgradeToGoogle();
-                    if (context.mounted) {
-                      final message = result == UpgradeResult.success
-                          ? l10n.upgradeSuccess
-                          : l10n.upgradeError;
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(message)));
-                    }
-                  } catch (_) {}
-                },
-              ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(l10n.signOut),
-              onTap: () async {
-                Navigator.of(sheetContext).pop();
-                closeSettings();
-                await context.read<AuthCubit>().signOut();
-              },
-            ),
-            if (!isAnonymous)
-              ListTile(
-                leading: Icon(
-                  Icons.delete_forever,
-                  color: Theme.of(sheetContext).colorScheme.error,
-                ),
-                title: Text(
-                  l10n.deleteAccount,
-                  style: TextStyle(
-                    color: Theme.of(sheetContext).colorScheme.error,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  closeSettings();
-                  _onDeleteAccount(context);
-                },
-              ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
+  User? _getUser() => context.read<AuthCubit>().state.user;
 
   Future<void> _openSettingsOverlay(BuildContext context) async {
     final user = _getUser();
     if (user == null) return;
+    final prefs = context.read<MatrixPrefsService>();
     final isAnonymous = context.read<AuthCubit>().state.isAnonymous;
-
-    final notificationService = context.read<NotificationService>();
-
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (builderContext, setState) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.settings,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 20),
-                    _ProfileHeader(
-                      user: user,
-                      onLogout: () {
-                        _openAccountActionsSheet(
-                          context,
-                          () => Navigator.of(sheetContext).pop(),
-                          isAnonymous: isAnonymous,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.check_circle_outline),
-                      title: Text(AppLocalizations.of(context)!.completedTasks),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => CompletedPage(uid: user.uid),
-                          ),
-                        );
-                      },
-                    ),
-                    if (!isAnonymous)
-                      ListTile(
-                        leading: const Icon(Icons.cloud_download_outlined),
-                        title: Text(
-                          AppLocalizations.of(context)!.importFromGoogleTasks,
-                        ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          Navigator.of(sheetContext).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (pageContext) => RepositoryProvider.value(
-                                value: pageContext.read<GoogleTasksRepository>(),
-                                child: const GoogleTasksImportPage(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ListTile(
-                      leading: const Icon(Icons.widgets_outlined),
-                      title: Text(
-                        AppLocalizations.of(context)!.widgetAppearance,
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        _openWidgetAppearance(context);
-                      },
-                    ),
-                    SwitchListTile(
-                      secondary: const Icon(Icons.notifications_outlined),
-                      title: Text(
-                        AppLocalizations.of(context)!.persistentNotification,
-                      ),
-                      subtitle: Text(
-                        AppLocalizations.of(
-                          context,
-                        )!.persistentNotificationDescription,
-                      ),
-                      value: notificationService.isEnabled,
-                      onChanged: (value) async {
-                        final tasks = context.read<TaskCubit>().state.tasks;
-                        await notificationService.setEnabled(value, tasks);
-                        setState(() {});
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.tune_outlined),
-                      title: Text(AppLocalizations.of(context)!.taskInputMode),
-                      trailing: DropdownButton<_TaskInputMode>(
-                        value: _taskInputMode,
-                        onChanged: (value) {
-                          if (value == null) return;
-                          setState(() => _taskInputMode = value);
-                          unawaited(_setTaskInputMode(value));
-                        },
-                        items: _TaskInputMode.values
-                            .map(
-                              (mode) => DropdownMenuItem<_TaskInputMode>(
-                                value: mode,
-                                child: Text(
-                                  _taskInputModeLabel(
-                                    AppLocalizations.of(context)!,
-                                    mode,
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.language_outlined),
-                      title: Text(AppLocalizations.of(context)!.language),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        _openLanguageSelector(context);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.info_outline),
-                      title: Text(AppLocalizations.of(context)!.about),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        _openAboutSection(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
+      builder: (_) => MatrixSettingsSheet(
+        user: user,
+        isAnonymous: isAnonymous,
+        taskInputMode: _taskInputMode,
+        onTaskInputModeChanged: (mode) {
+          setState(() => _taskInputMode = mode);
+          unawaited(prefs.saveTaskInputMode(mode));
+        },
+      ),
     );
   }
 
@@ -486,11 +165,11 @@ class _MatrixPageState extends State<MatrixPage> {
           IconButton(
             onPressed: _toggleLayoutMode,
             icon: Icon(
-              _layoutMode == _LayoutMode.grid
+              _layoutMode == MatrixLayoutMode.grid
                   ? Icons.view_agenda_outlined
                   : Icons.grid_view_outlined,
             ),
-            tooltip: _layoutMode == _LayoutMode.grid
+            tooltip: _layoutMode == MatrixLayoutMode.grid
                 ? l10n.columnView
                 : l10n.gridView,
           ),
@@ -507,7 +186,7 @@ class _MatrixPageState extends State<MatrixPage> {
                     ? null
                     : () => _openSettingsOverlay(context),
                 tooltip: l10n.profileAndSettings,
-                icon: _ProfileAvatar(photoUrl: user?.photoURL, radius: 20),
+                icon: ProfileAvatar(photoUrl: user?.photoURL, radius: 20),
               );
             },
           ),
@@ -603,7 +282,7 @@ class _MatrixPageState extends State<MatrixPage> {
 
                     if (state.status == TaskStatus.error) {
                       return Center(
-                        child: Text(state.errorMessage ?? 'Errore'),
+                        child: Text(state.errorMessage ?? l10n.loadingError),
                       );
                     }
 
@@ -632,8 +311,8 @@ class _MatrixPageState extends State<MatrixPage> {
                               )
                               .toList();
 
-                    final grid = _layoutMode == _LayoutMode.grid
-                        ? _MatrixGrid(
+                    final grid = _layoutMode == MatrixLayoutMode.grid
+                        ? MatrixGrid(
                             tasks: filtered,
                             categoryEmojiMap: categoryEmojiMap,
                             onToggleTask: (task) =>
@@ -644,7 +323,7 @@ class _MatrixPageState extends State<MatrixPage> {
                                 .read<TaskCubit>()
                                 .moveTask(task, targetQuadrant),
                           )
-                        : _StackedMatrix(
+                        : StackedMatrix(
                             tasks: filtered,
                             categoryEmojiMap: categoryEmojiMap,
                             onToggleTask: (task) =>
@@ -673,11 +352,11 @@ class _MatrixPageState extends State<MatrixPage> {
     if (_isModalOpen) return;
     _isModalOpen = true;
     final categories = context.read<CategoryCubit>().state.categories;
-    final result = await showModalBottomSheet<_TaskFormResult>(
+    final result = await showModalBottomSheet<TaskFormResult>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _TaskForm(
+      builder: (_) => TaskFormSheet(
         categories: categories,
         existing: existing,
         inputMode: _taskInputMode,
@@ -721,210 +400,8 @@ class _MatrixPageState extends State<MatrixPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => const _CategoryManagerModal(),
+      builder: (_) => const CategoryManagerModal(),
     );
-  }
-
-  Future<void> _openLanguageSelector(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final currentLocale = context.read<LocaleCubit>().state.locale;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.language,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 20),
-                _LanguageOption(
-                  languageName: l10n.languageEnglish,
-                  locale: const Locale('en'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageItalian,
-                  locale: const Locale('it'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageSpanish,
-                  locale: const Locale('es'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageFrench,
-                  locale: const Locale('fr'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageGerman,
-                  locale: const Locale('de'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageChinese,
-                  locale: const Locale('zh'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languagePortuguese,
-                  locale: const Locale('pt'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageRussian,
-                  locale: const Locale('ru'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageJapanese,
-                  locale: const Locale('ja'),
-                  currentLocale: currentLocale,
-                ),
-                _LanguageOption(
-                  languageName: l10n.languageArabic,
-                  locale: const Locale('ar'),
-                  currentLocale: currentLocale,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _openAboutSection(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  l10n.about,
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.appInfo,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.openSource,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 16),
-                FilledButton.icon(
-                  onPressed: () => launchUrl(
-                    Uri.parse('https://github.com/thomasborgogno/iketasks'),
-                  ),
-                  icon: const Icon(Icons.code),
-                  label: Text(l10n.viewOnGitHub),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () => launchUrl(
-                    Uri.parse(
-                      'https://thomasborgogno.github.io/iketasks/privacy-policy',
-                    ),
-                  ),
-                  icon: const Icon(Icons.privacy_tip_outlined),
-                  label: Text(l10n.privacyPolicy),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.supportDevelopment,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => launchUrl(
-                          Uri.parse('https://paypal.me/thomasborgogno'),
-                        ),
-                        icon: const Icon(Icons.paypal_outlined),
-                        label: const Text('PayPal'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => launchUrl(
-                          Uri.parse('https://ko-fi.com/thomasborgogno'),
-                        ),
-                        icon: const Icon(Icons.local_cafe),
-                        label: const Text('Ko-fi'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.reportIssue,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.reportIssueDescription,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: () async {
-                    final Uri emailUri = Uri(
-                      scheme: 'mailto',
-                      path: 'thomas.borgogno99@gmail.com',
-                      query: 'subject=Eisenhower Matrix App - Issue Report',
-                    );
-                    await launchUrl(emailUri);
-                  },
-                  icon: const Icon(Icons.email_outlined),
-                  label: Text(l10n.reportIssue),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _openWidgetAppearance(BuildContext context) async {
-    if (_isModalOpen) return;
-    _isModalOpen = true;
-    final matrixService = context.read<WidgetAppearanceService>();
-    final minimalService = context.read<MinimalWidgetSyncService>();
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _UnifiedWidgetSettingsSheet(
-        matrixService: matrixService,
-        minimalService: minimalService,
-      ),
-    );
-    _isModalOpen = false;
   }
 
   @override

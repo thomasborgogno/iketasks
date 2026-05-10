@@ -1,4 +1,4 @@
-﻿import 'package:iketasks/features/tasks/presentation/task_completion_circle.dart';
+﻿import 'package:iketasks/features/tasks/presentation/widgets/task_completion_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iketasks/l10n/app_localizations.dart';
@@ -125,10 +125,7 @@ class _CompletedTaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
-    final updatedStr = DateFormat(
-      'dd/MM/yyyy',
-      locale.toString(),
-    ).format(task.updatedAt);
+    final updatedStr = DateFormat.yMd(locale.toString()).format(task.updatedAt);
     return ListTile(
       leading: TaskCompletionCircle(
         completed: true,

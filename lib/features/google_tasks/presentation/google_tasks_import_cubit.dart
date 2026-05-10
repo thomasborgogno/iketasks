@@ -1,4 +1,4 @@
-import 'package:iketasks/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/domain/eisenhower_quadrant.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

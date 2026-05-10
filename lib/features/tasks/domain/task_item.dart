@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:iketasks/features/tasks/presentation/helpers.dart';
+import 'package:iketasks/features/tasks/domain/eisenhower_quadrant.dart';
 import 'package:equatable/equatable.dart';
 
 class TaskItem extends Equatable {

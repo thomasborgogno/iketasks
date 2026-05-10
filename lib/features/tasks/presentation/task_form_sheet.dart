@@ -1,7 +1,17 @@
-part of 'matrix_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:iketasks/features/categories/domain/task_category.dart';
+import 'package:iketasks/features/categories/presentation/category_cubit.dart';
+import 'package:iketasks/features/tasks/domain/task_item.dart';
+import 'package:iketasks/features/tasks/domain/eisenhower_quadrant.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
+import 'matrix_enums.dart';
+import 'package:iketasks/features/categories/presentation/category_manager_modal.dart';
+import 'task_cubit.dart';
 
-class _TaskFormResult {
-  const _TaskFormResult({
+class TaskFormResult {
+  const TaskFormResult({
     required this.title,
     required this.quadrant,
     required this.description,
@@ -26,22 +36,23 @@ class _TaskFormResult {
   final bool clearCategory;
 }
 
-class _TaskForm extends StatefulWidget {
-  const _TaskForm({
+class TaskFormSheet extends StatefulWidget {
+  const TaskFormSheet({
+    super.key,
     required this.categories,
     required this.inputMode,
     this.existing,
   });
 
   final List<TaskCategory> categories;
-  final _TaskInputMode inputMode;
+  final TaskInputMode inputMode;
   final TaskItem? existing;
 
   @override
-  State<_TaskForm> createState() => _TaskFormState();
+  State<TaskFormSheet> createState() => _TaskFormSheetState();
 }
 
-class _TaskFormState extends State<_TaskForm> {
+class _TaskFormSheetState extends State<TaskFormSheet> {
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   final FocusNode _descriptionFocusNode = FocusNode();
@@ -178,11 +189,11 @@ class _TaskFormState extends State<_TaskForm> {
     final isEdit = widget.existing != null;
     final l10n = AppLocalizations.of(context)!;
     final showPrioritySection =
-        widget.inputMode == _TaskInputMode.priorityOnly ||
-        widget.inputMode == _TaskInputMode.both;
+        widget.inputMode == TaskInputMode.priorityOnly ||
+        widget.inputMode == TaskInputMode.both;
     final showQuadrantSection =
-        widget.inputMode == _TaskInputMode.quadrantOnly ||
-        widget.inputMode == _TaskInputMode.both;
+        widget.inputMode == TaskInputMode.quadrantOnly ||
+        widget.inputMode == TaskInputMode.both;
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -263,20 +274,20 @@ class _TaskFormState extends State<_TaskForm> {
                 children: [
                   for (
                     var rowIndex = 0;
-                    rowIndex < _matrixQuadrantRows.length;
+                    rowIndex < matrixQuadrantRows.length;
                     rowIndex++
                   )
                     Row(
                       children: [
                         for (
                           var columnIndex = 0;
-                          columnIndex < _matrixQuadrantRows[rowIndex].length;
+                          columnIndex < matrixQuadrantRows[rowIndex].length;
                           columnIndex++
                         ) ...[
                           if (columnIndex > 0) const SizedBox(width: 8),
                           Expanded(
                             child: _quadrantChoiceChip(
-                              _matrixQuadrantRows[rowIndex][columnIndex],
+                              matrixQuadrantRows[rowIndex][columnIndex],
                             ),
                           ),
                         ],
@@ -296,7 +307,7 @@ class _TaskFormState extends State<_TaskForm> {
                       context: context,
                       isScrollControlled: true,
                       showDragHandle: true,
-                      builder: (_) => const _CategoryManagerModal(),
+                      builder: (_) => const CategoryManagerModal(),
                     ),
                     icon: const Icon(Icons.add),
                     label: Text(l10n.createCategory),
@@ -328,7 +339,7 @@ class _TaskFormState extends State<_TaskForm> {
                 l10n.dueDate,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
-              Text(DateFormat('dd/MM/yyyy').format(_dueDate!)),
+              Text(DateFormat.yMd(Localizations.localeOf(context).toString()).format(_dueDate!)),
               const SizedBox(height: 12),
             ],
             if (_showFromDate != null) ...[
@@ -336,7 +347,7 @@ class _TaskFormState extends State<_TaskForm> {
                 l10n.showFromDate,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
-              Text(DateFormat('dd/MM/yyyy').format(_showFromDate!)),
+              Text(DateFormat.yMd(Localizations.localeOf(context).toString()).format(_showFromDate!)),
               const SizedBox(height: 12),
             ],
 
@@ -481,7 +492,7 @@ class _TaskFormState extends State<_TaskForm> {
 
                       Navigator.pop(
                         context,
-                        _TaskFormResult(
+                        TaskFormResult(
                           title: title,
                           quadrant: _quadrant,
                           description:

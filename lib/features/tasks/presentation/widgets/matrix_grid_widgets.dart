@@ -1,7 +1,13 @@
-part of 'matrix_page.dart';
+import 'package:flutter/material.dart';
+import 'package:iketasks/features/tasks/domain/task_item.dart';
+import 'package:iketasks/features/tasks/domain/eisenhower_quadrant.dart';
+import 'package:iketasks/features/tasks/presentation/widgets/task_completion_circle.dart';
+import 'package:iketasks/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
+import '../matrix_enums.dart';
 
-class _QuadrantCard extends StatelessWidget {
-  const _QuadrantCard({
+class QuadrantCard extends StatelessWidget {
+  const QuadrantCard({
     required this.quadrant,
     required this.tasks,
     required this.categoryEmojiMap,
@@ -133,8 +139,8 @@ class _QuadrantCard extends StatelessWidget {
   }
 }
 
-class _MatrixGrid extends StatelessWidget {
-  const _MatrixGrid({
+class MatrixGrid extends StatelessWidget {
+  const MatrixGrid({
     required this.tasks,
     required this.categoryEmojiMap,
     required this.onToggleTask,
@@ -160,7 +166,7 @@ class _MatrixGrid extends StatelessWidget {
       children: [
         for (
           var rowIndex = 0;
-          rowIndex < _matrixQuadrantRows.length;
+          rowIndex < matrixQuadrantRows.length;
           rowIndex++
         ) ...[
           Expanded(
@@ -168,15 +174,15 @@ class _MatrixGrid extends StatelessWidget {
               children: [
                 for (
                   var columnIndex = 0;
-                  columnIndex < _matrixQuadrantRows[rowIndex].length;
+                  columnIndex < matrixQuadrantRows[rowIndex].length;
                   columnIndex++
                 ) ...[
                   if (columnIndex > 0) const SizedBox(width: cardSpacing),
                   Expanded(
-                    child: _QuadrantCard(
-                      quadrant: _matrixQuadrantRows[rowIndex][columnIndex],
+                    child: QuadrantCard(
+                      quadrant: matrixQuadrantRows[rowIndex][columnIndex],
                       tasks: _tasksFor(
-                        _matrixQuadrantRows[rowIndex][columnIndex],
+                        matrixQuadrantRows[rowIndex][columnIndex],
                       ),
                       categoryEmojiMap: categoryEmojiMap,
                       onToggle: onToggleTask,
@@ -188,7 +194,7 @@ class _MatrixGrid extends StatelessWidget {
               ],
             ),
           ),
-          if (rowIndex < _matrixQuadrantRows.length - 1)
+          if (rowIndex < matrixQuadrantRows.length - 1)
             const SizedBox(height: cardSpacing),
         ],
       ],
@@ -196,8 +202,8 @@ class _MatrixGrid extends StatelessWidget {
   }
 }
 
-class _StackedMatrix extends StatelessWidget {
-  const _StackedMatrix({
+class StackedMatrix extends StatelessWidget {
+  const StackedMatrix({
     required this.tasks,
     required this.categoryEmojiMap,
     required this.onToggleTask,
@@ -231,7 +237,7 @@ class _StackedMatrix extends StatelessWidget {
       separatorBuilder: (_, _) => const SizedBox(height: cardSpacing),
       itemBuilder: (context, index) {
         final quadrant = quadrants[index];
-        return _QuadrantCard(
+        return QuadrantCard(
           quadrant: quadrant,
           tasks: _tasksFor(quadrant),
           categoryEmojiMap: categoryEmojiMap,
@@ -263,7 +269,7 @@ class _TaskTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final due = task.dueDate == null
         ? null
-        : DateFormat('dd/MM/yyyy').format(task.dueDate!);
+        : DateFormat.yMd(Localizations.localeOf(context).toString()).format(task.dueDate!);
     final tile = AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),

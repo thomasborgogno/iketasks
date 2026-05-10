@@ -1,6 +1,6 @@
 import 'package:home_widget/home_widget.dart';
 
-import 'widget_appearance_settings.dart';
+import 'data/widget_appearance_settings.dart';
 
 class WidgetAppearanceService {
   static const _androidProvider = 'EisenhowerGlanceReceiver';

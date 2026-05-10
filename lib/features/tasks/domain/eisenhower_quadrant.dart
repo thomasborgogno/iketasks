@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:iketasks/core/theme/app_theme.dart';
 import 'package:iketasks/l10n/app_localizations.dart';
 
 enum EisenhowerQuadrant {
@@ -11,13 +12,13 @@ enum EisenhowerQuadrant {
 Color quadrantColor(EisenhowerQuadrant q) {
   switch (q) {
     case EisenhowerQuadrant.importantUrgent:
-      return const Color(0xFFD7263D);
+      return AppTheme.q1Color;
     case EisenhowerQuadrant.importantNotUrgent:
-      return const Color(0xFF1B998B);
+      return AppTheme.q2Color;
     case EisenhowerQuadrant.notImportantUrgent:
-      return const Color(0xFFF4A261);
+      return AppTheme.q3Color;
     case EisenhowerQuadrant.notImportantNotUrgent:
-      return const Color(0xFF457B9D);
+      return AppTheme.q4Color;
   }
 }
 

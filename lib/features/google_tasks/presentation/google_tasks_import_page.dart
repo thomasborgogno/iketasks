@@ -150,8 +150,8 @@ class _TabbedTaskSelection extends StatefulWidget {
 
 class _TabbedTaskSelectionState extends State<_TabbedTaskSelection>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-  late final List<MapEntry<String, List<GoogleTaskItem>>> _sections;
+  late TabController _tabController;
+  late List<MapEntry<String, List<GoogleTaskItem>>> _sections;
 
   @override
   void initState() {
