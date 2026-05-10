@@ -48,6 +48,7 @@
   "completedOn": "اكتمل في {date}",
   "categories": "الفئات",
   "categoryManagement": "إدارة الفئات",
+  "dragToReorder": "اضغط مطولاً واسحب لإعادة الترتيب",
   "emoji": "رمز تعبيري",
   "categoryName": "اسم الفئة",
   "add": "إضافة",

@@ -69,6 +69,7 @@
   },
   "categories": "Categories",
   "categoryManagement": "Category management",
+  "dragToReorder": "Hold and drag to reorder",
   "emoji": "Emoji",
   "categoryName": "Category name",
   "add": "Add",

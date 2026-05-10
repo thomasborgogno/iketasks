@@ -234,7 +234,14 @@ class _CategoryManagerModalState extends State<_CategoryManagerModal> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 4),
+        Text(
+          l10n.dragToReorder,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 16),
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 300),
           child: BlocBuilder<CategoryCubit, CategoryState>(
@@ -251,22 +258,42 @@ class _CategoryManagerModalState extends State<_CategoryManagerModal> {
                   ),
                 );
               }
-              return ListView.builder(
+              return ReorderableListView.builder(
                 shrinkWrap: true,
+                onReorder: (oldIndex, newIndex) {
+                  if (newIndex > oldIndex) newIndex--;
+                  final updated = List<TaskCategory>.from(state.categories);
+                  final item = updated.removeAt(oldIndex);
+                  updated.insert(newIndex, item);
+                  context.read<CategoryCubit>().reorderCategories(updated);
+                },
                 itemCount: state.categories.length,
                 itemBuilder: (context, index) {
                   final category = state.categories[index];
                   return ListTile(
+                    key: ValueKey(category.id),
                     dense: true,
-                    leading:
-                        category.emoji != null && category.emoji!.isNotEmpty
-                        ? Text(
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ReorderableDragStartListener(
+                          index: index,
+                          child: Icon(
+                            Icons.drag_handle,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (category.emoji != null &&
+                            category.emoji!.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Text(
                             category.emoji!,
                             style: const TextStyle(fontSize: 20),
-                          )
-                        : null,
+                          ),
+                        ],
+                      ],
+                    ),
                     title: Text(category.name),
-                    trailing: const Icon(Icons.chevron_right),
                     onTap: () => _startEdit(category),
                   );
                 },
@@ -275,7 +302,7 @@ class _CategoryManagerModalState extends State<_CategoryManagerModal> {
           ),
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 24),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

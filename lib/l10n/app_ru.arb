@@ -48,6 +48,7 @@
   "completedOn": "Завершено {date}",
   "categories": "Категории",
   "categoryManagement": "Управление категориями",
+  "dragToReorder": "Удерживайте и перетащите для изменения порядка",
   "emoji": "Эмодзи",
   "categoryName": "Название категории",
   "add": "Добавить",

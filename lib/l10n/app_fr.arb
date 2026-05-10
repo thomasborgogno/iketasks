@@ -48,6 +48,7 @@
   "completedOn": "Terminée le {date}",
   "categories": "Catégories",
   "categoryManagement": "Gestion des catégories",
+  "dragToReorder": "Maintenir et glisser pour réorganiser",
   "emoji": "Emoji",
   "categoryName": "Nom de la catégorie",
   "add": "Ajouter",

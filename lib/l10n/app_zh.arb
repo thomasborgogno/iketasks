@@ -48,6 +48,7 @@
   "completedOn": "完成于 {date}",
   "categories": "类别",
   "categoryManagement": "类别管理",
+  "dragToReorder": "长按并拖动以重新排序",
   "emoji": "表情符号",
   "categoryName": "类别名称",
   "add": "添加",

@@ -48,6 +48,7 @@
   "completedOn": "{date} に完了",
   "categories": "カテゴリ",
   "categoryManagement": "カテゴリ管理",
+  "dragToReorder": "長押しして並べ替え",
   "emoji": "絵文字",
   "categoryName": "カテゴリ名",
   "add": "追加",
