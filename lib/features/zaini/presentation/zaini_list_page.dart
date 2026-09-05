@@ -5,6 +5,7 @@ import '../../auth/presentation/auth_cubit.dart';
 import '../data/zaino_google_tasks_service.dart';
 import '../data/zaino_repository.dart';
 import '../domain/zaino.dart';
+import 'zaini_search_delegate.dart';
 import 'zaino_cubit.dart';
 import 'zaino_detail_page.dart';
 import 'zaino_state.dart';
@@ -23,6 +24,22 @@ class ZainiListPage extends StatelessWidget {
               SliverAppBar.large(
                 title: const Text('Zaini'),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    tooltip: 'Cerca zaino',
+                    onPressed: () async {
+                      final zaino = await showSearch<Zaino?>(
+                        context: context,
+                        delegate: ZainiSearchDelegate(
+                          zaini: state.zaini,
+                          onZainoTap: (z) => _openDetail(context, z),
+                        ),
+                      );
+                      if (zaino != null && context.mounted) {
+                        _openDetail(context, zaino);
+                      }
+                    },
+                  ),
                   if (state.isSyncing)
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),

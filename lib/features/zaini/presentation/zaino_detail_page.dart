@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../domain/zaino.dart';
 import '../domain/zaino_item.dart';
+import 'zaini_search_delegate.dart';
 import 'zaino_cubit.dart';
 import 'zaino_state.dart';
 import 'widgets/zaino_item_form_sheet.dart';
@@ -37,6 +38,23 @@ class ZainoDetailPage extends StatelessWidget {
                   ],
                 ),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    tooltip: 'Cerca elemento',
+                    onPressed: () async {
+                      final item = await showSearch<ZainoItem?>(
+                        context: context,
+                        delegate: ZainoItemSearchDelegate(
+                          items: state.items,
+                          onItemTap: (item) =>
+                              _showEditItem(context, state, categories, item),
+                        ),
+                      );
+                      if (item != null && context.mounted) {
+                        _showEditItem(context, state, categories, item);
+                      }
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.label_outline),
                     tooltip: 'Gestisci tag',

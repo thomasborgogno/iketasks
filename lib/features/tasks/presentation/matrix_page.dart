@@ -7,10 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iketasks/l10n/app_localizations.dart';
 
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/utils/fuzzy_search.dart';
 import '../../auth/presentation/auth_cubit.dart';
 import '../../categories/presentation/category_cubit.dart';
 import '../domain/task_item.dart';
 import 'matrix_enums.dart';
+import 'task_search_delegate.dart';
 import 'widgets/matrix_grid_widgets.dart';
 import 'package:iketasks/features/categories/presentation/category_manager_modal.dart';
 import '../data/matrix_prefs_service.dart';
@@ -34,6 +36,7 @@ class _MatrixPageState extends State<MatrixPage> {
   TaskInputMode _taskInputMode = TaskInputMode.quadrantOnly;
   StreamSubscription<void>? _newTaskSubscription;
   bool _isModalOpen = false;
+  String _searchQuery = '';
 
   static const _widgetChannel = MethodChannel('com.eisenhower.matrix/widget');
 
@@ -162,6 +165,25 @@ class _MatrixPageState extends State<MatrixPage> {
               : l10n.greeting(user!.displayName!.trim().split(' ').first),
         ),
         actions: [
+          BlocBuilder<TaskCubit, TaskState>(
+            builder: (context, taskState) {
+              return IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: 'Cerca task',
+                onPressed: () async {
+                  final result = await showSearch<TaskItem?>(
+                    context: context,
+                    delegate: TaskSearchDelegate(
+                      tasks: taskState.tasks,
+                      onTaskTap: (task) => _openTaskForm(context, existing: task),
+                    ),
+                    query: _searchQuery,
+                  );
+                  if (result == null) setState(() => _searchQuery = '');
+                },
+              );
+            },
+          ),
           IconButton(
             onPressed: _toggleLayoutMode,
             icon: Icon(
@@ -294,7 +316,7 @@ class _MatrixPageState extends State<MatrixPage> {
                     final validExcludedIds = _excludedCategoryIds
                         .intersection(existingCategoryIds);
 
-                    final filtered = _showPostponed
+                    var filtered = _showPostponed
                         ? state.postponedTasks
                         : validSelectedIds.isNotEmpty
                         ? state.tasks
@@ -310,6 +332,14 @@ class _MatrixPageState extends State<MatrixPage> {
                                     !validExcludedIds.contains(t.categoryId),
                               )
                               .toList();
+
+                    if (_searchQuery.isNotEmpty) {
+                      filtered = FuzzySearch.filter(
+                        _searchQuery,
+                        filtered,
+                        (t) => [t.title, t.description],
+                      );
+                    }
 
                     final grid = _layoutMode == MatrixLayoutMode.grid
                         ? MatrixGrid(
