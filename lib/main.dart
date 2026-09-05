@@ -19,6 +19,9 @@ import 'features/tasks/presentation/task_cubit.dart';
 import 'features/widget/widget_appearance_service.dart';
 import 'features/widget/widget_sync_service.dart';
 import 'features/widget/minimal_widget_sync_service.dart';
+import 'features/zaini/data/zaino_google_tasks_service.dart';
+import 'features/zaini/data/zaino_repository.dart';
+import 'features/zaini/presentation/zaino_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +44,8 @@ Future<void> main() async {
   final categoryRepository = CategoryRepository();
   final googleTasksRepository = GoogleTasksRepository();
   final onboardingRepository = OnboardingRepository();
+  final zainoRepository = ZainoRepository();
+  final zainoGoogleTasksService = ZainoGoogleTasksService();
   final matrixPrefsService = MatrixPrefsService();
   final widgetSyncService = WidgetSyncService();
   await widgetSyncService.initialize();
@@ -72,6 +77,8 @@ Future<void> main() async {
         RepositoryProvider.value(value: widgetAppearanceService),
         RepositoryProvider.value(value: minimalWidgetSyncService),
         RepositoryProvider.value(value: notificationService),
+        RepositoryProvider.value(value: zainoRepository),
+        RepositoryProvider.value(value: zainoGoogleTasksService),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -95,6 +102,12 @@ Future<void> main() async {
           BlocProvider(
             create: (context) =>
                 CategoryCubit(context.read<CategoryRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ZainoCubit(
+              context.read<ZainoRepository>(),
+              context.read<ZainoGoogleTasksService>(),
+            ),
           ),
         ],
         child: const EisenhowerApp(),

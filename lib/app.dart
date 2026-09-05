@@ -11,8 +11,9 @@ import 'features/auth/presentation/sign_in_page.dart';
 import 'features/categories/presentation/category_cubit.dart';
 import 'features/onboarding/presentation/onboarding_cubit.dart';
 import 'features/onboarding/presentation/onboarding_wizard.dart';
-import 'features/tasks/presentation/matrix_page.dart';
 import 'features/tasks/presentation/task_cubit.dart';
+import 'features/zaini/presentation/zaino_cubit.dart';
+import 'main_shell.dart';
 import 'package:iketasks/l10n/app_localizations.dart';
 
 class EisenhowerApp extends StatelessWidget {
@@ -63,6 +64,7 @@ class EisenhowerApp extends StatelessWidget {
                   if (user != null) {
                     context.read<TaskCubit>().bindUser(user.uid);
                     context.read<CategoryCubit>().bindUser(user.uid);
+                    context.read<ZainoCubit>().bindUser(user.uid);
                   }
                 },
                 builder: (context, state) {
@@ -97,7 +99,7 @@ class EisenhowerApp extends StatelessWidget {
 
                       // Show main app if authenticated
                       if (state.status == AuthStatus.authenticated) {
-                        return const MatrixPage();
+                        return const MainShell();
                       }
 
                       // Show sign-in if not authenticated
