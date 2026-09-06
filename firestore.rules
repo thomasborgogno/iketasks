@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: request comes from the authenticated owner of this user document
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ── User data ────────────────────────────────────────────────────────────
+    match /users/{uid} {
+
+      // Tasks
+      match /tasks/{taskId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Categories
+      match /categories/{categoryId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // ── Zaini ──────────────────────────────────────────────────────────────
+      match /zaini/{zainoId} {
+        allow read, write: if isOwner(uid);
+
+        // Items inside a zaino
+        match /items/{itemId} {
+          allow read, write: if isOwner(uid);
+        }
+
+        // Tags inside a zaino
+        match /tags/{tagId} {
+          allow read, write: if isOwner(uid);
+        }
+      }
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
