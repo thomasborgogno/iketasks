@@ -188,8 +188,7 @@ class _CategoryManagerModalState extends State<CategoryManagerModal> {
               }
               return ReorderableListView.builder(
                 shrinkWrap: true,
-                onReorder: (oldIndex, newIndex) {
-                  if (newIndex > oldIndex) newIndex--;
+                onReorderItem: (oldIndex, newIndex) {
                   final updated = List<TaskCategory>.from(state.categories);
                   final item = updated.removeAt(oldIndex);
                   updated.insert(newIndex, item);
