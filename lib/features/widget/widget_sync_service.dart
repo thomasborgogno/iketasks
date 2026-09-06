@@ -6,7 +6,7 @@ import 'package:home_widget/home_widget.dart';
 import '../tasks/domain/task_item.dart';
 
 class WidgetSyncService {
-  static const _androidProvider = 'EisenhowerGlanceReceiver';
+  static const _androidProvider = 'com.bortho.iketasks.EisenhowerGlanceReceiver';
 
   Future<void> initialize() async {
     await HomeWidget.setAppGroupId('group.com.eisenhower.matrix');
@@ -33,6 +33,6 @@ class WidgetSyncService {
       'matrix_payload',
       jsonEncode(byQuadrant),
     );
-    await HomeWidget.updateWidget(androidName: _androidProvider);
+    await HomeWidget.updateWidget(qualifiedAndroidName: _androidProvider);
   }
 }

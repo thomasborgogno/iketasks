@@ -12,7 +12,9 @@ plugins {
 
 android {
     namespace = "com.bortho.iketasks"
-    compileSdk = flutter.compileSdkVersion
+    // Flutter's bundled default (flutter.compileSdkVersion) lags behind; androidx.glance
+    // needs compileSdk 37+, so override it explicitly.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -86,10 +88,11 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("com.google.firebase:firebase-auth:23.1.0")
-    implementation("com.google.firebase:firebase-firestore:25.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
-    implementation("androidx.glance:glance-appwidget:1.1.1")
-    implementation("androidx.glance:glance-material3:1.1.1")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation(platform("com.google.firebase:firebase-bom:34.18.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
+    implementation("androidx.glance:glance-appwidget:1.3.0-alpha02")
+    implementation("androidx.glance:glance-material3:1.3.0-alpha02")
 }

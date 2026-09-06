@@ -3,7 +3,7 @@ import 'package:home_widget/home_widget.dart';
 import 'data/widget_appearance_settings.dart';
 
 class WidgetAppearanceService {
-  static const _androidProvider = 'EisenhowerGlanceReceiver';
+  static const _androidProvider = 'com.bortho.iketasks.EisenhowerGlanceReceiver';
   static const _prefKey = 'widget_appearance';
 
   WidgetAppearanceSettings _current = WidgetAppearanceSettings.defaults();
@@ -20,6 +20,6 @@ class WidgetAppearanceService {
   Future<void> save(WidgetAppearanceSettings settings) async {
     _current = settings;
     await HomeWidget.saveWidgetData<String>(_prefKey, settings.toJsonString());
-    await HomeWidget.updateWidget(androidName: _androidProvider);
+    await HomeWidget.updateWidget(qualifiedAndroidName: _androidProvider);
   }
 }

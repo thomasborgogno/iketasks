@@ -18,9 +18,8 @@
 #
 # VERSION STRATEGY: patch auto-incremented on every push based on the latest git tag.
 # If no tag exists yet, pubspec.yaml version is used as the base.
-# build number = github.run_number (always unique).
-# Git tag format: v{major}.{minor}.{patch}+{run_number} (e.g. v1.0.7+52).
-# To bump major/minor: push a manual tag v2.0.0+0 — next build will increment from there.
+# Git tag format: v{major}.{minor}.{patch} (e.g. v1.0.7).
+# To bump major/minor: push a manual tag v2.0.0 — next build will increment from there.
 
 name: Release
 
@@ -73,7 +72,7 @@ jobs:
       - name: Compute version
         id: version
         run: |
-          # Find the latest semver tag (format vX.Y.Z or vX.Y.Z+N)
+          # Find the latest semver tag (format vX.Y.Z, ignoring any legacy +N suffix)
           LATEST_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' \
             | sort -t. -k1,1V -k2,2n -k3,3n \
             | tail -1)
@@ -82,7 +81,7 @@ jobs:
             # No tag yet — use pubspec.yaml as base, patch stays as-is
             BASE=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           else
-            # Strip leading 'v' and build suffix (+N)
+            # Strip leading 'v' and any legacy build suffix (+N)
             BASE=$(echo "$LATEST_TAG" | sed 's/^v//' | cut -d'+' -f1)
             # Increment patch
             MAJOR=$(echo "$BASE" | cut -d'.' -f1)
@@ -91,10 +90,8 @@ jobs:
             BASE="${MAJOR}.${MINOR}.$((PATCH + 1))"
           fi
 
-          VERSION_CODE=${{ github.run_number }}
-          echo "version_name=${BASE}"                  >> "$GITHUB_OUTPUT"
-          echo "version_code=${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
-          echo "tag=v${BASE}+${VERSION_CODE}"          >> "$GITHUB_OUTPUT"
+          echo "version_name=${BASE}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${BASE}"         >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         id: changelog
@@ -124,7 +121,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD:      ${{ secrets.KEY_PASSWORD }}
-        run: flutter build apk --release --split-per-abi --build-name=${{ steps.version.outputs.version_name }} --build-number=${{ steps.version.outputs.version_code }}
+        run: flutter build apk --release --split-per-abi --build-name=${{ steps.version.outputs.version_name }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

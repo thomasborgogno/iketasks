@@ -7,7 +7,7 @@ import '../tasks/domain/task_item.dart';
 import 'data/minimal_widget_settings.dart';
 
 class MinimalWidgetSyncService {
-  static const _androidProvider = 'MinimalWidgetReceiver';
+  static const _androidProvider = 'com.bortho.iketasks.MinimalWidgetReceiver';
   static const _settingsKey = 'minimal_widget_settings';
   static const _tasksKey = 'minimal_widget_tasks';
 
@@ -28,7 +28,7 @@ class MinimalWidgetSyncService {
       _settingsKey,
       settings.toJsonString(),
     );
-    await HomeWidget.updateWidget(androidName: _androidProvider);
+    await HomeWidget.updateWidget(qualifiedAndroidName: _androidProvider);
   }
 
   Future<void> pushTasks(List<TaskItem> tasks) async {
@@ -68,6 +68,6 @@ class MinimalWidgetSyncService {
     final taskTitles = limitedTasks.map((t) => t.title).toList();
 
     await HomeWidget.saveWidgetData<String>(_tasksKey, jsonEncode(taskTitles));
-    await HomeWidget.updateWidget(androidName: _androidProvider);
+    await HomeWidget.updateWidget(qualifiedAndroidName: _androidProvider);
   }
 }
