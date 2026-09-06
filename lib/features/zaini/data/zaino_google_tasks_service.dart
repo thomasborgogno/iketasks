@@ -98,7 +98,7 @@ class ZainoGoogleTasksService {
 
   /// Creates a new Google Tasks list with '#' prefix. Returns the list ID.
   Future<String?> createList(String name) async {
-    return _withApi((api) async {
+    return _withApi<String?>((api) async {
       final list = await api.tasklists.insert(
         gtasks.TaskList(title: '#$name'),
       );
@@ -108,7 +108,7 @@ class ZainoGoogleTasksService {
 
   /// Creates a task in a Google Tasks list. Returns the task ID.
   Future<String?> createTask(String listId, String title) async {
-    return _withApi((api) async {
+    return _withApi<String?>((api) async {
       final task = await api.tasks.insert(
         gtasks.Task(title: title, status: 'needsAction'),
         listId,

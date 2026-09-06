@@ -75,7 +75,7 @@ class _ZainoFormSheetState extends State<ZainoFormSheet> {
                   style: const TextStyle(fontSize: 28),
                   textAlign: TextAlign.center,
                   maxLength: 2,
-                  buildCounter: (_, {required count, required isFocused, maxLength}) =>
+                  buildCounter: (_, {required currentLength, required isFocused, maxLength}) =>
                       const SizedBox.shrink(),
                 ),
               ),
