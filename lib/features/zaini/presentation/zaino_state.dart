@@ -73,19 +73,34 @@ class ZainoDetailState extends Equatable {
     );
   }
 
+  /// True when no tags are selected, or every existing tag is selected —
+  /// both cases mean "no filtering", so all items should be shown.
+  bool get _isFilterEffectivelyOff {
+    if (activeTagFilter.isEmpty) return true;
+    if (tags.isEmpty) return true;
+    return tags.every((t) => activeTagFilter.contains(t.name));
+  }
+
   List<ZainoItem> get filteredItems {
-    if (activeTagFilter.isEmpty) return items;
+    if (_isFilterEffectivelyOff) return items;
     return items
         .where((item) => item.tags.any((t) => activeTagFilter.contains(t)))
         .toList();
   }
 
   /// Items grouped by category name. Items without a category are in the '' group.
+  /// Within each group, incomplete items come first (by order), completed items last.
   Map<String, List<ZainoItem>> get itemsByCategory {
     final map = <String, List<ZainoItem>>{};
     for (final item in filteredItems) {
       final key = item.categoryName ?? '';
       map.putIfAbsent(key, () => []).add(item);
+    }
+    for (final list in map.values) {
+      list.sort((a, b) {
+        if (a.completed != b.completed) return a.completed ? 1 : -1;
+        return a.order.compareTo(b.order);
+      });
     }
     return map;
   }

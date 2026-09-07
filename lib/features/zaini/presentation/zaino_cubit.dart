@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 import '../data/zaino_google_tasks_service.dart';
 import '../data/zaino_repository.dart';
@@ -8,6 +9,8 @@ import '../domain/zaino.dart';
 import '../domain/zaino_item.dart';
 import '../domain/zaino_tag.dart';
 import 'zaino_state.dart';
+
+const _uuid = Uuid();
 
 class ZainoCubit extends Cubit<ZainoState> {
   ZainoCubit(this._repo, this._googleTasksService) : super(const ZainoState());
@@ -87,6 +90,7 @@ class ZainoCubit extends Cubit<ZainoState> {
               zaino.id,
               title: taskData.title,
               googleTaskId: taskData.id,
+              completed: taskData.completed,
             );
           } else if (existing.completed != taskData.completed) {
             await _repo.updateItem(
@@ -99,7 +103,7 @@ class ZainoCubit extends Cubit<ZainoState> {
         }
       }
     } finally {
-      emit(state.copyWith(isSyncing: false));
+      if (!isClosed) emit(state.copyWith(isSyncing: false));
     }
   }
 
@@ -199,6 +203,13 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
     final uid = _uid;
     if (uid == null) return;
     final newCompleted = !item.completed;
+    // Optimistic update: show change immediately without waiting for Firestore
+    emit(state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.id == item.id) i.copyWith(completed: newCompleted) else i,
+      ],
+    ));
     await _repo.updateItem(uid, _zaino.id, item.id, completed: newCompleted);
     if (item.googleTaskId != null && _zaino.googleTaskListId != null) {
       await _googleTasksService.setTaskCompleted(
@@ -212,16 +223,25 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   Future<void> resetAll() async {
     final uid = _uid;
     if (uid == null) return;
+    final completedItems = state.items.where((i) => i.completed).toList();
+    if (completedItems.isEmpty) return;
+    // Optimistic update: uncheck everything immediately.
+    emit(state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.completed) i.copyWith(completed: false) else i,
+      ],
+    ));
     await _repo.resetAll(uid, _zaino.id);
     if (_zaino.googleTaskListId != null) {
-      final completedItems = state.items
-          .where((i) => i.completed && i.googleTaskId != null)
+      final googleIds = completedItems
+          .where((i) => i.googleTaskId != null)
           .map((i) => i.googleTaskId!)
           .toList();
-      if (completedItems.isNotEmpty) {
+      if (googleIds.isNotEmpty) {
         await _googleTasksService.resetAllTasks(
           _zaino.googleTaskListId!,
-          completedItems,
+          googleIds,
         );
       }
     }
@@ -234,6 +254,21 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   }) async {
     final uid = _uid;
     if (uid == null) return;
+    final now = DateTime.now();
+    final item = ZainoItem(
+      id: _uuid.v4(),
+      zainoId: _zaino.id,
+      title: title,
+      completed: false,
+      order: state.items.length,
+      categoryName: categoryName,
+      tags: tags,
+      createdAt: now,
+      updatedAt: now,
+    );
+    // Optimistic add: show the new item immediately.
+    emit(state.copyWith(items: [...state.items, item]));
+
     String? googleTaskId;
     if (_zaino.googleTaskListId != null) {
       googleTaskId = await _googleTasksService.createTask(
@@ -248,7 +283,17 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
       categoryName: categoryName,
       tags: tags,
       googleTaskId: googleTaskId,
+      order: item.order,
+      id: item.id,
     );
+    if (googleTaskId != null && !isClosed) {
+      emit(state.copyWith(
+        items: [
+          for (final i in state.items)
+            if (i.id == item.id) i.copyWith(googleTaskId: googleTaskId) else i,
+        ],
+      ));
+    }
   }
 
   Future<void> updateItem(
@@ -260,6 +305,18 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   }) async {
     final uid = _uid;
     if (uid == null) return;
+    final updated = item.copyWith(
+      title: title,
+      categoryName: categoryName,
+      tags: tags,
+      clearCategoryName: clearCategoryName,
+    );
+    // Optimistic update: reflect edits immediately.
+    emit(state.copyWith(
+      items: [
+        for (final i in state.items) if (i.id == item.id) updated else i,
+      ],
+    ));
     await _repo.updateItem(
       uid,
       _zaino.id,
@@ -274,6 +331,10 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   Future<void> deleteItem(ZainoItem item) async {
     final uid = _uid;
     if (uid == null) return;
+    // Optimistic remove.
+    emit(state.copyWith(
+      items: state.items.where((i) => i.id != item.id).toList(),
+    ));
     await _repo.deleteItem(uid, _zaino.id, item.id);
     if (item.googleTaskId != null && _zaino.googleTaskListId != null) {
       await _googleTasksService.deleteTask(
@@ -283,24 +344,72 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
     }
   }
 
+  /// Adds [tagNames] to every item in [itemIds], merging with existing tags.
+  Future<void> bulkAddTags(List<String> itemIds, List<String> tagNames) async {
+    final uid = _uid;
+    if (uid == null || tagNames.isEmpty || itemIds.isEmpty) return;
+    final idSet = itemIds.toSet();
+    final newItems = <ZainoItem>[];
+    for (final i in state.items) {
+      if (idSet.contains(i.id)) {
+        final merged = {...i.tags, ...tagNames}.toList();
+        newItems.add(i.copyWith(tags: merged));
+      } else {
+        newItems.add(i);
+      }
+    }
+    emit(state.copyWith(items: newItems));
+    for (final item in newItems) {
+      if (idSet.contains(item.id)) {
+        await _repo.updateItem(uid, _zaino.id, item.id, tags: item.tags);
+      }
+    }
+  }
+
   Future<void> createTag(String name) async {
     final uid = _uid;
     if (uid == null) return;
-    await _repo.createTag(uid, _zaino.id, name: name);
+    final tag = ZainoTag(
+      id: _uuid.v4(),
+      zainoId: _zaino.id,
+      name: name,
+      order: state.tags.length,
+      createdAt: DateTime.now(),
+    );
+    // Optimistic add.
+    emit(state.copyWith(tags: [...state.tags, tag]));
+    await _repo.createTag(uid, _zaino.id, name: name, order: tag.order, id: tag.id);
   }
 
   Future<void> updateTag(ZainoTag tag, String newName) async {
     final uid = _uid;
     if (uid == null) return;
-    // Update tag name on all items referencing the old name
+    // Update tag name on all items referencing the old name.
     final itemsWithTag = state.items
         .where((i) => i.tags.contains(tag.name))
         .toList();
+    final renamedById = <String, List<String>>{};
     for (final item in itemsWithTag) {
       final newTags = [...item.tags];
       final idx = newTags.indexOf(tag.name);
       if (idx >= 0) newTags[idx] = newName;
-      await _repo.updateItem(uid, _zaino.id, item.id, tags: newTags);
+      renamedById[item.id] = newTags;
+    }
+    // Optimistic update: rename the tag, its item references, and the active filter.
+    emit(state.copyWith(
+      tags: [
+        for (final t in state.tags) if (t.id == tag.id) t.copyWith(name: newName) else t,
+      ],
+      items: [
+        for (final i in state.items)
+          if (renamedById.containsKey(i.id)) i.copyWith(tags: renamedById[i.id]) else i,
+      ],
+      activeTagFilter: [
+        for (final f in state.activeTagFilter) f == tag.name ? newName : f,
+      ],
+    ));
+    for (final entry in renamedById.entries) {
+      await _repo.updateItem(uid, _zaino.id, entry.key, tags: entry.value);
     }
     await _repo.updateTag(uid, _zaino.id, tag.id, name: newName);
   }
@@ -308,6 +417,18 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   Future<void> deleteTag(ZainoTag tag) async {
     final uid = _uid;
     if (uid == null) return;
+    // Optimistic remove: drop the tag and strip it from any item referencing it.
+    emit(state.copyWith(
+      tags: state.tags.where((t) => t.id != tag.id).toList(),
+      items: [
+        for (final i in state.items)
+          if (i.tags.contains(tag.name))
+            i.copyWith(tags: i.tags.where((t) => t != tag.name).toList())
+          else
+            i,
+      ],
+      activeTagFilter: state.activeTagFilter.where((f) => f != tag.name).toList(),
+    ));
     await _repo.deleteTag(uid, _zaino.id, tag.id, tag.name);
   }
 

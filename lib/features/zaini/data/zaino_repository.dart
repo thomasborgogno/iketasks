@@ -113,15 +113,18 @@ class ZainoRepository {
     List<String> tags = const [],
     String? googleTaskId,
     int? order,
+    bool completed = false,
+    String? id,
   }) async {
-    final existingCount = await _itemsRef(uid, zainoId).count().get();
+    final resolvedOrder = order ??
+        ((await _itemsRef(uid, zainoId).count().get()).count ?? 0);
     final now = DateTime.now();
     final item = ZainoItem(
-      id: _uuid.v4(),
+      id: id ?? _uuid.v4(),
       zainoId: zainoId,
       title: title,
-      completed: false,
-      order: order ?? (existingCount.count ?? 0),
+      completed: completed,
+      order: resolvedOrder,
       googleTaskId: googleTaskId,
       categoryName: categoryName,
       tags: tags,
@@ -207,13 +210,16 @@ class ZainoRepository {
     String uid,
     String zainoId, {
     required String name,
+    int? order,
+    String? id,
   }) async {
-    final existingCount = await _tagsRef(uid, zainoId).count().get();
+    final resolvedOrder =
+        order ?? ((await _tagsRef(uid, zainoId).count().get()).count ?? 0);
     final tag = ZainoTag(
-      id: _uuid.v4(),
+      id: id ?? _uuid.v4(),
       zainoId: zainoId,
       name: name,
-      order: existingCount.count ?? 0,
+      order: resolvedOrder,
       createdAt: DateTime.now(),
     );
     await _tagsRef(uid, zainoId).doc(tag.id).set(tag.toMap());
