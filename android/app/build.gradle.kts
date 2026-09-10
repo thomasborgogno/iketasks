@@ -67,12 +67,19 @@ android {
             versionNameSuffix = "-debug"
         }
         release {
+            // NOTE: this block is configured by Gradle for every task, including
+            // `assembleDebug` - it must never throw here, or debug builds break too.
             val hasReleaseKeys = System.getenv("KEYSTORE_PATH") != null
                 || keyPropsFile.exists()
-            if (!hasReleaseKeys) {
-                throw GradleException("Release signing keys not found. Set KEYSTORE_PATH env var or provide key.properties.")
+            signingConfig = if (hasReleaseKeys) {
+                signingConfigs.getByName("release")
+            } else {
+                logger.warn(
+                    "Release signing keys not found (set KEYSTORE_PATH env var or provide " +
+                        "key.properties) - falling back to debug signing for release builds."
+                )
+                signingConfigs.getByName("debug")
             }
-            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

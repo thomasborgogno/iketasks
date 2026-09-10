@@ -1,0 +1,59 @@
+# Build a debug APK on demand for manual testing, without creating a
+# GitHub Release or a version tag.
+#
+# The debug build type has an applicationId suffix (com.bortho.iketasks.debug,
+# see android/app/build.gradle.kts), so it installs side-by-side with a real
+# release build instead of overwriting it, and uses Flutter's auto-generated
+# debug signing key (no release keystore needed).
+#
+# HOW TO USE (from a phone, no PC needed):
+#   1. Open the repo on GitHub -> Actions tab -> "Test build" workflow.
+#   2. Tap "Run workflow" (top right) -> Run workflow.
+#   3. Wait a few minutes for it to finish (green check).
+#   4. Open the finished run, scroll to "Artifacts", download "app-test-apk".
+#   5. Open the downloaded .apk from your phone's Downloads to install it
+#      (Android will ask to allow installs from that source the first time).
+
+name: Test build
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Decode google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > android/app/google-services.json
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug APK (arm64)
+        run: flutter build apk --debug --target-platform android-arm64
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-test-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
