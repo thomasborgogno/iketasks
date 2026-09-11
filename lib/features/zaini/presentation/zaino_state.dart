@@ -88,21 +88,26 @@ class ZainoDetailState extends Equatable {
         .toList();
   }
 
-  /// Items grouped by category name. Items without a category are in the '' group.
-  /// Within each group, incomplete items come first (by order), completed items last.
+  /// Incomplete items grouped by category name. Items without a category are
+  /// in the '' group. Completed items are excluded — see [completedItems].
   Map<String, List<ZainoItem>> get itemsByCategory {
     final map = <String, List<ZainoItem>>{};
     for (final item in filteredItems) {
+      if (item.completed) continue;
       final key = item.categoryName ?? '';
       map.putIfAbsent(key, () => []).add(item);
     }
     for (final list in map.values) {
-      list.sort((a, b) {
-        if (a.completed != b.completed) return a.completed ? 1 : -1;
-        return a.order.compareTo(b.order);
-      });
+      list.sort((a, b) => a.order.compareTo(b.order));
     }
     return map;
+  }
+
+  /// Completed items across all categories, shown separately at the bottom
+  /// of the page instead of inline within each category.
+  List<ZainoItem> get completedItems {
+    return filteredItems.where((i) => i.completed).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
   }
 
   @override

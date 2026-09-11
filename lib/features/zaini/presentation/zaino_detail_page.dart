@@ -6,6 +6,7 @@ import '../domain/zaino_item.dart';
 import 'zaini_search_delegate.dart';
 import 'zaino_cubit.dart';
 import 'zaino_state.dart';
+import 'widgets/zaino_category_sheet.dart';
 import 'widgets/zaino_item_form_sheet.dart';
 import 'widgets/zaino_tag_sheet.dart';
 
@@ -31,7 +32,24 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
   /// undo window in the confirmation SnackBar.
   final Set<String> _pendingDeleteIds = {};
 
+  /// Maps an item id to its completed status *before* an in-flight toggle,
+  /// for the brief window right after tapping its checkbox. Keeping the item
+  /// classified under its pre-toggle section (incomplete vs. completed) for
+  /// this window lets the user see the checkbox tick/strikethrough settle
+  /// before the row animates away to its new section.
+  final Map<String, bool> _frozenCompleted = {};
+
   bool get _selectionMode => _selectedIds.isNotEmpty;
+
+  void _handleToggle(BuildContext context, ZainoItem item) {
+    final cubit = context.read<ZainoDetailCubit>();
+    setState(() => _frozenCompleted[item.id] = item.completed);
+    cubit.toggleItem(item);
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      setState(() => _frozenCompleted.remove(item.id));
+    });
+  }
 
   void _toggleSelected(String id) {
     setState(() {
@@ -51,13 +69,18 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
       builder: (context, state) {
         final categories = _distinctCategories(state.items);
         final byCategory = _visibleByCategory(state);
-        final visibleCount =
-            byCategory.values.fold<int>(0, (sum, list) => sum + list.length);
+        final completed = _visibleCompleted(state);
+        final incompleteCount = byCategory.values.fold<int>(
+          0,
+          (sum, list) => sum + list.length,
+        );
+        final visibleCount = incompleteCount + completed.length;
 
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              SliverAppBar.large(
+              SliverAppBar(
+                pinned: true,
                 leading: _selectionMode
                     ? IconButton(
                         icon: const Icon(Icons.close),
@@ -83,11 +106,22 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                 actions: _selectionMode
                     ? [
                         IconButton(
+                          icon: const Icon(Icons.category_outlined),
+                          tooltip: 'Assegna categoria',
+                          onPressed: () =>
+                              _showBulkCategoryDialog(context, categories),
+                        ),
+                        IconButton(
                           icon: const Icon(Icons.label_outline),
                           tooltip: 'Assegna tag',
                           onPressed: state.tags.isEmpty
                               ? null
                               : () => _showBulkTagDialog(context, state),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          tooltip: 'Elimina selezionati',
+                          onPressed: () => _handleBulkDelete(context, state),
                         ),
                       ]
                     : [
@@ -99,8 +133,12 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                               context: context,
                               delegate: ZainoItemSearchDelegate(
                                 items: state.items,
-                                onItemTap: (item) =>
-                                    _showEditItem(context, state, categories, item),
+                                onItemTap: (item) => _showEditItem(
+                                  context,
+                                  state,
+                                  categories,
+                                  item,
+                                ),
                               ),
                             );
                             if (item != null && context.mounted) {
@@ -109,20 +147,18 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.label_outline),
-                          tooltip: 'Gestisci tag',
-                          onPressed: () => _showTagSheet(context),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          tooltip: 'Reimposta tutto',
-                          onPressed: () => _confirmReset(context),
+                          icon: const Icon(Icons.more_vert),
+                          tooltip: 'Altre opzioni',
+                          onPressed: () => _showOptionsSheet(context),
                         ),
                       ],
               ),
-              if (!_selectionMode && state.tags.isNotEmpty)
+              if (!_selectionMode)
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
                   sliver: SliverToBoxAdapter(
                     child: _TagFilterRow(state: state),
                   ),
@@ -137,35 +173,87 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                     onAdd: () => _showAddItem(context, state, categories),
                   ),
                 )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 96),
-                  sliver: _buildItemsSliver(context, state, categories, byCategory),
-                ),
+              else ...[
+                _buildItemsSliver(context, state, categories, byCategory),
+                if (completed.isNotEmpty)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 96),
+                    sliver: SliverToBoxAdapter(
+                      child: _CompletedItemsCard(
+                        items: completed,
+                        selectedIds: _selectedIds,
+                        selectionMode: _selectionMode,
+                        onItemEdit: (item) =>
+                            _showEditItem(context, state, categories, item),
+                        onItemToggle: (item) => _handleToggle(context, item),
+                        onItemSelectToggle: _toggleSelected,
+                        onItemLongPress: (id) {
+                          if (!_selectionMode) _toggleSelected(id);
+                        },
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
           floatingActionButton: _selectionMode
               ? null
-              : FloatingActionButton(
-                  onPressed: () => _showAddItem(context, state, categories),
-                  child: const Icon(Icons.add),
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FloatingActionButton.small(
+                      heroTag: 'zaino-reset-fab',
+                      tooltip: 'Reimposta tutto',
+                      onPressed: () => _confirmReset(context),
+                      child: const Icon(Icons.refresh),
+                    ),
+                    const SizedBox(height: 12),
+                    FloatingActionButton(
+                      heroTag: 'zaino-add-fab',
+                      onPressed: () => _showAddItem(context, state, categories),
+                      child: const Icon(Icons.add),
+                    ),
+                  ],
                 ),
         );
       },
     );
   }
 
-  /// [ZainoDetailState.itemsByCategory] with any pending-delete items removed.
+  /// Whether [item] should be classified as completed for display purposes:
+  /// its real status, unless a toggle is still in its brief "freeze" window
+  /// (see [_frozenCompleted]), in which case it keeps its pre-toggle section.
+  bool _isCompletedForDisplay(ZainoItem item) =>
+      _frozenCompleted[item.id] ?? item.completed;
+
+  /// Incomplete items (for display) grouped by category, with pending
+  /// deletes and in-flight toggle freezes applied.
   Map<String, List<ZainoItem>> _visibleByCategory(ZainoDetailState state) {
-    final grouped = state.itemsByCategory;
-    if (_pendingDeleteIds.isEmpty) return grouped;
-    final result = <String, List<ZainoItem>>{};
-    grouped.forEach((key, items) {
-      final filtered =
-          items.where((i) => !_pendingDeleteIds.contains(i.id)).toList();
-      if (filtered.isNotEmpty) result[key] = filtered;
-    });
-    return result;
+    final map = <String, List<ZainoItem>>{};
+    for (final item in state.filteredItems) {
+      if (_pendingDeleteIds.contains(item.id)) continue;
+      if (_isCompletedForDisplay(item)) continue;
+      map.putIfAbsent(item.categoryName ?? '', () => []).add(item);
+    }
+    for (final list in map.values) {
+      list.sort((a, b) => a.order.compareTo(b.order));
+    }
+    return map;
+  }
+
+  /// Completed items (for display), with pending deletes and in-flight
+  /// toggle freezes applied — see [_visibleByCategory].
+  List<ZainoItem> _visibleCompleted(ZainoDetailState state) {
+    final list =
+        state.filteredItems
+            .where(
+              (item) =>
+                  !_pendingDeleteIds.contains(item.id) &&
+                  _isCompletedForDisplay(item),
+            )
+            .toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
+    return list;
   }
 
   Widget _buildItemsSliver(
@@ -182,8 +270,7 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
       selectedIds: _selectedIds,
       selectionMode: _selectionMode,
       onItemEdit: (item) => _showEditItem(context, state, categories, item),
-      onItemDelete: (item) => _handleDeleteRequested(context, item),
-      onItemToggle: (item) => context.read<ZainoDetailCubit>().toggleItem(item),
+      onItemToggle: (item) => _handleToggle(context, item),
       onItemSelectToggle: _toggleSelected,
       onItemLongPress: (id) {
         if (!_selectionMode) _toggleSelected(id);
@@ -191,27 +278,133 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     );
   }
 
-  void _handleDeleteRequested(BuildContext context, ZainoItem item) {
+  /// Deletes every currently-selected item (single or multi-selection alike),
+  /// with an undo window via a "ANNULLA" SnackBar, then exits selection mode.
+  void _handleBulkDelete(BuildContext context, ZainoDetailState state) {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
     final cubit = context.read<ZainoDetailCubit>();
+    final items = state.items.where((i) => ids.contains(i.id)).toList();
     final messenger = ScaffoldMessenger.of(context);
-    setState(() => _pendingDeleteIds.add(item.id));
+    setState(() {
+      _pendingDeleteIds.addAll(ids);
+      _selectedIds.clear();
+    });
     messenger.hideCurrentSnackBar();
     messenger
         .showSnackBar(
           SnackBar(
-            content: Text('"${item.title}" eliminato'),
+            content: Text(
+              items.length == 1
+                  ? '"${items.first.title}" eliminato'
+                  : '${items.length} elementi eliminati',
+            ),
             duration: const Duration(seconds: 4),
             action: SnackBarAction(label: 'ANNULLA', onPressed: () {}),
           ),
         )
         .closed
         .then((reason) {
-      if (!mounted) return;
-      if (reason != SnackBarClosedReason.action) {
-        cubit.deleteItem(item);
-      }
-      setState(() => _pendingDeleteIds.remove(item.id));
-    });
+          if (!mounted) return;
+          if (reason != SnackBarClosedReason.action) {
+            for (final item in items) {
+              cubit.deleteItem(item);
+            }
+          }
+          setState(() => _pendingDeleteIds.removeAll(ids));
+        });
+  }
+
+  Future<void> _showBulkCategoryDialog(
+    BuildContext context,
+    List<String> categories,
+  ) async {
+    String? selectedCategory;
+    final extraCategories = <String>{};
+    final apply = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          final allCategories = [...categories, ...extraCategories];
+          return AlertDialog(
+            title: const Text('Assegna categoria'),
+            content: SingleChildScrollView(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  for (final cat in allCategories)
+                    ChoiceChip(
+                      label: Text(cat),
+                      selected: selectedCategory == cat,
+                      onSelected: (v) => setDialogState(
+                        () => selectedCategory = v ? cat : null,
+                      ),
+                    ),
+                  ActionChip(
+                    label: const Icon(Icons.add, size: 18),
+                    onPressed: () async {
+                      final name = await _promptForCategoryName(ctx);
+                      if (name == null || name.isEmpty) return;
+                      setDialogState(() {
+                        if (!allCategories.contains(name)) {
+                          extraCategories.add(name);
+                        }
+                        selectedCategory = name;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Annulla'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Applica'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    if (apply == true && context.mounted) {
+      await context.read<ZainoDetailCubit>().bulkSetCategory(
+        _selectedIds.toList(),
+        selectedCategory,
+      );
+    }
+    if (mounted) _clearSelection();
+  }
+
+  Future<String?> _promptForCategoryName(BuildContext context) {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nuova categoria'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(labelText: 'Nome categoria'),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text('Crea'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _showBulkTagDialog(
@@ -258,9 +451,10 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
       ),
     );
     if (apply == true && selectedTags.isNotEmpty && context.mounted) {
-      await context
-          .read<ZainoDetailCubit>()
-          .bulkAddTags(_selectedIds.toList(), selectedTags.toList());
+      await context.read<ZainoDetailCubit>().bulkAddTags(
+        _selectedIds.toList(),
+        selectedTags.toList(),
+      );
     }
     if (mounted) _clearSelection();
   }
@@ -289,12 +483,13 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     ZainoDetailState state,
     List<String> categories,
   ) async {
+    final cubit = context.read<ZainoDetailCubit>();
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ZainoItemFormSheet(
-        tags: state.tags,
-        categories: categories,
+      builder: (_) => BlocProvider.value(
+        value: cubit,
+        child: ZainoItemFormSheet(tags: state.tags, categories: categories),
       ),
     );
     if (result == null || !context.mounted) return;
@@ -311,13 +506,17 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     List<String> categories,
     ZainoItem item,
   ) async {
+    final cubit = context.read<ZainoDetailCubit>();
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ZainoItemFormSheet(
-        tags: state.tags,
-        categories: categories,
-        item: item,
+      builder: (_) => BlocProvider.value(
+        value: cubit,
+        child: ZainoItemFormSheet(
+          tags: state.tags,
+          categories: categories,
+          item: item,
+        ),
       ),
     );
     if (result == null || !context.mounted) return;
@@ -331,14 +530,57 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     );
   }
 
-  Future<void> _showTagSheet(BuildContext context) async {
+  Future<void> _showOptionsSheet(BuildContext context) async {
+    final cubit = context.read<ZainoDetailCubit>();
+    await showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.label_outline),
+              title: const Text('Gestisci tag'),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showTagSheet(context, cubit);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.category_outlined),
+              title: const Text('Gestisci categorie'),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showCategorySheet(context, cubit);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showTagSheet(
+    BuildContext context,
+    ZainoDetailCubit cubit,
+  ) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => BlocProvider.value(
-        value: context.read<ZainoDetailCubit>(),
-        child: const ZainoTagSheet(),
-      ),
+      builder: (ctx) =>
+          BlocProvider.value(value: cubit, child: const ZainoTagSheet()),
+    );
+  }
+
+  Future<void> _showCategorySheet(
+    BuildContext context,
+    ZainoDetailCubit cubit,
+  ) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) =>
+          BlocProvider.value(value: cubit, child: const ZainoCategorySheet()),
     );
   }
 
@@ -406,11 +648,13 @@ List<_Row> _buildRowList(
       rows.add(const _HeaderRow('Altro'));
     }
     for (var i = 0; i < items.length; i++) {
-      rows.add(_ItemRow(
-        items[i],
-        isFirstInGroup: !showHeader && i == 0,
-        isLastInGroup: i == items.length - 1,
-      ));
+      rows.add(
+        _ItemRow(
+          items[i],
+          isFirstInGroup: !showHeader && i == 0,
+          isLastInGroup: i == items.length - 1,
+        ),
+      );
     }
   }
   return rows;
@@ -426,7 +670,6 @@ class _AnimatedItemsSliver extends StatefulWidget {
     required this.selectedIds,
     required this.selectionMode,
     required this.onItemEdit,
-    required this.onItemDelete,
     required this.onItemToggle,
     required this.onItemSelectToggle,
     required this.onItemLongPress,
@@ -437,7 +680,6 @@ class _AnimatedItemsSliver extends StatefulWidget {
   final Set<String> selectedIds;
   final bool selectionMode;
   final void Function(ZainoItem) onItemEdit;
-  final void Function(ZainoItem) onItemDelete;
   final void Function(ZainoItem) onItemToggle;
   final void Function(String) onItemSelectToggle;
   final void Function(String) onItemLongPress;
@@ -450,7 +692,6 @@ class _AnimatedItemsSliverState extends State<_AnimatedItemsSliver> {
   final GlobalKey<SliverAnimatedListState> _listKey = GlobalKey();
   // Mirrors what SliverAnimatedList currently shows.
   late List<_Row> _live;
-  int _generation = 0;
 
   @override
   void initState() {
@@ -463,47 +704,26 @@ class _AnimatedItemsSliverState extends State<_AnimatedItemsSliver> {
     super.didUpdateWidget(old);
     final newRows = _buildRowList(widget.orderedKeys, widget.byCategory);
 
-    // Find items whose completion status changed.
-    final oldItemMap = {
-      for (final r in _live)
-        if (r is _ItemRow) r.item.id: r.item,
-    };
-    final newItemMap = {
-      for (final r in newRows)
-        if (r is _ItemRow) r.item.id: r.item,
-    };
-    final changedIds = <String>{
-      for (final id in oldItemMap.keys)
-        if (newItemMap.containsKey(id) &&
-            newItemMap[id]!.completed != oldItemMap[id]!.completed)
-          id,
-    };
-
     // SliverAnimatedList tracks its own internal item count, which only ever
     // changes via insertItem/removeItem. If the row count changes (item or
-    // category added/removed) we MUST go through _reconcile to keep that
-    // count in sync — swapping `_live` directly here would desync it and
-    // silently break rendering until the widget is fully remounted (which is
-    // exactly why new items/categories used to only show up after leaving
-    // and re-entering the page).
-    if (_live.length != newRows.length || changedIds.length > 3) {
+    // category added/removed — completing an item now removes its row
+    // entirely, since completed items live in the separate completed card)
+    // we MUST go through _reconcile to keep that count in sync — swapping
+    // `_live` directly here would desync it and silently break rendering
+    // until the widget is fully remounted.
+    if (_live.length != newRows.length) {
       _reconcile(newRows);
       return;
     }
 
-    if (changedIds.isEmpty) {
-      // Same rows, same order — only content changed (e.g. title/tags
-      // edited, or selection-mode/selected-ids re-render).
-      setState(() => _live = newRows);
-      return;
-    }
-
-    // Only completion status changed for 1-3 items: nice two-phase animation.
-    _animateCompletionChange(newRows, changedIds);
+    // Same rows, same order — only content changed (e.g. title/tags edited,
+    // or selection-mode/selected-ids re-render).
+    setState(() => _live = newRows);
   }
 
-  String _rowKey(_Row r) =>
-      r is _ItemRow ? 'item:${r.item.id}' : 'header:${(r as _HeaderRow).category}';
+  String _rowKey(_Row r) => r is _ItemRow
+      ? 'item:${r.item.id}'
+      : 'header:${(r as _HeaderRow).category}';
 
   Widget _rowWidget(_Row row) {
     if (row is _HeaderRow) return _CategoryHeader(category: row.category);
@@ -514,9 +734,6 @@ class _AnimatedItemsSliverState extends State<_AnimatedItemsSliver> {
   /// driving SliverAnimatedList's remove/insert APIs so its internal item
   /// count never drifts out of sync with `_live.length`.
   void _reconcile(List<_Row> newRows) {
-    // Invalidate any in-flight two-phase completion animation: its captured
-    // indices would no longer be valid once the row set changes structurally.
-    _generation++;
     final newKeySet = newRows.map(_rowKey).toSet();
     final oldKeySet = _live.map(_rowKey).toSet();
 
@@ -550,92 +767,6 @@ class _AnimatedItemsSliverState extends State<_AnimatedItemsSliver> {
     setState(() => _live = newRows);
   }
 
-  /// Phase 1: update the checkbox + strikethrough for the toggled items
-  /// immediately, in place, with no reordering. Phase 2: after a short pause
-  /// (so the user clearly sees the checked state), animate the item(s) out of
-  /// their old spot and back in at the bottom of their category.
-  void _animateCompletionChange(List<_Row> newRows, Set<String> changedIds) {
-    final newItemMap = {
-      for (final r in newRows)
-        if (r is _ItemRow) r.item.id: r.item,
-    };
-
-    setState(() {
-      for (final id in changedIds) {
-        final idx = _live.indexWhere((r) => r is _ItemRow && r.item.id == id);
-        if (idx < 0) continue;
-        final newItem = newItemMap[id];
-        if (newItem == null) continue;
-        final oldRow = _live[idx] as _ItemRow;
-        _live[idx] = _ItemRow(
-          newItem,
-          isFirstInGroup: oldRow.isFirstInGroup,
-          isLastInGroup: oldRow.isLastInGroup,
-        );
-      }
-    });
-
-    final generation = ++_generation;
-    Future.delayed(const Duration(milliseconds: 450), () {
-      if (!mounted || generation != _generation) return;
-
-      final removals = <(int, ZainoItem)>[];
-      for (final id in changedIds) {
-        final idx = _live.indexWhere((r) => r is _ItemRow && r.item.id == id);
-        if (idx >= 0) removals.add((idx, (_live[idx] as _ItemRow).item));
-      }
-      removals.sort((a, b) => b.$1.compareTo(a.$1));
-
-      for (final (idx, item) in removals) {
-        _listKey.currentState?.removeItem(
-          idx,
-          (ctx, anim) => SizeTransition(
-            sizeFactor: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
-            child: FadeTransition(
-              opacity: anim,
-              child: _buildTile(_ItemRow(item)),
-            ),
-          ),
-          duration: const Duration(milliseconds: 250),
-        );
-        _live.removeAt(idx);
-      }
-
-      Future.delayed(const Duration(milliseconds: 270), () {
-        if (!mounted || generation != _generation) return;
-        for (final id in changedIds) {
-          final newIdx =
-              newRows.indexWhere((r) => r is _ItemRow && r.item.id == id);
-          if (newIdx < 0) continue;
-          final newRow = newRows[newIdx] as _ItemRow;
-
-          int insertAt = _live.length;
-          for (int i = newIdx - 1; i >= 0; i--) {
-            final pred = newRows[i];
-            final liveIdx = _live.indexWhere((r) {
-              if (r is _ItemRow && pred is _ItemRow) return r.item.id == pred.item.id;
-              if (r is _HeaderRow && pred is _HeaderRow) {
-                return r.category == pred.category;
-              }
-              return false;
-            });
-            if (liveIdx >= 0) {
-              insertAt = liveIdx + 1;
-              break;
-            }
-          }
-          insertAt = insertAt.clamp(0, _live.length);
-          _live.insert(insertAt, newRow);
-          _listKey.currentState?.insertItem(
-            insertAt,
-            duration: const Duration(milliseconds: 250),
-          );
-        }
-        setState(() {});
-      });
-    });
-  }
-
   Widget _buildTile(_ItemRow row) {
     final item = row.item;
     final selected = widget.selectedIds.contains(item.id);
@@ -647,7 +778,6 @@ class _AnimatedItemsSliverState extends State<_AnimatedItemsSliver> {
       selectionMode: widget.selectionMode,
       selected: selected,
       onEdit: () => widget.onItemEdit(item),
-      onDelete: () => widget.onItemDelete(item),
       onToggle: () => widget.onItemToggle(item),
       onSelectToggle: () => widget.onItemSelectToggle(item.id),
       onLongPress: () => widget.onItemLongPress(item.id),
@@ -683,31 +813,61 @@ class _TagFilterRow extends StatelessWidget {
 
   final ZainoDetailState state;
 
+  Future<void> _addTag(BuildContext context) async {
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nuovo tag'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(labelText: 'Nome tag'),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text('Crea'),
+          ),
+        ],
+      ),
+    );
+    if (name == null || name.isEmpty || !context.mounted) return;
+    await context.read<ZainoDetailCubit>().createTag(name);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: state.tags.map((tag) {
-          final active = state.activeTagFilter.contains(tag.name);
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(tag.name),
-              selected: active,
-              onSelected: (v) {
-                final current = List<String>.from(state.activeTagFilter);
-                if (v) {
-                  current.add(tag.name);
-                } else {
-                  current.remove(tag.name);
-                }
-                context.read<ZainoDetailCubit>().setTagFilter(current);
-              },
-            ),
-          );
-        }).toList(),
-      ),
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        for (final tag in state.tags)
+          FilterChip(
+            label: Text(tag.name),
+            selected: state.activeTagFilter.contains(tag.name),
+            onSelected: (v) {
+              final current = List<String>.from(state.activeTagFilter);
+              if (v) {
+                current.add(tag.name);
+              } else {
+                current.remove(tag.name);
+              }
+              context.read<ZainoDetailCubit>().setTagFilter(current);
+            },
+          ),
+        ActionChip(
+          label: const Icon(Icons.add, size: 18),
+          onPressed: () => _addTag(context),
+        ),
+      ],
     );
   }
 }
@@ -721,7 +881,7 @@ class _CategoryHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
@@ -743,7 +903,6 @@ class _ItemTile extends StatelessWidget {
     super.key,
     required this.item,
     required this.onEdit,
-    required this.onDelete,
     required this.onToggle,
     required this.onSelectToggle,
     required this.onLongPress,
@@ -755,7 +914,6 @@ class _ItemTile extends StatelessWidget {
 
   final ZainoItem item;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
   final VoidCallback onToggle;
   final VoidCallback onSelectToggle;
   final VoidCallback onLongPress;
@@ -771,36 +929,47 @@ class _ItemTile extends StatelessWidget {
       top: isFirstInGroup ? _cardRadius : Radius.zero,
       bottom: isLastInGroup ? _cardRadius : Radius.zero,
     );
+    final isSelected = selectionMode && selected;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(12, 0, 12, isLastInGroup ? 12 : 0),
+      margin: EdgeInsets.fromLTRB(12, 0, 12, isLastInGroup ? 8 : 0),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: isSelected
+            ? theme.colorScheme.secondaryContainer
+            : theme.colorScheme.surfaceContainerLow,
         borderRadius: radius,
       ),
       child: ClipRRect(
         borderRadius: radius,
         child: Dismissible(
           key: Key('dismissible_${item.id}'),
-          direction:
-              selectionMode ? DismissDirection.none : DismissDirection.endToStart,
-          // Require a larger swipe than the default before committing to a
-          // delete, so a shallow edge-swipe (e.g. the OS "back" gesture)
-          // doesn't accidentally remove an item.
-          dismissThresholds: const {DismissDirection.endToStart: 0.6},
-          background: Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 16),
-            color: theme.colorScheme.errorContainer,
-            child: Icon(
-              Icons.delete_outline,
-              color: theme.colorScheme.onErrorContainer,
-            ),
+          // Swiping either way just toggles completion — trivially
+          // reversible, so no confirmation/undo banner is needed. We always
+          // return false from confirmDismiss so the tile springs back to
+          // place instead of being removed from the tree.
+          direction: selectionMode
+              ? DismissDirection.none
+              : DismissDirection.horizontal,
+          dismissThresholds: const {
+            DismissDirection.startToEnd: 0.4,
+            DismissDirection.endToStart: 0.4,
+          },
+          background: _SwipeToggleBackground(
+            alignment: Alignment.centerLeft,
+            completed: item.completed,
           ),
-          onDismissed: (_) => onDelete(),
+          secondaryBackground: _SwipeToggleBackground(
+            alignment: Alignment.centerRight,
+            completed: item.completed,
+          ),
+          confirmDismiss: (_) async {
+            onToggle();
+            return false;
+          },
           child: ListTile(
+            shape: RoundedRectangleBorder(borderRadius: radius),
             leading: Checkbox(
-              value: selectionMode ? selected : item.completed,
+              value: item.completed,
               onChanged: (_) => selectionMode ? onSelectToggle() : onToggle(),
             ),
             title: Text(
@@ -812,28 +981,105 @@ class _ItemTile extends StatelessWidget {
                     )
                   : null,
             ),
-            subtitle: item.tags.isNotEmpty
-                ? Wrap(
-                    spacing: 4,
-                    children: item.tags
-                        .map(
-                          (t) => Chip(
-                            label: Text(t, style: const TextStyle(fontSize: 11)),
-                            padding: EdgeInsets.zero,
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        )
-                        .toList(),
+            trailing: item.tags.isNotEmpty
+                ? Text(
+                    item.tags.join(' · '),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   )
                 : null,
-            selected: selectionMode && selected,
-            selectedTileColor:
-                theme.colorScheme.secondaryContainer.withValues(alpha: 0.35),
+            // Background color for selection comes from the outer Container
+            // above (so it respects the group's rounded corners); the tile
+            // itself stays transparent.
+            selected: isSelected,
             onTap: selectionMode ? onSelectToggle : onEdit,
             onLongPress: onLongPress,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Background revealed behind an [_ItemTile] while swiping it in either
+/// direction — swiping always toggles completion, so the icon reflects
+/// whichever action the swipe would perform.
+class _SwipeToggleBackground extends StatelessWidget {
+  const _SwipeToggleBackground({
+    required this.alignment,
+    required this.completed,
+  });
+
+  final Alignment alignment;
+  final bool completed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      color: theme.colorScheme.primaryContainer,
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Icon(
+        completed ? Icons.replay : Icons.check,
+        color: theme.colorScheme.onPrimaryContainer,
+      ),
+    );
+  }
+}
+
+class _CompletedItemsCard extends StatelessWidget {
+  const _CompletedItemsCard({
+    required this.items,
+    required this.selectedIds,
+    required this.selectionMode,
+    required this.onItemEdit,
+    required this.onItemToggle,
+    required this.onItemSelectToggle,
+    required this.onItemLongPress,
+  });
+
+  final List<ZainoItem> items;
+  final Set<String> selectedIds;
+  final bool selectionMode;
+  final void Function(ZainoItem) onItemEdit;
+  final void Function(ZainoItem) onItemToggle;
+  final void Function(String) onItemSelectToggle;
+  final void Function(String) onItemLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Theme(
+      // Suppress the divider ExpansionTile draws above/below itself.
+      data: theme.copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+        title: Text(
+          'Completati (${items.length})',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        children: [
+          for (var i = 0; i < items.length; i++)
+            _ItemTile(
+              key: Key(items[i].id),
+              item: items[i],
+              isFirstInGroup: i == 0,
+              isLastInGroup: i == items.length - 1,
+              selectionMode: selectionMode,
+              selected: selectedIds.contains(items[i].id),
+              onEdit: () => onItemEdit(items[i]),
+              onToggle: () => onItemToggle(items[i]),
+              onSelectToggle: () => onItemSelectToggle(items[i].id),
+              onLongPress: () => onItemLongPress(items[i].id),
+            ),
+        ],
       ),
     );
   }

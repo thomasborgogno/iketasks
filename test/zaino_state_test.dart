@@ -66,12 +66,12 @@ void main() {
   });
 
   group('ZainoDetailState.itemsByCategory', () {
-    test('sorts completed items to the bottom within each category', () {
+    test('excludes completed items — they live in completedItems instead', () {
       final done = _item('done', categoryName: 'Cat', completed: true, order: 0);
       final todo = _item('todo', categoryName: 'Cat', completed: false, order: 1);
       final state = ZainoDetailState(items: [done, todo]);
 
-      expect(state.itemsByCategory['Cat'], [todo, done]);
+      expect(state.itemsByCategory['Cat'], [todo]);
     });
 
     test('groups uncategorized items under the empty-string key', () {
@@ -81,6 +81,17 @@ void main() {
 
       expect(state.itemsByCategory['Cat'], [a]);
       expect(state.itemsByCategory[''], [b]);
+    });
+  });
+
+  group('ZainoDetailState.completedItems', () {
+    test('collects completed items across categories, ordered by order', () {
+      final doneB = _item('doneB', categoryName: 'B', completed: true, order: 1);
+      final doneA = _item('doneA', categoryName: 'A', completed: true, order: 0);
+      final todo = _item('todo', categoryName: 'A', completed: false, order: 2);
+      final state = ZainoDetailState(items: [doneB, doneA, todo]);
+
+      expect(state.completedItems, [doneA, doneB]);
     });
   });
 }

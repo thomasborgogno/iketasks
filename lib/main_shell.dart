@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 
@@ -17,10 +15,26 @@ class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
   late final PageController _pageController;
 
-  static const _pages = [
-    MatrixPage(),
-    ZainiListPage(),
+  static const _pages = [MatrixPage(), ZainiListPage()];
+
+  static const _navItems = [
+    (
+      icon: Icons.grid_view_outlined,
+      selectedIcon: Icons.grid_view,
+      label: 'Matrice',
+    ),
+    (
+      icon: Icons.backpack_outlined,
+      selectedIcon: Icons.backpack,
+      label: 'Zaini',
+    ),
   ];
+
+  static const _labelStyle = TextStyle(
+    fontFamily: 'GoogleSansFlex',
+    fontWeight: FontWeight.w600,
+    fontSize: 14,
+  );
 
   @override
   void initState() {
@@ -44,47 +58,59 @@ class _MainShellState extends State<MainShell> {
     );
   }
 
+  double _itemWidth(String label, bool selected, TextScaler textScaler) {
+    final labelWidth = (TextPainter(
+      text: TextSpan(text: label, style: _labelStyle),
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+    )..layout()).width;
+    final iconPart = selected ? _NavItem.iconSize + _NavItem.iconLabelGap : 0.0;
+    // Small safety margin: text measurement can be a fraction of a pixel
+    // narrower than what actually gets laid out/rounded on screen.
+    return _NavItem.horizontalPadding * 2 + iconPart + labelWidth + 2;
+  }
+
+  static const double _barHorizontalPadding = 8;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final screenWidth = MediaQuery.of(context).size.width;
-    // A compact, content-hugging pill rather than a nearly-full-width bar,
-    // consistent with Material 3's floating navigation bar proportions.
-    final barWidth = math.min(screenWidth - 64, 360.0);
+    final textScaler = MediaQuery.of(context).textScaler;
+
+    final barWidth =
+        [
+          for (var i = 0; i < _navItems.length; i++)
+            _itemWidth(_navItems[i].label, i == _selectedIndex, textScaler),
+        ].fold<double>(0, (a, b) => a + b) +
+        _barHorizontalPadding * 2;
 
     return BottomBar(
       borderRadius: BorderRadius.circular(32),
       barColor: colorScheme.surfaceContainer,
       showIcon: false,
       hideOnScroll: false,
-      offset: 16,
       width: barWidth,
       fit: StackFit.expand,
       child: SizedBox(
-        height: 64,
-        child: Row(
-          children: [
-            Expanded(
-              child: _NavItem(
-                icon: Icons.grid_view_outlined,
-                selectedIcon: Icons.grid_view,
-                label: 'Matrice',
-                selected: _selectedIndex == 0,
-                colorScheme: colorScheme,
-                onTap: () => _goToPage(0),
-              ),
-            ),
-            Expanded(
-              child: _NavItem(
-                icon: Icons.backpack_outlined,
-                selectedIcon: Icons.backpack,
-                label: 'Zaini',
-                selected: _selectedIndex == 1,
-                colorScheme: colorScheme,
-                onTap: () => _goToPage(1),
-              ),
-            ),
-          ],
+        height: 56,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: _barHorizontalPadding,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < _navItems.length; i++)
+                _NavItem(
+                  icon: _navItems[i].icon,
+                  selectedIcon: _navItems[i].selectedIcon,
+                  label: _navItems[i].label,
+                  selected: _selectedIndex == i,
+                  colorScheme: colorScheme,
+                  onTap: () => _goToPage(i),
+                ),
+            ],
+          ),
         ),
       ),
       body: (context, controller) => PageView(
@@ -106,6 +132,11 @@ class _NavItem extends StatelessWidget {
     required this.onTap,
   });
 
+  static const double horizontalPadding = 12;
+  static const double verticalPadding = 8;
+  static const double iconSize = 24;
+  static const double iconLabelGap = 8;
+
   final IconData icon;
   final IconData selectedIcon;
   final String label;
@@ -115,29 +146,37 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        selected ? colorScheme.onSecondaryContainer : colorScheme.onSurface;
+    final color = selected
+        ? colorScheme.onSecondaryContainer
+        : colorScheme.onSurface;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Center(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: selected
-              ? BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(20),
-                )
-              : null,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(selected ? selectedIcon : icon, color: color, size: 24),
-              if (selected) ...[
-                const SizedBox(width: 8),
+    final radius = BorderRadius.circular(20);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: selected ? colorScheme.secondaryContainer : Colors.transparent,
+        borderRadius: radius,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (selected) ...[
+                  Icon(selectedIcon, color: color, size: iconSize),
+                  const SizedBox(width: iconLabelGap),
+                ],
                 Text(
                   label,
                   style: TextStyle(
@@ -147,7 +186,7 @@ class _NavItem extends StatelessWidget {
                   ),
                 ),
               ],
-            ],
+            ),
           ),
         ),
       ),

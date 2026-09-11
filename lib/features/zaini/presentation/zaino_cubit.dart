@@ -39,6 +39,16 @@ class ZainoCubit extends Cubit<ZainoState> {
     syncFromGoogleTasks();
   }
 
+  Future<void> refreshItemCounts() async {
+    final uid = _uid;
+    if (uid == null) return;
+    final counts = await _loadItemCounts(
+      uid,
+      state.zaini.map((z) => z.id).toList(),
+    );
+    if (!isClosed) emit(state.copyWith(itemCounts: counts));
+  }
+
   void unbind() {
     _uid = null;
     _zainiSub?.cancel();
@@ -328,6 +338,50 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
     );
   }
 
+  /// Renames [oldName] to [newName] on every item currently under it.
+  /// Categories aren't a persisted entity — they're just the distinct
+  /// `categoryName` values across items — so this is a bulk item update.
+  Future<void> renameCategory(String oldName, String newName) async {
+    final uid = _uid;
+    if (uid == null || newName.isEmpty || newName == oldName) return;
+    final affected = state.items.where((i) => i.categoryName == oldName).toList();
+    if (affected.isEmpty) return;
+    // Optimistic update.
+    emit(state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.categoryName == oldName) i.copyWith(categoryName: newName) else i,
+      ],
+    ));
+    for (final item in affected) {
+      await _repo.updateItem(uid, _zaino.id, item.id, categoryName: newName);
+    }
+  }
+
+  /// Clears [name] from every item currently under it, leaving them
+  /// uncategorized. See [renameCategory].
+  Future<void> deleteCategory(String name) async {
+    final uid = _uid;
+    if (uid == null) return;
+    final affected = state.items.where((i) => i.categoryName == name).toList();
+    if (affected.isEmpty) return;
+    // Optimistic update.
+    emit(state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.categoryName == name) i.copyWith(clearCategoryName: true) else i,
+      ],
+    ));
+    for (final item in affected) {
+      await _repo.updateItem(
+        uid,
+        _zaino.id,
+        item.id,
+        clearCategoryName: true,
+      );
+    }
+  }
+
   Future<void> deleteItem(ZainoItem item) async {
     final uid = _uid;
     if (uid == null) return;
@@ -362,6 +416,37 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
     for (final item in newItems) {
       if (idSet.contains(item.id)) {
         await _repo.updateItem(uid, _zaino.id, item.id, tags: item.tags);
+      }
+    }
+  }
+
+  /// Sets (or clears, when [categoryName] is null) the category on every
+  /// item in [itemIds] at once — unlike tags, an item has a single category,
+  /// so this replaces rather than merges.
+  Future<void> bulkSetCategory(
+    List<String> itemIds,
+    String? categoryName,
+  ) async {
+    final uid = _uid;
+    if (uid == null || itemIds.isEmpty) return;
+    final idSet = itemIds.toSet();
+    final newItems = <ZainoItem>[
+      for (final i in state.items)
+        if (idSet.contains(i.id))
+          i.copyWith(categoryName: categoryName, clearCategoryName: categoryName == null)
+        else
+          i,
+    ];
+    emit(state.copyWith(items: newItems));
+    for (final item in newItems) {
+      if (idSet.contains(item.id)) {
+        await _repo.updateItem(
+          uid,
+          _zaino.id,
+          item.id,
+          categoryName: categoryName,
+          clearCategoryName: categoryName == null,
+        );
       }
     }
   }

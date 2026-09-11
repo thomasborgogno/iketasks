@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/zaino_item.dart';
 import '../../domain/zaino_tag.dart';
+import '../zaino_cubit.dart';
 
 class ZainoItemFormSheet extends StatefulWidget {
   const ZainoItemFormSheet({
@@ -21,41 +23,109 @@ class ZainoItemFormSheet extends StatefulWidget {
 
 class _ZainoItemFormSheetState extends State<ZainoItemFormSheet> {
   late final TextEditingController _titleController;
-  late final TextEditingController _categoryController;
+  late String? _selectedCategory;
   late Set<String> _selectedTags;
+
+  /// Categories created via the "+" chip during this session, not yet
+  /// reflected in [ZainoItemFormSheet.categories] (which is a snapshot taken
+  /// when the sheet was opened).
+  final Set<String> _extraCategories = {};
+
+  /// Tag names created via the "+" chip during this session, mirroring
+  /// [_extraCategories] — the corresponding [ZainoTag] is persisted right
+  /// away, but this sheet isn't a BlocBuilder so it won't see it until then.
+  final Set<String> _extraTagNames = {};
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.item?.title ?? '');
-    _categoryController = TextEditingController(
-      text: widget.item?.categoryName ?? '',
-    );
+    _selectedCategory = widget.item?.categoryName;
     _selectedTags = Set<String>.from(widget.item?.tags ?? []);
+    if (_selectedCategory != null &&
+        !widget.categories.contains(_selectedCategory)) {
+      _extraCategories.add(_selectedCategory!);
+    }
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _categoryController.dispose();
     super.dispose();
   }
 
   void _submit() {
     final title = _titleController.text.trim();
     if (title.isEmpty) return;
-    final category = _categoryController.text.trim();
     Navigator.of(context).pop({
       'title': title,
-      'categoryName': category.isEmpty ? null : category,
+      'categoryName': _selectedCategory,
       'tags': _selectedTags.toList(),
     });
+  }
+
+  Future<void> _addCategory() async {
+    final name = await _promptForName(
+      title: 'Nuova categoria',
+      label: 'Nome categoria',
+    );
+    if (name == null || name.isEmpty || !mounted) return;
+    setState(() {
+      if (!widget.categories.contains(name)) _extraCategories.add(name);
+      _selectedCategory = name;
+    });
+  }
+
+  Future<void> _addTag() async {
+    final name = await _promptForName(title: 'Nuovo tag', label: 'Nome tag');
+    if (name == null || name.isEmpty || !mounted) return;
+    final alreadyExists = widget.tags.any((t) => t.name == name);
+    if (!alreadyExists) {
+      await context.read<ZainoDetailCubit>().createTag(name);
+    }
+    if (!mounted) return;
+    setState(() {
+      if (!alreadyExists) _extraTagNames.add(name);
+      _selectedTags.add(name);
+    });
+  }
+
+  Future<String?> _promptForName({
+    required String title,
+    required String label,
+  }) {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(labelText: label),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text('Crea'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.item != null;
+    final categories = [...widget.categories, ..._extraCategories];
+    final tagNames = [...widget.tags.map((t) => t.name), ..._extraTagNames];
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -83,62 +153,52 @@ class _ZainoItemFormSheetState extends State<ZainoItemFormSheet> {
             autofocus: true,
             onSubmitted: (_) => _submit(),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _categoryController,
-            decoration: const InputDecoration(
-              labelText: 'Categoria (raggruppamento)',
-              hintText: 'es. Abbigliamento',
-              border: OutlineInputBorder(),
-            ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          if (widget.categories.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: widget.categories.map((cat) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: ActionChip(
-                      label: Text(cat, style: const TextStyle(fontSize: 12)),
-                      onPressed: () => setState(() {
-                        _categoryController.text = cat;
-                      }),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  );
-                }).toList(),
+          const SizedBox(height: 16),
+          Text('Categoria', style: theme.textTheme.labelLarge),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (final cat in categories)
+                ChoiceChip(
+                  label: Text(cat),
+                  selected: _selectedCategory == cat,
+                  onSelected: (v) =>
+                      setState(() => _selectedCategory = v ? cat : null),
+                ),
+              ActionChip(
+                label: const Icon(Icons.add, size: 18),
+                onPressed: _addCategory,
               ),
-            ),
-          ],
-          if (widget.tags.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text('Tag', style: theme.textTheme.labelLarge),
-            const SizedBox(height: 4),
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: widget.tags.map((tag) {
-                final selected = _selectedTags.contains(tag.name);
-                return FilterChip(
-                  label: Text(tag.name),
-                  selected: selected,
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text('Tag', style: theme.textTheme.labelLarge),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (final name in tagNames)
+                FilterChip(
+                  label: Text(name),
+                  selected: _selectedTags.contains(name),
                   onSelected: (v) {
                     setState(() {
                       if (v) {
-                        _selectedTags.add(tag.name);
+                        _selectedTags.add(name);
                       } else {
-                        _selectedTags.remove(tag.name);
+                        _selectedTags.remove(name);
                       }
                     });
                   },
-                );
-              }).toList(),
-            ),
-          ],
-          const SizedBox(height: 20),
+                ),
+              ActionChip(
+                label: const Icon(Icons.add, size: 18),
+                onPressed: _addTag,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           FilledButton(
             onPressed: _submit,
             child: Text(isEdit ? 'Salva' : 'Aggiungi'),

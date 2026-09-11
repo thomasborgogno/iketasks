@@ -64,9 +64,7 @@ class ZainiListPage extends StatelessWidget {
                 )
               else if (state.zaini.isEmpty)
                 SliverFillRemaining(
-                  child: _EmptyState(
-                    onCreate: () => _showCreateSheet(context),
-                  ),
+                  child: _EmptyState(onCreate: () => _showCreateSheet(context)),
                 )
               else
                 SliverPadding(
@@ -88,11 +86,13 @@ class ZainiListPage extends StatelessWidget {
                 ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => _showCreateSheet(context),
-            icon: const Icon(Icons.add),
-            label: const Text('Nuovo zaino'),
-          ),
+          floatingActionButton:
+              state.status == ZainoStatus.loading || state.zaini.isEmpty
+              ? null
+              : FloatingActionButton(
+                  onPressed: () => _showCreateSheet(context),
+                  child: const Icon(Icons.add),
+                ),
         );
       },
     );
@@ -115,10 +115,8 @@ class ZainiListPage extends StatelessWidget {
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ZainoFormSheet(
-        initialName: zaino.name,
-        initialEmoji: zaino.emoji,
-      ),
+      builder: (_) =>
+          ZainoFormSheet(initialName: zaino.name, initialEmoji: zaino.emoji),
     );
     if (result == null || !context.mounted) return;
     await context.read<ZainoCubit>().updateZaino(
@@ -154,10 +152,11 @@ class ZainiListPage extends StatelessWidget {
     }
   }
 
-  void _openDetail(BuildContext context, Zaino zaino) {
+  Future<void> _openDetail(BuildContext context, Zaino zaino) async {
     final uid = context.read<AuthCubit>().state.user?.uid;
     if (uid == null) return;
-    Navigator.of(context).push(
+    final zainoCubit = context.read<ZainoCubit>();
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (ctx) => ZainoDetailCubit(
@@ -169,6 +168,7 @@ class ZainiListPage extends StatelessWidget {
         ),
       ),
     );
+    await zainoCubit.refreshItemCounts();
   }
 }
 

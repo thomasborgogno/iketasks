@@ -145,6 +145,15 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage>
                                       ),
                                 label: Text(l10n.signInWithGoogle),
                               ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () => context
+                                          .read<AuthCubit>()
+                                          .signInAnonymously(),
+                                child: Text(l10n.continueAsGuest),
+                              ),
                               if (state.status == AuthStatus.error) ...[
                                 const SizedBox(height: 16),
                                 Text(
