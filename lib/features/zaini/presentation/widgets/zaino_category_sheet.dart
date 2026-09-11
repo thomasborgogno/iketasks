@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../zaino_cubit.dart';
+import '../zaino_detail_cubit.dart';
 import '../zaino_state.dart';
 
 /// Categories aren't a persisted entity — they're just the distinct

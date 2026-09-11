@@ -45,7 +45,8 @@ class ZainoTag extends Equatable {
       zainoId: zainoId,
       name: (data['name'] as String?) ?? '',
       order: (data['order'] as int?) ?? 0,
-      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
     );
   }
 

@@ -42,8 +42,12 @@ class ZainoItem extends Equatable {
       title: title ?? this.title,
       completed: completed ?? this.completed,
       order: order ?? this.order,
-      googleTaskId: clearGoogleTaskId ? null : (googleTaskId ?? this.googleTaskId),
-      categoryName: clearCategoryName ? null : (categoryName ?? this.categoryName),
+      googleTaskId: clearGoogleTaskId
+          ? null
+          : (googleTaskId ?? this.googleTaskId),
+      categoryName: clearCategoryName
+          ? null
+          : (categoryName ?? this.categoryName),
       tags: tags ?? this.tags,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
@@ -78,8 +82,10 @@ class ZainoItem extends Equatable {
       googleTaskId: data['googleTaskId'] as String?,
       categoryName: data['categoryName'] as String?,
       tags: List<String>.from((data['tags'] as List<dynamic>?) ?? []),
-      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
-      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
+      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
     );
   }
 

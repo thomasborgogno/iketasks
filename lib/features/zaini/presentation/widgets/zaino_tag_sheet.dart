@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/zaino_tag.dart';
-import '../zaino_cubit.dart';
+import '../zaino_detail_cubit.dart';
 import '../zaino_state.dart';
 
 class ZainoTagSheet extends StatefulWidget {
@@ -47,7 +47,10 @@ class _ZainoTagSheetState extends State<ZainoTagSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: Text('Gestisci tag', style: theme.textTheme.titleLarge),
+                    child: Text(
+                      'Gestisci tag',
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),

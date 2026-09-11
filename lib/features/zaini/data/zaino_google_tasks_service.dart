@@ -46,8 +46,9 @@ class ZainoGoogleTasksService {
     final signIn = GoogleSignIn.instance;
     _AuthClient? client;
     try {
-      final auth =
-          await signIn.authorizationClient.authorizeScopes([_tasksScope]);
+      final auth = await signIn.authorizationClient.authorizeScopes([
+        _tasksScope,
+      ]);
       client = _AuthClient(http.Client(), auth.accessToken);
       return await fn(gtasks.TasksApi(client));
     } catch (_) {
@@ -77,19 +78,24 @@ class ZainoGoogleTasksService {
         for (final task in tasksResponse.items ?? []) {
           final taskId = task.id;
           final taskTitle = task.title;
-          if (taskId == null || taskTitle == null || taskTitle.isEmpty) continue;
-          tasks.add(GoogleTaskData(
-            id: taskId,
-            title: taskTitle,
-            completed: task.status == 'completed',
-          ));
+          if (taskId == null || taskTitle == null || taskTitle.isEmpty)
+            continue;
+          tasks.add(
+            GoogleTaskData(
+              id: taskId,
+              title: taskTitle,
+              completed: task.status == 'completed',
+            ),
+          );
         }
 
-        lists.add(GoogleTasksListData(
-          listId: id,
-          name: title.substring(1),
-          tasks: tasks,
-        ));
+        lists.add(
+          GoogleTasksListData(
+            listId: id,
+            name: title.substring(1),
+            tasks: tasks,
+          ),
+        );
       }
       return lists;
     });
@@ -99,9 +105,7 @@ class ZainoGoogleTasksService {
   /// Creates a new Google Tasks list with '#' prefix. Returns the list ID.
   Future<String?> createList(String name) async {
     return _withApi<String?>((api) async {
-      final list = await api.tasklists.insert(
-        gtasks.TaskList(title: '#$name'),
-      );
+      final list = await api.tasklists.insert(gtasks.TaskList(title: '#$name'));
       return list.id;
     });
   }
@@ -123,14 +127,18 @@ class ZainoGoogleTasksService {
     String taskId,
     bool completed,
   ) async {
-    await _withApi((api) => api.tasks.patch(
-      gtasks.Task(
-        status: completed ? 'completed' : 'needsAction',
-        completed: completed ? DateTime.now().toUtc().toIso8601String() : null,
+    await _withApi(
+      (api) => api.tasks.patch(
+        gtasks.Task(
+          status: completed ? 'completed' : 'needsAction',
+          completed: completed
+              ? DateTime.now().toUtc().toIso8601String()
+              : null,
+        ),
+        listId,
+        taskId,
       ),
-      listId,
-      taskId,
-    ));
+    );
   }
 
   /// Marks all tasks in a list as not completed (reset).
@@ -155,10 +163,9 @@ class ZainoGoogleTasksService {
 
   /// Renames a Google Tasks list (keeps the '#' prefix).
   Future<void> renameList(String listId, String newName) async {
-    await _withApi((api) => api.tasklists.patch(
-      gtasks.TaskList(title: '#$newName'),
-      listId,
-    ));
+    await _withApi(
+      (api) => api.tasklists.patch(gtasks.TaskList(title: '#$newName'), listId),
+    );
   }
 
   /// Deletes a Google Tasks list.

@@ -16,10 +16,7 @@ class ZainiSearchDelegate extends SearchDelegate<Zaino?> {
   @override
   List<Widget> buildActions(BuildContext context) => [
     if (query.isNotEmpty)
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () => query = '',
-      ),
+      IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
   ];
 
   @override
@@ -35,11 +32,7 @@ class ZainiSearchDelegate extends SearchDelegate<Zaino?> {
   Widget buildSuggestions(BuildContext context) => _buildList(context);
 
   Widget _buildList(BuildContext context) {
-    final filtered = FuzzySearch.filter(
-      query,
-      zaini,
-      (z) => [z.name],
-    );
+    final filtered = FuzzySearch.filter(query, zaini, (z) => [z.name]);
     if (filtered.isEmpty) {
       return Center(
         child: Text(
@@ -69,10 +62,7 @@ class ZainiSearchDelegate extends SearchDelegate<Zaino?> {
 }
 
 class ZainoItemSearchDelegate extends SearchDelegate<ZainoItem?> {
-  ZainoItemSearchDelegate({
-    required this.items,
-    required this.onItemTap,
-  });
+  ZainoItemSearchDelegate({required this.items, required this.onItemTap});
 
   final List<ZainoItem> items;
   final ValueChanged<ZainoItem> onItemTap;
@@ -83,10 +73,7 @@ class ZainoItemSearchDelegate extends SearchDelegate<ZainoItem?> {
   @override
   List<Widget> buildActions(BuildContext context) => [
     if (query.isNotEmpty)
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () => query = '',
-      ),
+      IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
   ];
 
   @override
@@ -120,10 +107,7 @@ class ZainoItemSearchDelegate extends SearchDelegate<ZainoItem?> {
       itemBuilder: (context, idx) {
         final item = filtered[idx];
         return ListTile(
-          leading: Checkbox(
-            value: item.completed,
-            onChanged: null,
-          ),
+          leading: Checkbox(value: item.completed, onChanged: null),
           title: Text(
             item.title,
             style: item.completed

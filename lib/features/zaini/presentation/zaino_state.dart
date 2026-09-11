@@ -17,6 +17,7 @@ class ZainoState extends Equatable {
 
   final ZainoStatus status;
   final List<Zaino> zaini;
+
   /// Map from zaino id → total item count.
   final Map<String, int> itemCounts;
   final String? errorMessage;
@@ -39,7 +40,13 @@ class ZainoState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, zaini, itemCounts, errorMessage, isSyncing];
+  List<Object?> get props => [
+    status,
+    zaini,
+    itemCounts,
+    errorMessage,
+    isSyncing,
+  ];
 }
 
 class ZainoDetailState extends Equatable {
@@ -111,5 +118,11 @@ class ZainoDetailState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, items, tags, errorMessage, activeTagFilter];
+  List<Object?> get props => [
+    status,
+    items,
+    tags,
+    errorMessage,
+    activeTagFilter,
+  ];
 }

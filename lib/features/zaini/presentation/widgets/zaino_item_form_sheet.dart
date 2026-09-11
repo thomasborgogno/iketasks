@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/zaino_item.dart';
 import '../../domain/zaino_tag.dart';
-import '../zaino_cubit.dart';
+import '../zaino_detail_cubit.dart';
 
 class ZainoItemFormSheet extends StatefulWidget {
   const ZainoItemFormSheet({

@@ -7,6 +7,7 @@ import '../data/zaino_repository.dart';
 import '../domain/zaino.dart';
 import 'zaini_search_delegate.dart';
 import 'zaino_cubit.dart';
+import 'zaino_detail_cubit.dart';
 import 'zaino_detail_page.dart';
 import 'zaino_state.dart';
 import 'widgets/zaino_form_sheet.dart';

@@ -54,11 +54,20 @@ class Zaino extends Equatable {
       name: (data['name'] as String?) ?? '',
       emoji: data['emoji'] as String?,
       googleTaskListId: data['googleTaskListId'] as String?,
-      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
-      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+      createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
+      updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now())
+          .toDate(),
     );
   }
 
   @override
-  List<Object?> get props => [id, name, emoji, googleTaskListId, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    name,
+    emoji,
+    googleTaskListId,
+    createdAt,
+    updatedAt,
+  ];
 }

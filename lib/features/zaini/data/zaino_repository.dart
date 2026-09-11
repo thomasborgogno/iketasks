@@ -7,7 +7,7 @@ import '../domain/zaino_tag.dart';
 
 class ZainoRepository {
   ZainoRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
   static const _uuid = Uuid();
@@ -20,14 +20,12 @@ class ZainoRepository {
   CollectionReference<Map<String, dynamic>> _itemsRef(
     String uid,
     String zainoId,
-  ) =>
-      _zainiRef(uid).doc(zainoId).collection('items');
+  ) => _zainiRef(uid).doc(zainoId).collection('items');
 
   CollectionReference<Map<String, dynamic>> _tagsRef(
     String uid,
     String zainoId,
-  ) =>
-      _zainiRef(uid).doc(zainoId).collection('tags');
+  ) => _zainiRef(uid).doc(zainoId).collection('tags');
 
   // ── Zaini ────────────────────────────────────────────────────────────────────
 
@@ -87,10 +85,9 @@ class ZainoRepository {
     String uid,
     String googleTaskListId,
   ) async {
-    final snap = await _zainiRef(uid)
-        .where('googleTaskListId', isEqualTo: googleTaskListId)
-        .limit(1)
-        .get();
+    final snap = await _zainiRef(
+      uid,
+    ).where('googleTaskListId', isEqualTo: googleTaskListId).limit(1).get();
     if (snap.docs.isEmpty) return null;
     return Zaino.fromDoc(snap.docs.first);
   }
@@ -116,8 +113,8 @@ class ZainoRepository {
     bool completed = false,
     String? id,
   }) async {
-    final resolvedOrder = order ??
-        ((await _itemsRef(uid, zainoId).count().get()).count ?? 0);
+    final resolvedOrder =
+        order ?? ((await _itemsRef(uid, zainoId).count().get()).count ?? 0);
     final now = DateTime.now();
     final item = ZainoItem(
       id: id ?? _uuid.v4(),
@@ -166,9 +163,10 @@ class ZainoRepository {
   }
 
   Future<void> resetAll(String uid, String zainoId) async {
-    final snap = await _itemsRef(uid, zainoId)
-        .where('completed', isEqualTo: true)
-        .get();
+    final snap = await _itemsRef(
+      uid,
+      zainoId,
+    ).where('completed', isEqualTo: true).get();
     if (snap.docs.isEmpty) return;
     final batch = _firestore.batch();
     for (final doc in snap.docs) {
@@ -186,9 +184,10 @@ class ZainoRepository {
     List<String> googleTaskIds,
   ) async {
     if (googleTaskIds.isEmpty) return [];
-    final snap = await _itemsRef(uid, zainoId)
-        .where('googleTaskId', whereIn: googleTaskIds)
-        .get();
+    final snap = await _itemsRef(
+      uid,
+      zainoId,
+    ).where('googleTaskId', whereIn: googleTaskIds).get();
     return snap.docs.map((d) => ZainoItem.fromDoc(d, zainoId)).toList();
   }
 
@@ -242,9 +241,10 @@ class ZainoRepository {
     String tagName,
   ) async {
     // Remove this tag from all items that reference it
-    final items = await _itemsRef(uid, zainoId)
-        .where('tags', arrayContains: tagName)
-        .get();
+    final items = await _itemsRef(
+      uid,
+      zainoId,
+    ).where('tags', arrayContains: tagName).get();
     final batch = _firestore.batch();
     for (final doc in items.docs) {
       final current = List<String>.from(
