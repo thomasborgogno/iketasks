@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
+import 'firebase_options_web_test.dart';
 import 'core/locale/locale_cubit.dart';
 import 'core/notifications/notification_service.dart';
 import 'features/auth/data/auth_repository.dart';
@@ -25,7 +27,13 @@ import 'features/zaini/presentation/zaino_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  if (kIsWeb) {
+    // Web has no platform config file equivalent to google-services.json;
+    // this options object is only used for local sandbox testing.
+    await Firebase.initializeApp(options: webTestFirebaseOptions);
+  } else {
+    await Firebase.initializeApp();
+  }
 
   // Initialize date formatting for all supported locales
   await initializeDateFormatting('en_US');
