@@ -6,7 +6,7 @@ permalink: /privacy-policy
 
 # Privacy Policy
 
-**Last updated:** May 1, 2026
+**Last updated:** September 16, 2026
 
 "IkeTasks - Eisenhower to-do app" is developed and maintained by Thomas Borgogno as a free, open-source project.
 
@@ -32,18 +32,24 @@ All tasks and categories you create are stored in **Firebase Firestore** under y
 - Category names and emoji icons
 - Timestamps (created/updated)
 
+### Zaini (Packing Lists) Data
+Any packing lists ("zaini") you create — their names, items, item categories, tags, and completion status — are likewise stored in Firebase Firestore under your account UID.
+
 ### Google Tasks (optional, Google accounts only)
 If you choose to import tasks from Google Tasks, the app reads the task lists and tasks from your Google Tasks account. Imported tasks are then stored in Firebase Firestore as described above.
+
+Separately, Google Tasks lists whose name starts with "#" are synced two-way with your zaini: the app reads and writes list names, task titles, and completion status for these lists so that changes made in Google Tasks (or in another app that uses Google Tasks) and changes made to a zaino stay in sync.
 
 ---
 
 ## 2. How We Use Your Data
 
 Your data is used **only** to provide the app's functionality:
-- To sync your tasks across devices (Google accounts)
+- To sync your tasks and zaini across devices (Google accounts)
 - To store your tasks locally on the device (guest mode)
 - To display your tasks in the app and home screen widget
 - To import tasks from Google Tasks on your request (Google accounts only)
+- To keep "#"-prefixed Google Tasks lists in sync with your zaini (Google accounts only)
 
 We do **not**:
 - Sell your data
@@ -70,7 +76,7 @@ The app uses the following third-party services:
 | Firebase Auth | Authentication (Google and anonymous) | [Google Privacy Policy](https://policies.google.com/privacy) |
 | Firebase Firestore | Data storage | [Google Privacy Policy](https://policies.google.com/privacy) |
 | Google Sign-In | Login (optional) | [Google Privacy Policy](https://policies.google.com/privacy) |
-| Google Tasks API | Optional import (Google accounts only) | [Google Privacy Policy](https://policies.google.com/privacy) |
+| Google Tasks API | Optional import, and two-way sync of "#"-prefixed lists with zaini (Google accounts only) | [Google Privacy Policy](https://policies.google.com/privacy) |
 
 ---
 

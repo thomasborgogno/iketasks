@@ -2,7 +2,7 @@
 
 ## Overview
 
-Flutter Android app for task management using the Eisenhower Matrix (4-quadrant urgency/importance grid). Backend: Firebase (Firestore + Auth). Two Android home widgets (Glance-based). Supports 10 languages.
+Flutter Android app for task management using the Eisenhower Matrix (4-quadrant urgency/importance grid), plus a secondary **Zaini** (packing lists / checklists) feature. Backend: Firebase (Firestore + Auth). Two Android home widgets (Glance-based). Supports 10 languages.
 
 ## Architecture
 
@@ -21,6 +21,7 @@ lib/
     ├── tasks/                 # Core CRUD, quadrant assignment, due dates, showFromDate, categories
     ├── categories/            # Category management with emoji support
     ├── google_tasks/          # Import from Google Tasks API (incremental OAuth)
+    ├── zaini/                 # Packing lists/checklists, two-way sync with '#'-prefixed Google Tasks lists
     ├── onboarding/            # First-run wizard; SharedPreferences state
     └── widget/                # Two Android home widgets: Matrix (4-quadrant) + Minimal (priority bar)
 ```
@@ -38,6 +39,7 @@ Each feature follows:
 | tasks | TaskCubit, CompletedTasksCubit | TaskRepository | TaskItem |
 | categories | CategoryCubit | CategoryRepository | TaskCategory |
 | google_tasks | GoogleTasksImportCubit | GoogleTasksRepository | GoogleTaskItem |
+| zaini | ZainoCubit (list-level), ZainoDetailCubit (per-zaino) | ZainoRepository, ZainoGoogleTasksService | Zaino, ZainoItem, ZainoTag |
 | onboarding | OnboardingCubit | OnboardingRepository | — |
 | locale | LocaleCubit | — | LocaleState |
 | widget | — | — | — (WidgetSyncService, MinimalWidgetSyncService, WidgetAppearanceService) |
@@ -52,10 +54,20 @@ users/{uid}/tasks/{taskId}
 
 users/{uid}/categories/{categoryId}
   name (with emoji prefix), createdAt, updatedAt
+
+users/{uid}/zaini/{zainoId}
+  name, emoji, googleTaskListId, categoryOrder (list<string>), createdAt, updatedAt
+
+users/{uid}/zaini/{zainoId}/items/{itemId}
+  title, completed, order, googleTaskId, categoryName, tags (list<string>), createdAt, updatedAt
+
+users/{uid}/zaini/{zainoId}/tags/{tagId}
+  name, order, createdAt
 ```
 
 - **`showFromDate`**: task is hidden from the matrix until this date (deferred scheduling).
 - **`quadrant` enum in Dart**: `EisenhowerQuadrant` — values `importantUrgent`, `importantNotUrgent`, `notImportantUrgent`, `notImportantNotUrgent`. Extension `.value` maps to `'q1'`–`'q4'`; use `EisenhowerQuadrant.fromValue(str)` to parse from Firestore.
+- **`categoryOrder`** on a zaino: user-chosen display order for item categories (set via the up/down carets on category headers). Categories not listed are appended alphabetically. Categories themselves aren't a persisted entity — they're just distinct `categoryName` values across a zaino's items.
 
 ## Quadrant Reference
 
@@ -79,6 +91,16 @@ Two Glance-based widgets registered in `AndroidManifest.xml`:
 
 Sync services in `lib/features/widget/`: `WidgetSyncService`, `MinimalWidgetSyncService`, `WidgetAppearanceService`.  
 Triggered on: auth changes, connectivity restored, task updates.
+
+## Zaini (Packing Lists)
+
+Checklist-style lists ("zaini" = backpacks), separate from the Eisenhower matrix. Items can have a category (grouped, collapsible, reorderable via carets) and tags (filterable chips).
+
+- **Google Tasks sync**: a Google Tasks list titled `#<name>` becomes a zaino named `<name>`. `ZainoGoogleTasksService.fetchZainoLists()` pulls all such lists (paginated) including completed tasks; `ZainoCubit.syncFromGoogleTasks()` reconciles them into Firestore, matching existing items by `googleTaskId`. These `#`-prefixed lists are deliberately excluded from the regular matrix's Google Tasks import (`GoogleTasksRepository`) — they're reserved for zaini.
+- **OAuth scope**: unlike the read-only matrix import, `ZainoGoogleTasksService` requests the full `https://www.googleapis.com/auth/tasks` scope, since it also creates/renames/completes/deletes tasks and lists in Google Tasks.
+- **Two-way sync**: renames and completion toggles pushed to Google (`renameTask`/`setTaskCompleted`) when the item has a `googleTaskId`; pulled back into Firestore on the next `syncFromGoogleTasks()` by comparing `title`/`completed` against the stored values.
+- **Item ordering**: items are sorted alphabetically by title (case-insensitive), not by the legacy `order` field (kept only for `createItem`'s insertion position).
+- **`watchItems()` does not `orderBy('categoryName')`**: grouping by category is done client-side in `ZainoDetailState`/`_visibleByCategory` — Firestore's `orderBy` silently excludes documents missing that field, which previously caused items with a cleared category to disappear from the list. Don't reintroduce a Firestore-side `orderBy` on a field that can be absent/deleted.
 
 ## Localization
 
@@ -141,7 +163,8 @@ flutter analyze
 - **Guest mode**: `AuthState.isAnonymous` (`user.isAnonymous`) distinguishes anonymous from Google users. Use this flag to hide Google-only features (Google Tasks import, Delete Account). Anonymous UIDs use the same Firestore path as Google UIDs — no special handling needed in repositories.
 - **Guest upgrade**: `AuthRepository.upgradeToGoogle()` returns `UpgradeResult.success` (UID preserved, data intact) or `UpgradeResult.conflict` (existing Google account — user signed in, guest data abandoned). Show a snackbar for both outcomes.
 - **Anonymous Auth**: Must be enabled in Firebase Console → Authentication → Sign-in method → Anonymous.
-- **Google Tasks import**: Only available for Google-authenticated users (not anonymous). Performs incremental OAuth requesting `tasks.readonly` scope. Filters out system task lists (names starting with `#`).
+- **Google Tasks import**: Only available for Google-authenticated users (not anonymous). Performs incremental OAuth requesting `tasks.readonly` scope. Filters out task lists starting with `#` — those are reserved for the Zaini feature (see below), not the matrix import.
+- **Firestore fields used in `orderBy`**: never clear them with `FieldValue.delete()` — Firestore excludes documents missing an ordered field from the query results entirely. Set the field to `null` instead, or sort client-side (see Zaini's `watchItems()`).
 - **Onboarding**: `OnboardingCubit` checks `OnboardingRepository.hasCompletedOnboarding()` at launch. Wizard shown before auth flow if not completed.
 
 ## Keeping Docs Updated

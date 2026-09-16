@@ -55,6 +55,11 @@ Two widget styles to keep your tasks visible from your home screen:
 - Import existing tasks from your Google Tasks lists and assign them to quadrants before they land in your matrix
 - **Guest mode** — use the full app without a Google account; your data is saved locally on the device and can be linked to a Google account at any time to enable cloud sync
 
+### 🎒 Zaini (Packing Lists)
+- Create checklist-style lists for anything you need to pack or prepare — trips, events, shopping
+- Group items into collapsible, reorderable categories, and filter them with tags
+- Two-way sync with Google Tasks: any Google Tasks list named `#<name>` becomes a zaino automatically, and renames/completions stay in sync in both directions
+
 ### 🎨 App Theme
 - Light & Dark Theme follows your system automatically, built with Material Design 3
 

@@ -45,8 +45,13 @@ features/<name>/
   presentation/<name>_page.dart   # or _widget.dart
 ```
 
+## Zaini (Packing Lists)
+
+Secondary feature (`features/zaini/`): checklist-style lists synced two-way with Google Tasks lists named `#<name>`. See `AGENTS.md` → "Zaini (Packing Lists)" for details (sync model, category ordering, Firestore schema).
+
 ## Key Gotchas
 
 - `showFromDate` on `TaskItem` hides tasks from matrix until that date — respect this filter.
-- Google Tasks import only for authenticated (non-anonymous) users.
+- Google Tasks import only for authenticated (non-anonymous) users. `#`-prefixed lists are excluded — reserved for Zaini.
 - `NotificationService.updateLocale(locale)` must be called on every locale change.
+- Never clear a Firestore field used in `orderBy` with `FieldValue.delete()` — the document silently drops out of the query. Set it to `null`, or sort client-side.

@@ -74,7 +74,23 @@ Forgetting this leaves the persistent notification in the previous language.
 The app requests the `tasks.readonly` scope only when the user opens the import screen — not at sign-in time. If the user revokes scope access mid-session, the import will fail with an auth error; the UI should show a re-authenticate prompt.
 
 ### System Task Lists Filtered
-Google Tasks includes system lists whose names begin with `#` (e.g. `#hashtag lists`). These are filtered out in `GoogleTasksRepository` and never shown to the user.
+Google Tasks lists whose names begin with `#` are filtered out of the regular matrix import in `GoogleTasksRepository` and never shown there. They're not "system" lists — they're reserved for the **Zaini** feature (see below), which imports them instead.
+
+---
+
+## Zaini (Packing Lists) — Google Tasks Sync
+
+### `#`-Prefixed Lists Are the Zaini Namespace
+A Google Tasks list titled `#Camping` becomes a zaino named "Camping". `ZainoGoogleTasksService.fetchZainoLists()` is the only place that reads these lists; the regular matrix import explicitly skips them (see above) so a list isn't imported twice into two different features.
+
+### Pagination
+`api.tasks.list()` defaults to a small page size. `fetchZainoLists()` loops on `nextPageToken` with `maxResults: 100` — without this, lists with many tasks would silently lose items past the first page on every sync.
+
+### Firestore `orderBy` + `FieldValue.delete()` Don't Mix
+`ZainoRepository.watchItems()` used to `.orderBy('categoryName')`. Clearing an item's category called `FieldValue.delete()` on that field, and Firestore excludes documents missing an `orderBy`-ed field from the result set entirely — so those items silently vanished from the list (while still being counted elsewhere via an unordered query). Fixed by sorting/grouping by category client-side instead of in the Firestore query, and by setting the field to `null` rather than deleting it. General rule: don't `orderBy` a field that can be cleared with `FieldValue.delete()`.
+
+### Rename Sync Is One Field at a Time
+Local title edits push via `ZainoGoogleTasksService.renameTask()`; Google-side renames are picked up on the next `syncFromGoogleTasks()` by diffing `title` (and `completed`) against the stored item. There's no realtime push notification from Google Tasks — sync is pull-based, triggered on app open and the manual sync button.
 
 ---
 
