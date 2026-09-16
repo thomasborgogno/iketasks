@@ -95,8 +95,10 @@ class ZainoRepository {
   // ── Items ────────────────────────────────────────────────────────────────────
 
   Stream<List<ZainoItem>> watchItems(String uid, String zainoId) {
+    // Sorted/grouped by category client-side (see ZainoDetailState), since
+    // Firestore's orderBy('categoryName') silently excludes documents where
+    // that field is missing (e.g. items with a cleared category).
     return _itemsRef(uid, zainoId)
-        .orderBy('categoryName')
         .orderBy('order')
         .snapshots()
         .map((s) => s.docs.map((d) => ZainoItem.fromDoc(d, zainoId)).toList());
@@ -149,7 +151,7 @@ class ZainoRepository {
     if (completed != null) data['completed'] = completed;
     if (order != null) data['order'] = order;
     if (clearCategoryName) {
-      data['categoryName'] = FieldValue.delete();
+      data['categoryName'] = null;
     } else if (categoryName != null) {
       data['categoryName'] = categoryName;
     }

@@ -68,26 +68,31 @@ class ZainoGoogleTasksService {
         final title = list.title ?? '';
         if (id == null || !title.startsWith('#')) continue;
 
-        final tasksResponse = await api.tasks.list(
-          id,
-          showCompleted: true,
-          showHidden: true,
-        );
-
         final tasks = <GoogleTaskData>[];
-        for (final task in tasksResponse.items ?? []) {
-          final taskId = task.id;
-          final taskTitle = task.title;
-          if (taskId == null || taskTitle == null || taskTitle.isEmpty)
-            continue;
-          tasks.add(
-            GoogleTaskData(
-              id: taskId,
-              title: taskTitle,
-              completed: task.status == 'completed',
-            ),
+        String? pageToken;
+        do {
+          final tasksResponse = await api.tasks.list(
+            id,
+            showCompleted: true,
+            showHidden: true,
+            maxResults: 100,
+            pageToken: pageToken,
           );
-        }
+          for (final task in tasksResponse.items ?? []) {
+            final taskId = task.id;
+            final taskTitle = task.title;
+            if (taskId == null || taskTitle == null || taskTitle.isEmpty)
+              continue;
+            tasks.add(
+              GoogleTaskData(
+                id: taskId,
+                title: taskTitle,
+                completed: task.status == 'completed',
+              ),
+            );
+          }
+          pageToken = tasksResponse.nextPageToken;
+        } while (pageToken != null);
 
         lists.add(
           GoogleTasksListData(
@@ -119,6 +124,13 @@ class ZainoGoogleTasksService {
       );
       return task.id;
     });
+  }
+
+  /// Renames a task in a Google Tasks list.
+  Future<void> renameTask(String listId, String taskId, String newTitle) async {
+    await _withApi(
+      (api) => api.tasks.patch(gtasks.Task(title: newTitle), listId, taskId),
+    );
   }
 
   /// Marks a task as completed or not completed.

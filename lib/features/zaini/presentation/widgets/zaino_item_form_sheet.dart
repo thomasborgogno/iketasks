@@ -172,32 +172,34 @@ class _ZainoItemFormSheetState extends State<ZainoItemFormSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text('Tag', style: theme.textTheme.labelLarge),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              for (final name in tagNames)
-                FilterChip(
-                  label: Text(name),
-                  selected: _selectedTags.contains(name),
-                  onSelected: (v) {
-                    setState(() {
-                      if (v) {
-                        _selectedTags.add(name);
-                      } else {
-                        _selectedTags.remove(name);
-                      }
-                    });
-                  },
+          if (tagNames.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text('Tag', style: theme.textTheme.labelLarge),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final name in tagNames)
+                  FilterChip(
+                    label: Text(name),
+                    selected: _selectedTags.contains(name),
+                    onSelected: (v) {
+                      setState(() {
+                        if (v) {
+                          _selectedTags.add(name);
+                        } else {
+                          _selectedTags.remove(name);
+                        }
+                      });
+                    },
+                  ),
+                ActionChip(
+                  label: const Icon(Icons.add, size: 18),
+                  onPressed: _addTag,
                 ),
-              ActionChip(
-                label: const Icon(Icons.add, size: 18),
-                onPressed: _addTag,
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
           const SizedBox(height: 8),
           FilledButton(
             onPressed: _submit,

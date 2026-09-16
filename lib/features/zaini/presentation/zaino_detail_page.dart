@@ -203,13 +203,15 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    FloatingActionButton.small(
-                      heroTag: 'zaino-reset-fab',
-                      tooltip: 'Reimposta tutto',
-                      onPressed: () => _confirmReset(context),
-                      child: const Icon(Icons.refresh),
-                    ),
-                    const SizedBox(height: 12),
+                    if (completed.isNotEmpty) ...[
+                      FloatingActionButton.small(
+                        heroTag: 'zaino-reset-fab',
+                        tooltip: 'Reimposta tutto',
+                        onPressed: () => _confirmReset(context),
+                        child: const Icon(Icons.refresh),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     FloatingActionButton(
                       heroTag: 'zaino-add-fab',
                       onPressed: () => _showAddItem(context, state, categories),

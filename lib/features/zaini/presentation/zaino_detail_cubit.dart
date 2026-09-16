@@ -198,6 +198,16 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
       tags: tags,
       clearCategoryName: clearCategoryName,
     );
+    if (title != null &&
+        title != item.title &&
+        item.googleTaskId != null &&
+        _zaino.googleTaskListId != null) {
+      await _googleTasksService.renameTask(
+        _zaino.googleTaskListId!,
+        item.googleTaskId!,
+        title,
+      );
+    }
   }
 
   /// Renames [oldName] to [newName] on every item currently under it.

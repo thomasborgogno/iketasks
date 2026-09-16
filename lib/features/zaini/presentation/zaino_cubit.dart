@@ -106,11 +106,13 @@ class ZainoCubit extends Cubit<ZainoState> {
               googleTaskId: taskData.id,
               completed: taskData.completed,
             );
-          } else if (existing.completed != taskData.completed) {
+          } else if (existing.completed != taskData.completed ||
+              existing.title != taskData.title) {
             await _repo.updateItem(
               uid,
               zaino.id,
               existing.id,
+              title: existing.title != taskData.title ? taskData.title : null,
               completed: taskData.completed,
             );
           }
