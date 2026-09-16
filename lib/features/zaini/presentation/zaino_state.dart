@@ -56,6 +56,7 @@ class ZainoDetailState extends Equatable {
     this.tags = const [],
     this.errorMessage,
     this.activeTagFilter = const [],
+    this.categoryOrder = const [],
   });
 
   final ZainoStatus status;
@@ -64,12 +65,18 @@ class ZainoDetailState extends Equatable {
   final String? errorMessage;
   final List<String> activeTagFilter;
 
+  /// User-chosen display order of category names (via the up/down carets).
+  /// Categories not listed here are appended alphabetically after the ones
+  /// that are — see [orderedCategoryNames].
+  final List<String> categoryOrder;
+
   ZainoDetailState copyWith({
     ZainoStatus? status,
     List<ZainoItem>? items,
     List<ZainoTag>? tags,
     String? errorMessage,
     List<String>? activeTagFilter,
+    List<String>? categoryOrder,
   }) {
     return ZainoDetailState(
       status: status ?? this.status,
@@ -77,6 +84,7 @@ class ZainoDetailState extends Equatable {
       tags: tags ?? this.tags,
       errorMessage: errorMessage,
       activeTagFilter: activeTagFilter ?? this.activeTagFilter,
+      categoryOrder: categoryOrder ?? this.categoryOrder,
     );
   }
 
@@ -105,7 +113,7 @@ class ZainoDetailState extends Equatable {
       map.putIfAbsent(key, () => []).add(item);
     }
     for (final list in map.values) {
-      list.sort((a, b) => a.order.compareTo(b.order));
+      list.sort(_byTitle);
     }
     return map;
   }
@@ -113,8 +121,7 @@ class ZainoDetailState extends Equatable {
   /// Completed items across all categories, shown separately at the bottom
   /// of the page instead of inline within each category.
   List<ZainoItem> get completedItems {
-    return filteredItems.where((i) => i.completed).toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    return filteredItems.where((i) => i.completed).toList()..sort(_byTitle);
   }
 
   @override
@@ -124,5 +131,27 @@ class ZainoDetailState extends Equatable {
     tags,
     errorMessage,
     activeTagFilter,
+    categoryOrder,
   ];
+}
+
+int _byTitle(ZainoItem a, ZainoItem b) =>
+    a.title.toLowerCase().compareTo(b.title.toLowerCase());
+
+/// Orders [present] category names: those listed in [savedOrder] come first
+/// (in that order), followed by the rest sorted alphabetically. Lets the
+/// user reorder categories via the up/down carets while newly-seen
+/// categories still show up in a sensible place.
+List<String> orderedCategoryNames(
+  List<String> present,
+  List<String> savedOrder,
+) {
+  final presentSet = present.toSet();
+  final ordered = [
+    for (final c in savedOrder)
+      if (presentSet.contains(c)) c,
+  ];
+  final remaining = present.where((c) => !ordered.contains(c)).toList()
+    ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  return [...ordered, ...remaining];
 }

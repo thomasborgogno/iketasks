@@ -30,10 +30,13 @@ class ZainoRepository {
   // ── Zaini ────────────────────────────────────────────────────────────────────
 
   Stream<List<Zaino>> watchZaini(String uid) {
-    return _zainiRef(uid)
-        .orderBy('name')
-        .snapshots()
-        .map((s) => s.docs.map((d) => Zaino.fromDoc(d)).toList());
+    return _zainiRef(uid).snapshots().map(
+      (s) =>
+          s.docs.map((d) => Zaino.fromDoc(d)).toList()..sort(
+            (a, b) =>
+                a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+          ),
+    );
   }
 
   Future<Zaino> createZaino(
@@ -62,6 +65,7 @@ class ZainoRepository {
     String? emoji,
     bool clearEmoji = false,
     String? googleTaskListId,
+    List<String>? categoryOrder,
   }) async {
     final data = <String, dynamic>{'updatedAt': Timestamp.now()};
     if (name != null) data['name'] = name;
@@ -71,6 +75,7 @@ class ZainoRepository {
       data['emoji'] = emoji;
     }
     if (googleTaskListId != null) data['googleTaskListId'] = googleTaskListId;
+    if (categoryOrder != null) data['categoryOrder'] = categoryOrder;
     await _zainiRef(uid).doc(zainoId).update(data);
   }
 

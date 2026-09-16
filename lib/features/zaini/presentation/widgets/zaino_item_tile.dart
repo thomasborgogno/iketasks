@@ -78,19 +78,26 @@ class ZainoItemTile extends StatelessWidget {
           child: Material(
             type: MaterialType.transparency,
             child: ListTile(
+              dense: true,
+              visualDensity: const VisualDensity(vertical: -1),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(borderRadius: radius),
               leading: Checkbox(
                 value: item.completed,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
                 onChanged: (_) => selectionMode ? onSelectToggle() : onToggle(),
               ),
               title: Text(
                 item.title,
-                style: item.completed
-                    ? TextStyle(
-                        decoration: TextDecoration.lineThrough,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      )
-                    : null,
+                style:
+                    (item.completed
+                            ? TextStyle(
+                                decoration: TextDecoration.lineThrough,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              )
+                            : const TextStyle())
+                        .merge(theme.textTheme.bodyMedium),
               ),
               trailing: item.tags.isNotEmpty
                   ? Text(

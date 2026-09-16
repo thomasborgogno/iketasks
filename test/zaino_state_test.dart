@@ -85,13 +85,29 @@ void main() {
   });
 
   group('ZainoDetailState.completedItems', () {
-    test('collects completed items across categories, ordered by order', () {
-      final doneB = _item('doneB', categoryName: 'B', completed: true, order: 1);
-      final doneA = _item('doneA', categoryName: 'A', completed: true, order: 0);
-      final todo = _item('todo', categoryName: 'A', completed: false, order: 2);
-      final state = ZainoDetailState(items: [doneB, doneA, todo]);
+    test(
+      'collects completed items across categories, sorted alphabetically by title',
+      () {
+        final zebra = _item('zebra', categoryName: 'B', completed: true, order: 0);
+        final apple = _item('apple', categoryName: 'A', completed: true, order: 1);
+        final todo = _item('todo', categoryName: 'A', completed: false, order: 2);
+        final state = ZainoDetailState(items: [zebra, apple, todo]);
 
-      expect(state.completedItems, [doneA, doneB]);
+        expect(state.completedItems, [apple, zebra]);
+      },
+    );
+  });
+
+  group('orderedCategoryNames', () {
+    test('keeps saved order first, appends new categories alphabetically', () {
+      expect(
+        orderedCategoryNames(['C', 'A', 'B'], ['B', 'C']),
+        ['B', 'C', 'A'],
+      );
+    });
+
+    test('drops saved names no longer present', () {
+      expect(orderedCategoryNames(['A'], ['Z', 'A']), ['A']);
     });
   });
 }

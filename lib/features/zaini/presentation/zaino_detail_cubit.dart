@@ -35,7 +35,12 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   void _init() {
     final uid = _uid;
     if (uid == null) return;
-    emit(state.copyWith(status: ZainoStatus.loading));
+    emit(
+      state.copyWith(
+        status: ZainoStatus.loading,
+        categoryOrder: _zaino.categoryOrder,
+      ),
+    );
     _itemsSub?.cancel();
     _tagsSub?.cancel();
     _itemsSub = _repo
@@ -259,6 +264,28 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
     for (final item in affected) {
       await _repo.updateItem(uid, _zaino.id, item.id, clearCategoryName: true);
     }
+  }
+
+  /// Swaps [category] with its neighbor in the display order (up or down),
+  /// persisting the resulting order on the zaino.
+  Future<void> moveCategory(String category, {required bool up}) async {
+    final uid = _uid;
+    if (uid == null) return;
+    final present = <String>{
+      for (final i in state.items)
+        if ((i.categoryName ?? '').isNotEmpty) i.categoryName!,
+    };
+    final order = orderedCategoryNames(present.toList(), state.categoryOrder);
+    final idx = order.indexOf(category);
+    if (idx < 0) return;
+    final swapWith = up ? idx - 1 : idx + 1;
+    if (swapWith < 0 || swapWith >= order.length) return;
+    final newOrder = [...order];
+    final tmp = newOrder[idx];
+    newOrder[idx] = newOrder[swapWith];
+    newOrder[swapWith] = tmp;
+    emit(state.copyWith(categoryOrder: newOrder));
+    await _repo.updateZaino(uid, _zaino.id, categoryOrder: newOrder);
   }
 
   Future<void> deleteItem(ZainoItem item) async {

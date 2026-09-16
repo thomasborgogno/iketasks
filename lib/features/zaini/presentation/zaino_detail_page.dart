@@ -41,7 +41,18 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
   /// before the row animates away to its new section.
   final Map<String, bool> _frozenCompleted = {};
 
+  /// Raw category names (possibly '' for "Altro") currently collapsed.
+  final Set<String> _collapsedCategories = {};
+
   bool get _selectionMode => _selectedIds.isNotEmpty;
+
+  void _toggleCategoryCollapsed(String category) {
+    setState(() {
+      if (!_collapsedCategories.remove(category)) {
+        _collapsedCategories.add(category);
+      }
+    });
+  }
 
   void _handleToggle(BuildContext context, ZainoItem item) {
     final cubit = context.read<ZainoDetailCubit>();
@@ -240,7 +251,7 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
       map.putIfAbsent(item.categoryName ?? '', () => []).add(item);
     }
     for (final list in map.values) {
-      list.sort((a, b) => a.order.compareTo(b.order));
+      list.sort(_byTitle);
     }
     return map;
   }
@@ -256,7 +267,7 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                   _isCompletedForDisplay(item),
             )
             .toList()
-          ..sort((a, b) => a.order.compareTo(b.order));
+          ..sort(_byTitle);
     return list;
   }
 
@@ -266,7 +277,7 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     List<String> categories,
     Map<String, List<ZainoItem>> byCategory,
   ) {
-    final orderedKeys = _orderedCategoryKeys(byCategory);
+    final orderedKeys = _orderedCategoryKeys(byCategory, state.categoryOrder);
     return ZainoAnimatedItemsSliver(
       key: const ValueKey('animated-items'),
       orderedKeys: orderedKeys,
@@ -279,6 +290,12 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
       onItemLongPress: (id) {
         if (!_selectionMode) _toggleSelected(id);
       },
+      collapsedCategories: _collapsedCategories,
+      onToggleCategoryCollapsed: _toggleCategoryCollapsed,
+      onMoveCategoryUp: (cat) =>
+          context.read<ZainoDetailCubit>().moveCategory(cat, up: true),
+      onMoveCategoryDown: (cat) =>
+          context.read<ZainoDetailCubit>().moveCategory(cat, up: false),
     );
   }
 
@@ -463,11 +480,15 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     if (mounted) _clearSelection();
   }
 
-  List<String> _orderedCategoryKeys(Map<String, List<ZainoItem>> map) {
+  List<String> _orderedCategoryKeys(
+    Map<String, List<ZainoItem>> map,
+    List<String> categoryOrder,
+  ) {
     final keys = map.keys.toList();
-    final named = keys.where((k) => k.isNotEmpty).toList()..sort();
+    final named = keys.where((k) => k.isNotEmpty).toList();
+    final orderedNamed = orderedCategoryNames(named, categoryOrder);
     final unnamed = keys.where((k) => k.isEmpty).toList();
-    return [...named, ...unnamed];
+    return [...orderedNamed, ...unnamed];
   }
 
   List<String> _distinctCategories(List<ZainoItem> items) {
@@ -613,3 +634,6 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     }
   }
 }
+
+int _byTitle(ZainoItem a, ZainoItem b) =>
+    a.title.toLowerCase().compareTo(b.title.toLowerCase());

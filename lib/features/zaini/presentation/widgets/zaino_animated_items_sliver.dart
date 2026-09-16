@@ -20,6 +20,10 @@ class ZainoAnimatedItemsSliver extends StatefulWidget {
     required this.onItemToggle,
     required this.onItemSelectToggle,
     required this.onItemLongPress,
+    this.collapsedCategories = const {},
+    this.onToggleCategoryCollapsed,
+    this.onMoveCategoryUp,
+    this.onMoveCategoryDown,
   });
 
   final List<String> orderedKeys;
@@ -30,6 +34,12 @@ class ZainoAnimatedItemsSliver extends StatefulWidget {
   final void Function(ZainoItem) onItemToggle;
   final void Function(String) onItemSelectToggle;
   final void Function(String) onItemLongPress;
+
+  /// Raw category names (possibly '') currently collapsed.
+  final Set<String> collapsedCategories;
+  final void Function(String)? onToggleCategoryCollapsed;
+  final void Function(String)? onMoveCategoryUp;
+  final void Function(String)? onMoveCategoryDown;
 
   @override
   State<ZainoAnimatedItemsSliver> createState() =>
@@ -44,13 +54,21 @@ class _ZainoAnimatedItemsSliverState extends State<ZainoAnimatedItemsSliver> {
   @override
   void initState() {
     super.initState();
-    _live = buildZainoRowList(widget.orderedKeys, widget.byCategory);
+    _live = buildZainoRowList(
+      widget.orderedKeys,
+      widget.byCategory,
+      collapsedCategories: widget.collapsedCategories,
+    );
   }
 
   @override
   void didUpdateWidget(ZainoAnimatedItemsSliver old) {
     super.didUpdateWidget(old);
-    final newRows = buildZainoRowList(widget.orderedKeys, widget.byCategory);
+    final newRows = buildZainoRowList(
+      widget.orderedKeys,
+      widget.byCategory,
+      collapsedCategories: widget.collapsedCategories,
+    );
 
     // SliverAnimatedList tracks its own internal item count, which only ever
     // changes via insertItem/removeItem. If the row count changes (item or
@@ -75,9 +93,29 @@ class _ZainoAnimatedItemsSliverState extends State<ZainoAnimatedItemsSliver> {
 
   Widget _rowWidget(ZainoRow row) {
     if (row is ZainoHeaderRow) {
-      return ZainoCategoryHeader(category: row.category);
+      return _buildHeader(row);
     }
     return _buildTile(row as ZainoItemRow);
+  }
+
+  Widget _buildHeader(ZainoHeaderRow row) {
+    final namedKeys = widget.orderedKeys.where((k) => k.isNotEmpty).toList();
+    final idx = namedKeys.indexOf(row.category);
+    return ZainoCategoryHeader(
+      category: row.category,
+      collapsed: widget.collapsedCategories.contains(row.category),
+      onToggleCollapsed: widget.onToggleCategoryCollapsed == null
+          ? null
+          : () => widget.onToggleCategoryCollapsed!(row.category),
+      canMoveUp: idx > 0,
+      canMoveDown: idx >= 0 && idx < namedKeys.length - 1,
+      onMoveUp: widget.onMoveCategoryUp == null
+          ? null
+          : () => widget.onMoveCategoryUp!(row.category),
+      onMoveDown: widget.onMoveCategoryDown == null
+          ? null
+          : () => widget.onMoveCategoryDown!(row.category),
+    );
   }
 
   /// Brings `_live` in line with [newRows] when the row count changed,
@@ -142,10 +180,7 @@ class _ZainoAnimatedItemsSliverState extends State<ZainoAnimatedItemsSliver> {
       itemBuilder: (ctx, index, animation) {
         final row = _live[index];
         if (row is ZainoHeaderRow) {
-          return FadeTransition(
-            opacity: animation,
-            child: ZainoCategoryHeader(category: row.category),
-          );
+          return FadeTransition(opacity: animation, child: _buildHeader(row));
         }
         return FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn),

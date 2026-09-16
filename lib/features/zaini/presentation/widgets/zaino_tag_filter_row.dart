@@ -61,10 +61,11 @@ class ZainoTagFilterRow extends StatelessWidget {
               context.read<ZainoDetailCubit>().setTagFilter(current);
             },
           ),
-        ActionChip(
-          label: const Icon(Icons.add, size: 18),
-          onPressed: () => _addTag(context),
-        ),
+        if (state.tags.isNotEmpty)
+          ActionChip(
+            label: const Icon(Icons.add, size: 18),
+            onPressed: () => _addTag(context),
+          ),
       ],
     );
   }

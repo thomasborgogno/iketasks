@@ -23,22 +23,22 @@ class ZainoItemRow extends ZainoRow {
 
 /// Flattens items grouped by category into a single row list — a header
 /// followed by its items — ready for [ZainoAnimatedItemsSliver]/
-/// SliverAnimatedList to render.
+/// SliverAnimatedList to render. A category in [collapsedCategories] (keyed
+/// by its raw, possibly-empty name — see [ZainoHeaderRow.category]) still
+/// gets its header row, but its item rows are omitted.
 List<ZainoRow> buildZainoRowList(
   List<String> orderedKeys,
-  Map<String, List<ZainoItem>> byCategory,
-) {
+  Map<String, List<ZainoItem>> byCategory, {
+  Set<String> collapsedCategories = const {},
+}) {
   final hasNamedCategory = orderedKeys.any((k) => k.isNotEmpty);
   final rows = <ZainoRow>[];
   for (final cat in orderedKeys) {
     final items = byCategory[cat] ?? const [];
     if (items.isEmpty) continue;
     final showHeader = cat.isNotEmpty || hasNamedCategory;
-    if (cat.isNotEmpty) {
-      rows.add(ZainoHeaderRow(cat));
-    } else if (hasNamedCategory) {
-      rows.add(const ZainoHeaderRow('Altro'));
-    }
+    if (showHeader) rows.add(ZainoHeaderRow(cat));
+    if (collapsedCategories.contains(cat)) continue;
     for (var i = 0; i < items.length; i++) {
       rows.add(
         ZainoItemRow(

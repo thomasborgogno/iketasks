@@ -9,6 +9,7 @@ class Zaino extends Equatable {
     required this.updatedAt,
     this.emoji,
     this.googleTaskListId,
+    this.categoryOrder = const [],
   });
 
   final String id;
@@ -18,10 +19,16 @@ class Zaino extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  /// Display order of category names chosen by the user (via the up/down
+  /// carets). Categories not listed here are appended alphabetically after
+  /// the ones that are.
+  final List<String> categoryOrder;
+
   Zaino copyWith({
     String? name,
     String? emoji,
     String? googleTaskListId,
+    List<String>? categoryOrder,
     bool clearEmoji = false,
     bool clearGoogleTaskListId = false,
   }) {
@@ -32,6 +39,7 @@ class Zaino extends Equatable {
       googleTaskListId: clearGoogleTaskListId
           ? null
           : (googleTaskListId ?? this.googleTaskListId),
+      categoryOrder: categoryOrder ?? this.categoryOrder,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
     );
@@ -42,6 +50,7 @@ class Zaino extends Equatable {
       'name': name,
       'emoji': emoji,
       'googleTaskListId': googleTaskListId,
+      'categoryOrder': categoryOrder,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -54,6 +63,9 @@ class Zaino extends Equatable {
       name: (data['name'] as String?) ?? '',
       emoji: data['emoji'] as String?,
       googleTaskListId: data['googleTaskListId'] as String?,
+      categoryOrder: List<String>.from(
+        (data['categoryOrder'] as List<dynamic>?) ?? [],
+      ),
       createdAt: ((data['createdAt'] as Timestamp?) ?? Timestamp.now())
           .toDate(),
       updatedAt: ((data['updatedAt'] as Timestamp?) ?? Timestamp.now())
@@ -67,6 +79,7 @@ class Zaino extends Equatable {
     name,
     emoji,
     googleTaskListId,
+    categoryOrder,
     createdAt,
     updatedAt,
   ];
