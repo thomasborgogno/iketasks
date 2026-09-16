@@ -61,7 +61,18 @@ class ZainoDetailCubit extends Cubit<ZainoDetailState> {
   }
 
   void setTagFilter(List<String> tags) {
-    emit(state.copyWith(activeTagFilter: tags));
+    emit(state.copyWith(activeTagFilter: tags, excludedTagFilter: const []));
+  }
+
+  void toggleExcludedTag(String tagName) {
+    final excluded = Set<String>.from(state.excludedTagFilter);
+    if (!excluded.add(tagName)) excluded.remove(tagName);
+    emit(
+      state.copyWith(
+        activeTagFilter: const [],
+        excludedTagFilter: excluded.toList(),
+      ),
+    );
   }
 
   Future<void> toggleItem(ZainoItem item) async {

@@ -48,18 +48,33 @@ class ZainoTagFilterRow extends StatelessWidget {
       runSpacing: 4,
       children: [
         for (final tag in state.tags)
-          FilterChip(
-            label: Text(tag.name),
-            selected: state.activeTagFilter.contains(tag.name),
-            onSelected: (v) {
-              final current = List<String>.from(state.activeTagFilter);
-              if (v) {
-                current.add(tag.name);
-              } else {
-                current.remove(tag.name);
-              }
-              context.read<ZainoDetailCubit>().setTagFilter(current);
-            },
+          GestureDetector(
+            onLongPress: () =>
+                context.read<ZainoDetailCubit>().toggleExcludedTag(tag.name),
+            child: () {
+              final isExcluded = state.excludedTagFilter.contains(tag.name);
+              final errorColor = Theme.of(context).colorScheme.error;
+              return FilterChip(
+                label: Text(tag.name),
+                selected: state.activeTagFilter.contains(tag.name),
+                backgroundColor: isExcluded
+                    ? errorColor.withValues(alpha: 0.15)
+                    : null,
+                labelStyle: isExcluded ? TextStyle(color: errorColor) : null,
+                avatar: isExcluded
+                    ? Icon(Icons.close, size: 14, color: errorColor)
+                    : null,
+                onSelected: (v) {
+                  final current = List<String>.from(state.activeTagFilter);
+                  if (v) {
+                    current.add(tag.name);
+                  } else {
+                    current.remove(tag.name);
+                  }
+                  context.read<ZainoDetailCubit>().setTagFilter(current);
+                },
+              );
+            }(),
           ),
         if (state.tags.isNotEmpty)
           ActionChip(

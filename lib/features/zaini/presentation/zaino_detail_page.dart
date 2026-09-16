@@ -127,9 +127,7 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                         IconButton(
                           icon: const Icon(Icons.label_outline),
                           tooltip: 'Assegna tag',
-                          onPressed: state.tags.isEmpty
-                              ? null
-                              : () => _showBulkTagDialog(context, state),
+                          onPressed: () => _showBulkTagDialog(context, state),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
@@ -190,7 +188,12 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                 _buildItemsSliver(context, state, categories, byCategory),
                 if (completed.isNotEmpty)
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 96),
+                    padding: EdgeInsets.fromLTRB(
+                      12,
+                      4,
+                      12,
+                      96 + MediaQuery.of(context).padding.bottom,
+                    ),
                     sliver: SliverToBoxAdapter(
                       child: ZainoCompletedItemsCard(
                         items: completed,
@@ -205,6 +208,13 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
                         },
                       ),
                     ),
+                  )
+                else
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom: 96 + MediaQuery.of(context).padding.bottom,
+                    ),
+                    sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
                   ),
               ],
             ],
@@ -433,51 +443,97 @@ class _ZainoDetailPageState extends State<ZainoDetailPage> {
     ZainoDetailState state,
   ) async {
     final selectedTags = <String>{};
+    final extraTags = <String>{};
+    final cubit = context.read<ZainoDetailCubit>();
     final apply = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Assegna tag'),
-          content: SingleChildScrollView(
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: state.tags.map((tag) {
-                final selected = selectedTags.contains(tag.name);
-                return FilterChip(
-                  label: Text(tag.name),
-                  selected: selected,
-                  onSelected: (v) => setDialogState(() {
-                    if (v) {
-                      selectedTags.add(tag.name);
-                    } else {
-                      selectedTags.remove(tag.name);
-                    }
-                  }),
-                );
-              }).toList(),
+        builder: (ctx, setDialogState) {
+          final allTagNames = [
+            ...state.tags.map((t) => t.name),
+            ...extraTags,
+          ];
+          return AlertDialog(
+            title: const Text('Assegna tag'),
+            content: SingleChildScrollView(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  for (final name in allTagNames)
+                    FilterChip(
+                      label: Text(name),
+                      selected: selectedTags.contains(name),
+                      onSelected: (v) => setDialogState(() {
+                        if (v) {
+                          selectedTags.add(name);
+                        } else {
+                          selectedTags.remove(name);
+                        }
+                      }),
+                    ),
+                  ActionChip(
+                    label: const Icon(Icons.add, size: 18),
+                    onPressed: () async {
+                      final name = await _promptForTagName(ctx);
+                      if (name == null || name.isEmpty) return;
+                      if (!allTagNames.contains(name)) {
+                        await cubit.createTag(name);
+                      }
+                      setDialogState(() {
+                        extraTags.add(name);
+                        selectedTags.add(name);
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Annulla'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Applica'),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Annulla'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Applica'),
+              ),
+            ],
+          );
+        },
       ),
     );
     if (apply == true && selectedTags.isNotEmpty && context.mounted) {
-      await context.read<ZainoDetailCubit>().bulkAddTags(
-        _selectedIds.toList(),
-        selectedTags.toList(),
-      );
+      await cubit.bulkAddTags(_selectedIds.toList(), selectedTags.toList());
     }
     if (mounted) _clearSelection();
+  }
+
+  Future<String?> _promptForTagName(BuildContext context) {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nuovo tag'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(labelText: 'Nome tag'),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text('Crea'),
+          ),
+        ],
+      ),
+    );
   }
 
   List<String> _orderedCategoryKeys(

@@ -56,6 +56,7 @@ class ZainoDetailState extends Equatable {
     this.tags = const [],
     this.errorMessage,
     this.activeTagFilter = const [],
+    this.excludedTagFilter = const [],
     this.categoryOrder = const [],
   });
 
@@ -64,6 +65,7 @@ class ZainoDetailState extends Equatable {
   final List<ZainoTag> tags;
   final String? errorMessage;
   final List<String> activeTagFilter;
+  final List<String> excludedTagFilter;
 
   /// User-chosen display order of category names (via the up/down carets).
   /// Categories not listed here are appended alphabetically after the ones
@@ -76,6 +78,7 @@ class ZainoDetailState extends Equatable {
     List<ZainoTag>? tags,
     String? errorMessage,
     List<String>? activeTagFilter,
+    List<String>? excludedTagFilter,
     List<String>? categoryOrder,
   }) {
     return ZainoDetailState(
@@ -84,6 +87,7 @@ class ZainoDetailState extends Equatable {
       tags: tags ?? this.tags,
       errorMessage: errorMessage,
       activeTagFilter: activeTagFilter ?? this.activeTagFilter,
+      excludedTagFilter: excludedTagFilter ?? this.excludedTagFilter,
       categoryOrder: categoryOrder ?? this.categoryOrder,
     );
   }
@@ -97,10 +101,17 @@ class ZainoDetailState extends Equatable {
   }
 
   List<ZainoItem> get filteredItems {
-    if (_isFilterEffectivelyOff) return items;
-    return items
-        .where((item) => item.tags.any((t) => activeTagFilter.contains(t)))
-        .toList();
+    var result = _isFilterEffectivelyOff
+        ? items
+        : items
+              .where((item) => item.tags.any((t) => activeTagFilter.contains(t)))
+              .toList();
+    if (excludedTagFilter.isNotEmpty) {
+      result = result
+          .where((item) => !item.tags.any((t) => excludedTagFilter.contains(t)))
+          .toList();
+    }
+    return result;
   }
 
   /// Incomplete items grouped by category name. Items without a category are
@@ -131,6 +142,7 @@ class ZainoDetailState extends Equatable {
     tags,
     errorMessage,
     activeTagFilter,
+    excludedTagFilter,
     categoryOrder,
   ];
 }
